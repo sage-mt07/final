@@ -133,6 +133,51 @@ internal class KafkaAdminService : IDisposable
     }
 
     /// <summary>
+    /// DBトピック作成。存在する場合はNo-Op
+    /// </summary>
+    public async Task CreateDbTopicAsync(string topicName, int partitions, short replicationFactor)
+    {
+        if (string.IsNullOrWhiteSpace(topicName))
+            throw new ArgumentException("Topic name is required", nameof(topicName));
+        if (partitions <= 0)
+            throw new ArgumentException("partitions must be > 0", nameof(partitions));
+        if (replicationFactor <= 0)
+            throw new ArgumentException("replicationFactor must be > 0", nameof(replicationFactor));
+
+        var topics = await _adminClient.DescribeTopicsAsync(new[] { topicName });
+        var desc = topics.FirstOrDefault();
+        if (desc != null)
+        {
+            _logger?.LogDebug("DB topic already exists: {Topic}", topicName);
+            return;
+        }
+
+        var spec = new TopicSpecification
+        {
+            Name = topicName,
+            NumPartitions = partitions,
+            ReplicationFactor = replicationFactor
+        };
+
+        try
+        {
+            await _adminClient.CreateTopicsAsync(new[] { spec }, new CreateTopicsOptions { RequestTimeout = TimeSpan.FromSeconds(30) });
+            _logger?.LogInformation("DB topic created: {Topic}", topicName);
+        }
+        catch (CreateTopicsException ex)
+        {
+            var result = ex.Results.FirstOrDefault(r => r.Topic == topicName);
+            if (result?.Error.Code == ErrorCode.TopicAlreadyExists)
+            {
+                _logger?.LogDebug("DB topic already exists (race): {Topic}", topicName);
+                return;
+            }
+
+            throw;
+        }
+    }
+
+    /// <summary>
     /// DLQトピック作成
     /// 設定: DlqTopicConfigurationに基づく動的設定
     /// </summary>
