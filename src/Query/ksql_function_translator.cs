@@ -222,6 +222,14 @@ internal static class KsqlFunctionTranslator
             args.Add(TranslateExpression(arg));
         }
 
+        // 拡張メソッドは最初の引数がレシーバなので除外
+        if (methodCall.Method.IsStatic &&
+            methodCall.Method.IsDefined(typeof(System.Runtime.CompilerServices.ExtensionAttribute), false) &&
+            args.Count > 0)
+        {
+            args.RemoveAt(0);
+        }
+
         return args;
     }
 

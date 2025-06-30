@@ -220,7 +220,7 @@ internal abstract class GeneratorBase
     {
         return structure.QueryType switch
         {
-            "SELECT" => QueryPart.Required($"SELECT * FROM {structure.TargetObject}", 0),
+            "SELECT" => QueryPart.Required("SELECT", 0),
             "CREATE_STREAM_AS" => QueryPart.Required($"CREATE STREAM {structure.TargetObject} AS SELECT", 0),
             "CREATE_TABLE_AS" => QueryPart.Required($"CREATE TABLE {structure.TargetObject} AS SELECT", 0),
             _ => throw new NotSupportedException($"Query type {structure.QueryType} is not supported")
