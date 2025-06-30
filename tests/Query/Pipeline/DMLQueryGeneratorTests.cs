@@ -78,7 +78,8 @@ public class DMLQueryGeneratorTests
         var generator = new DMLQueryGenerator();
         var query = generator.GenerateLinqQuery("s1", expr.Expression, false);
 
-        Assert.Contains("SELECT g.Key", query) || Assert.Contains("SELECT Key", query);
+        Assert.True(
+            query.Contains("SELECT g.Key") || query.Contains("SELECT Key"));
         Assert.Contains("COUNT(*) AS Count", query);
         Assert.Contains("FROM s1", query);
         Assert.Contains("WHERE (IsActive = true)", query);
