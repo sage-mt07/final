@@ -46,6 +46,25 @@ public class KafkaAdminServiceTests
         }
     }
 
+    private static void SetMember(object obj, string name, object? value)
+    {
+        var type = obj.GetType();
+        var prop = type.GetProperty(name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+        if (prop != null && prop.SetMethod != null)
+        {
+            prop.SetValue(obj, value);
+            return;
+        }
+        var field = type.GetField($"<{name}>k__BackingField", BindingFlags.Instance | BindingFlags.NonPublic)
+                    ?? type.GetField(name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+        if (field != null)
+        {
+            field.SetValue(obj, value);
+            return;
+        }
+        throw new ArgumentException($"Property set method not found for {name}");
+    }
+
     private static Metadata CreateMetadata(IEnumerable<TopicMetadata> topics)
     {
         var metadata = (Metadata)RuntimeHelpers.GetUninitializedObject(typeof(Metadata));
@@ -146,8 +165,8 @@ public class KafkaAdminServiceTests
         var proxy = DispatchProxy.Create<IAdminClient, FakeAdminClient>();
         var fake = (FakeAdminClient)proxy!;
         var meta = (TopicMetadata)RuntimeHelpers.GetUninitializedObject(typeof(TopicMetadata));
-        typeof(TopicMetadata).GetProperty("Topic")?.SetValue(meta, "t");
-        typeof(TopicMetadata).GetProperty("Error")?.SetValue(meta, new Error(ErrorCode.NoError));
+        SetMember(meta, "Topic", "t");
+        SetMember(meta, "Error", new Error(ErrorCode.NoError));
         fake.MetadataHandler = _ => CreateMetadata(new[] { meta });
         var created = false;
         fake.CreateHandler = (_, __) => { created = true; return Task.CompletedTask; };
