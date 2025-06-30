@@ -14,8 +14,7 @@ public class KsqlFunctionRegistryTests
     [InlineData("TopK", "ARRAY")]
     [InlineData("Histogram", "MAP")]
     [InlineData("FooBar", "UNKNOWN")]
-    [InlineData("sum", "DOUBLE")]
-    [InlineData("SuM", "DOUBLE")]
+    [InlineData("sUm", "DOUBLE")]
     public void InferTypeFromMethodName_ReturnsExpected(string methodName, string expected)
     {
         var result = KsqlFunctionRegistry.InferTypeFromMethodName(methodName);
