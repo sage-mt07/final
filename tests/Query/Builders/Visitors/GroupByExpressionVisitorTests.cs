@@ -21,6 +21,16 @@ public class GroupByExpressionVisitorTests
         Assert.Equal("Id, Type", result);
     }
 
+    [Fact]
+    public void SimpleMember_ReturnsMemberName()
+    {
+        Expression<Func<Customer, object>> expr = e => e.Id;
+        var visitor = new GroupByExpressionVisitor();
+        visitor.Visit(expr.Body);
+        var result = visitor.GetResult();
+        Assert.Equal("Id", result);
+    }
+
     private class Parent
     {
         public Child Child { get; set; } = new();
@@ -46,6 +56,7 @@ public class GroupByExpressionVisitorTests
         public int Id { get; set; }
         public string Category { get; set; } = string.Empty;
         public string Type { get; set; } = string.Empty;
+        public string Region { get; set; } = string.Empty;
         public int? NullableValue { get; set; }
         public List<int> List { get; set; } = new();
     }
@@ -71,6 +82,16 @@ public class GroupByExpressionVisitorTests
     }
 
     [Fact]
+    public void AnonymousType_ReturnsCommaSeparated()
+    {
+        Expression<Func<Customer, object>> expr = e => new { e.Id, e.Region };
+        var visitor = new GroupByExpressionVisitor();
+        visitor.Visit(expr.Body);
+        var result = visitor.GetResult();
+        Assert.Equal("Id, Region", result);
+    }
+
+    [Fact]
     public void Visit_CompositeKeyWithCategory_ReturnsGroupByClause()
     {
         Expression<Func<CategoryEntity, object>> expr = e => new { e.Id, e.Category };
@@ -91,21 +112,23 @@ public class GroupByExpressionVisitorTests
     }
 
     [Fact]
-    public void Visit_NestedAnonymousType_Throws()
+    public void NestedAnonymousType_FlattensProperties()
     {
-        Expression<Func<CategoryEntity, object>> expr = e => new { e.Type, Sub = new { e.Id } };
+        Expression<Func<CategoryEntity, object>> expr = e => new { e.Id, Sub = new { e.Region } };
         var visitor = new GroupByExpressionVisitor();
-        Assert.Throws<InvalidOperationException>(() => visitor.Visit(expr.Body));
+        visitor.Visit(expr.Body);
+        var result = visitor.GetResult();
+        Assert.Equal("Id, Region", result);
     }
 
     [Fact]
-    public void Visit_CoalesceExpression_ReturnsMemberName()
+    public void NullCoalesce_ReturnsCoalesceFunction()
     {
         Expression<Func<CategoryEntity, object>> expr = e => e.NullableValue ?? 0;
         var visitor = new GroupByExpressionVisitor();
         visitor.Visit(expr.Body);
         var result = visitor.GetResult();
-        Assert.Equal("NullableValue", result);
+        Assert.Equal("COALESCE(NullableValue, 0)", result);
     }
 
     [Fact]
@@ -192,5 +215,15 @@ public class GroupByExpressionVisitorTests
         var visitor = new GroupByExpressionVisitor();
         var result = InvokePrivate<string>(visitor, "ProcessGroupByFunction", new[] { typeof(MethodCallExpression) }, args: new object[] { call });
         Assert.Equal("FLOOR(Value)", result);
+    }
+
+    [Fact]
+    public void BinaryExpression_ReturnsExpression()
+    {
+        Expression<Func<NumericEntity, object>> expr = e => e.Value + 1;
+        var visitor = new GroupByExpressionVisitor();
+        visitor.Visit(expr.Body);
+        var result = visitor.GetResult();
+        Assert.Equal("Value + 1", result);
     }
 }

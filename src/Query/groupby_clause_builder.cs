@@ -90,28 +90,26 @@ internal class GroupByExpressionVisitor : ExpressionVisitor
 
     protected override Expression VisitNew(NewExpression node)
     {
-        // 複合キーの処理（匿名型）
         foreach (var arg in node.Arguments)
         {
-            var key = ExtractGroupByKey(arg);
-            if (!string.IsNullOrEmpty(key))
+            if (arg is NewExpression nested)
             {
+                Visit(nested);
+            }
+            else
+            {
+                var key = ProcessKeyExpression(arg);
                 _keys.Add(key);
             }
         }
-        
+
         return node;
     }
 
     protected override Expression VisitMember(MemberExpression node)
     {
-        // 単一キーの処理
-        var key = ExtractGroupByKey(node);
-        if (!string.IsNullOrEmpty(key))
-        {
-            _keys.Add(key);
-        }
-        
+        var key = ProcessKeyExpression(node);
+        _keys.Add(key);
         return node;
     }
 
@@ -128,9 +126,8 @@ internal class GroupByExpressionVisitor : ExpressionVisitor
 
     protected override Expression VisitMethodCall(MethodCallExpression node)
     {
-        // GROUP BYで使用可能な関数（日付部分抽出等）
         var methodName = node.Method.Name;
-        
+
         if (IsAllowedGroupByFunction(methodName))
         {
             var functionCall = ProcessGroupByFunction(node);
@@ -138,22 +135,72 @@ internal class GroupByExpressionVisitor : ExpressionVisitor
             return node;
         }
 
-        // 許可されていない関数
         throw new InvalidOperationException(
             $"Function '{methodName}' is not allowed in GROUP BY clause");
     }
 
-    /// <summary>
-    /// GROUP BYキー抽出
-    /// </summary>
-    private string ExtractGroupByKey(Expression expr)
+    protected override Expression VisitBinary(BinaryExpression node)
+    {
+        var expression = ProcessBinaryExpression(node);
+        _keys.Add(expression);
+        return node;
+    }
+
+    private string ProcessKeyExpression(Expression expr)
+    {
+        if (expr is ConstantExpression)
+        {
+            throw new InvalidOperationException("Constant expression is not supported in GROUP BY");
+        }
+
+        return ProcessExpression(expr);
+    }
+
+    private string ProcessExpression(Expression expr)
     {
         return expr switch
         {
             MemberExpression member => GetMemberName(member),
-            UnaryExpression unary when unary.NodeType == ExpressionType.Convert => ExtractGroupByKey(unary.Operand),
+            ConstantExpression constant => constant.Value?.ToString() ?? "NULL",
+            UnaryExpression unary when unary.NodeType == ExpressionType.Convert || unary.NodeType == ExpressionType.ConvertChecked => ProcessExpression(unary.Operand),
             MethodCallExpression method when IsAllowedGroupByFunction(method.Method.Name) => ProcessGroupByFunction(method),
+            BinaryExpression binary => ProcessBinaryExpression(binary),
             _ => throw new InvalidOperationException($"Expression type '{expr.GetType().Name}' is not supported in GROUP BY")
+        };
+    }
+
+    private string ProcessBinaryExpression(BinaryExpression binary)
+    {
+        var left = ProcessExpression(binary.Left);
+        var right = ProcessExpression(binary.Right);
+
+        if (binary.NodeType == ExpressionType.Coalesce)
+        {
+            return $"COALESCE({left}, {right})";
+        }
+
+        var op = GetOperator(binary.NodeType);
+        return $"{left} {op} {right}";
+    }
+
+    private static string GetOperator(ExpressionType nodeType)
+    {
+        return nodeType switch
+        {
+            ExpressionType.Add => "+",
+            ExpressionType.Subtract => "-",
+            ExpressionType.Multiply => "*",
+            ExpressionType.Divide => "/",
+            ExpressionType.Modulo => "%",
+            ExpressionType.Equal => "=",
+            ExpressionType.NotEqual => "<>",
+            ExpressionType.GreaterThan => ">",
+            ExpressionType.GreaterThanOrEqual => ">=",
+            ExpressionType.LessThan => "<",
+            ExpressionType.LessThanOrEqual => "<=",
+            ExpressionType.AndAlso => "AND",
+            ExpressionType.OrElse => "OR",
+            _ => throw new NotSupportedException($"Operator {nodeType} is not supported in GROUP BY")
         };
     }
 
