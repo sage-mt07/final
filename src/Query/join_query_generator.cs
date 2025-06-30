@@ -190,27 +190,39 @@ internal class JoinQueryGenerator : GeneratorBase
     /// JOIN式構築
     /// </summary>
     private Expression BuildJoinExpression(
-        string outerTable, 
-        string innerTable, 
-        Expression outerKeySelector, 
-        Expression innerKeySelector, 
+        string outerTable,
+        string innerTable,
+        Expression outerKeySelector,
+        Expression innerKeySelector,
         Expression? resultSelector)
     {
-        // 疑似的なJOIN式を構築（実際のLINQ Join呼び出しを模倣）
-        var outerParam = Expression.Parameter(typeof(object), outerTable.ToLower());
-        var innerParam = Expression.Parameter(typeof(object), innerTable.ToLower());
-        
-        // 簡略化されたJOIN式（JoinBuilderが実際の処理を行う）
+        // キーセレクタのラムダを抽出し、型情報を取得
+        var outerLambda = (LambdaExpression)BuilderValidation.ExtractLambdaBody(outerKeySelector)!;
+        var innerLambda = (LambdaExpression)BuilderValidation.ExtractLambdaBody(innerKeySelector)!;
+
+        var outerType = outerLambda.Parameters[0].Type;
+        var innerType = innerLambda.Parameters[0].Type;
+        var keyType = outerLambda.Body.Type;
+
+        // IQueryable<> パラメータは型情報のみ利用
+        var outerQueryable = Expression.Parameter(typeof(IQueryable<>).MakeGenericType(outerType), "outer");
+        var innerQueryable = Expression.Parameter(typeof(IQueryable<>).MakeGenericType(innerType), "inner");
+
+        var joinMethod = typeof(Queryable).GetMethods()
+            .First(m => m.Name == nameof(Queryable.Join) && m.GetParameters().Length == 5)
+            .MakeGenericMethod(outerType, innerType, keyType, typeof(object));
+
+        var defaultSelector = resultSelector ??
+            CreateDefaultResultSelector(Expression.Parameter(outerType, outerLambda.Parameters[0].Name!),
+                Expression.Parameter(innerType, innerLambda.Parameters[0].Name!));
+
         return Expression.Call(
-            typeof(Queryable),
-            "Join",
-            new[] { typeof(object), typeof(object), typeof(object), typeof(object) },
-            Expression.Constant(outerTable),
-            Expression.Constant(innerTable),
-            outerKeySelector,
-            innerKeySelector,
-            resultSelector ?? CreateDefaultResultSelector(outerParam, innerParam)
-        );
+            joinMethod,
+            outerQueryable,
+            innerQueryable,
+            outerLambda,
+            innerLambda,
+            defaultSelector);
     }
 
     /// <summary>

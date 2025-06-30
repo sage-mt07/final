@@ -8,12 +8,8 @@ namespace Kafka.Ksql.Linq.Tests.Query.Pipeline;
 internal static class TestQueryableExtensions
 {
     private static readonly MethodInfo HavingMethodInfo = typeof(TestQueryableExtensions)
-        .GetMethod(nameof(HavingInternal), BindingFlags.Static | BindingFlags.NonPublic)!
+        .GetMethod(nameof(Having), BindingFlags.Static | BindingFlags.Public)!
         .GetGenericMethodDefinition();
-
-    private static IQueryable<IGrouping<TKey, TSource>> HavingInternal<TKey, TSource>(
-        IQueryable<IGrouping<TKey, TSource>> source,
-        Expression<Func<IGrouping<TKey, TSource>, bool>> predicate) => throw new NotImplementedException();
 
     public static IQueryable<IGrouping<TKey, TSource>> Having<TKey, TSource>(
         this IQueryable<IGrouping<TKey, TSource>> source,

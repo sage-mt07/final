@@ -207,6 +207,7 @@ internal class DMLQueryGenerator : GeneratorBase, IDMLQueryGenerator
             "Where" => ProcessWhereMethod(structure, methodCall),
             "GroupBy" => ProcessGroupByMethod(structure, methodCall),
             "Having" => ProcessHavingMethod(structure, methodCall),
+            "Window" => ProcessWindowMethod(structure, methodCall),
             "OrderBy" or "OrderByDescending" or "ThenBy" or "ThenByDescending" => ProcessOrderByMethod(structure, methodCall),
             "Take" => ProcessTakeMethod(structure, methodCall),
             "Skip" => ProcessSkipMethod(structure, methodCall),
@@ -301,6 +302,22 @@ internal class DMLQueryGenerator : GeneratorBase, IDMLQueryGenerator
                 var clause = QueryClause.Required(QueryClauseType.Having, $"HAVING {havingContent}", lambdaBody);
                 structure = structure.AddClause(clause);
             }
+        }
+
+        return structure;
+    }
+
+    /// <summary>
+    /// WINDOW メソッド処理
+    /// </summary>
+    private QueryStructure ProcessWindowMethod(QueryStructure structure, MethodCallExpression methodCall)
+    {
+        if (HasBuilder(KsqlBuilderType.Window) && methodCall.Arguments.Count >= 2)
+        {
+            var windowExpr = methodCall.Arguments[1];
+            var windowContent = SafeCallBuilder(KsqlBuilderType.Window, windowExpr, "WINDOW processing");
+            var clause = QueryClause.Required(QueryClauseType.Window, $"WINDOW {windowContent}", windowExpr);
+            structure = structure.AddClause(clause);
         }
 
         return structure;
