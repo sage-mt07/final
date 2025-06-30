@@ -22,7 +22,7 @@ public class KafkaAdminServiceTests
         public Func<TimeSpan, Metadata> MetadataHandler { get; set; } = _ =>
         {
             var metadata = (Metadata)RuntimeHelpers.GetUninitializedObject(typeof(Metadata));
-            typeof(Metadata).GetProperty("Topics")?.SetValue(metadata, new List<TopicMetadata>());
+            SetMember(metadata, "Topics", new List<TopicMetadata>());
             return metadata;
         };
         public Func<IEnumerable<TopicSpecification>, CreateTopicsOptions?, Task> CreateHandler { get; set; } = (_, __) => Task.CompletedTask;
@@ -68,7 +68,7 @@ public class KafkaAdminServiceTests
     private static Metadata CreateMetadata(IEnumerable<TopicMetadata> topics)
     {
         var metadata = (Metadata)RuntimeHelpers.GetUninitializedObject(typeof(Metadata));
-        typeof(Metadata).GetProperty("Topics")?.SetValue(metadata, topics.ToList());
+        SetMember(metadata, "Topics", topics.ToList());
         return metadata;
     }
 
