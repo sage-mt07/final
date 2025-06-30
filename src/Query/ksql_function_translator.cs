@@ -24,7 +24,7 @@ internal static class KsqlFunctionTranslator
 
         if (mapping == null)
         {
-            throw new NotSupportedException($"Function '{methodName}' is not supported.");
+            return HandleUnknownMethod(methodCall);
         }
 
         // 引数数検証
@@ -198,9 +198,7 @@ internal static class KsqlFunctionTranslator
             return $"CAST({sourceArg} AS {targetType})";
         }
 
-        // 単純な関数呼び出しとして処理
-        var argsStr = string.Join(", ", args);
-        return $"{methodName.ToUpper()}({argsStr})";
+        throw new NotSupportedException($"Function '{methodName}' is not supported.");
     }
 
     /// <summary>
