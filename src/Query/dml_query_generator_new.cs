@@ -207,6 +207,7 @@ internal class DMLQueryGenerator : GeneratorBase, IDMLQueryGenerator
             "Where" => ProcessWhereMethod(structure, methodCall),
             "GroupBy" => ProcessGroupByMethod(structure, methodCall),
             "Having" => ProcessHavingMethod(structure, methodCall),
+            "Join" => ProcessJoinMethod(structure, methodCall),
             "Window" => ProcessWindowMethod(structure, methodCall),
             "OrderBy" or "OrderByDescending" or "ThenBy" or "ThenByDescending" => ProcessOrderByMethod(structure, methodCall),
             "Take" => ProcessTakeMethod(structure, methodCall),
@@ -359,6 +360,27 @@ internal class DMLQueryGenerator : GeneratorBase, IDMLQueryGenerator
     private QueryStructure ProcessSkipMethod(QueryStructure structure, MethodCallExpression methodCall)
     {
         Console.WriteLine("[KSQL-LINQ WARNING] SKIP/OFFSET is not supported in KSQL. Use WHERE conditions for filtering instead.");
+        return structure;
+    }
+
+    /// <summary>
+    /// JOIN メソッド処理 (単純内部JOINのみ対応)
+    /// </summary>
+    private QueryStructure ProcessJoinMethod(QueryStructure structure, MethodCallExpression methodCall)
+    {
+        if (HasBuilder(KsqlBuilderType.Join))
+        {
+            var joinContent = SafeCallBuilder(KsqlBuilderType.Join, methodCall, "JOIN processing");
+            var fromIndex = joinContent.IndexOf("FROM", StringComparison.OrdinalIgnoreCase);
+            if (fromIndex >= 0)
+            {
+                var fromPart = joinContent.Substring(fromIndex); // FROM table JOIN ...
+                var clause = QueryClause.Required(QueryClauseType.From, fromPart, methodCall);
+                structure = structure.RemoveClause(QueryClauseType.From);
+                structure = structure.AddClause(clause);
+            }
+        }
+
         return structure;
     }
 
