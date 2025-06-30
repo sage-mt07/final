@@ -54,7 +54,7 @@ public class JoinableEntitySetTests
         var third = new DummySet<GrandChildEntity>();
 
         var result = outer.Join<ChildEntity, object>(inner, o => (object)o.Id, i => (object)i.ParentId)
-                          .Join<GrandChildEntity, object>(third, o => (object)o.Id, g => (object)g.ChildId)
+                          .Join<GrandChildEntity, object>(third, (Expression<Func<TestEntity, object>>)(o => (object)o.Id), g => (object)g.ChildId)
                           .Select((o, i, g) => new { o.Id, g.Description });
 
         var list = await result.ToListAsync();
