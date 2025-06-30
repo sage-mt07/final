@@ -333,6 +333,9 @@ internal class DMLQueryGenerator : GeneratorBase, IDMLQueryGenerator
         {
             var orderByContent = SafeCallBuilder(KsqlBuilderType.OrderBy, methodCall, "ORDER BY processing");
             var clause = QueryClause.Optional(QueryClauseType.OrderBy, $"ORDER BY {orderByContent}", methodCall);
+
+            // ORDER BY は1つの句に統合するため既存句を置き換え
+            structure = structure.RemoveClause(QueryClauseType.OrderBy);
             structure = structure.AddClause(clause);
         }
 
