@@ -90,4 +90,96 @@ public class KsqlFunctionRegistryTests
             Assert.True(kvp.Value.Count > 0);
         }
     }
+
+    private static System.Collections.Generic.Dictionary<string, KsqlFunctionMapping> GetRegistryDictionary()
+    {
+        var field = typeof(KsqlFunctionRegistry).GetField("_functionMappings", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)!;
+        return (System.Collections.Generic.Dictionary<string, KsqlFunctionMapping>)field.GetValue(null)!;
+    }
+
+    [Fact]
+    public void GetDebugInfo_IncludesKnownFunctionNames()
+    {
+        var info = KsqlFunctionRegistry.GetDebugInfo();
+
+        Assert.Contains("[String]", info);
+        Assert.Contains("\u2022 ToUpper \u2192 UPPER", info); // bullet "•" and arrow "→"
+    }
+
+    [Fact]
+    public void GetDebugInfo_AllCategoriesPresent()
+    {
+        var info = KsqlFunctionRegistry.GetDebugInfo();
+        var categories = new[] { "String", "Math", "Date", "Aggregate", "Array", "JSON", "Cast", "Conditional", "URL", "GEO", "Crypto", "Window" };
+
+        foreach (var cat in categories)
+        {
+            Assert.Contains($"[{cat}]", info);
+        }
+    }
+
+    [Fact]
+    public void RegisterCustomMapping_AddsAndRetrievable()
+    {
+        var dict = GetRegistryDictionary();
+        dict.TryGetValue("MyFunc", out var original);
+        try
+        {
+            var mapping = new KsqlFunctionMapping("MY_FUNC", 1);
+            KsqlFunctionRegistry.RegisterCustomMapping("MyFunc", mapping);
+
+            var result = KsqlFunctionRegistry.GetMapping("MyFunc");
+            Assert.Same(mapping, result);
+        }
+        finally
+        {
+            if (original is not null)
+                dict["MyFunc"] = original;
+            else
+                dict.Remove("MyFunc");
+        }
+    }
+
+    [Fact]
+    public void RegisterCustomMapping_OverridesExisting()
+    {
+        var dict = GetRegistryDictionary();
+        var original = dict["ToUpper"];
+        try
+        {
+            var mapping = new KsqlFunctionMapping("UP", 1);
+            KsqlFunctionRegistry.RegisterCustomMapping("ToUpper", mapping);
+
+            var result = KsqlFunctionRegistry.GetMapping("ToUpper");
+            Assert.Same(mapping, result);
+            Assert.Equal("UP", result?.KsqlFunction);
+        }
+        finally
+        {
+            dict["ToUpper"] = original;
+        }
+    }
+
+    [Fact]
+    public void GetDebugInfo_ReflectsCustomMapping()
+    {
+        var dict = GetRegistryDictionary();
+        dict.TryGetValue("MyFunc", out var original);
+        try
+        {
+            var mapping = new KsqlFunctionMapping("MY_FUNC", 1);
+            KsqlFunctionRegistry.RegisterCustomMapping("MyFunc", mapping);
+
+            var info = KsqlFunctionRegistry.GetDebugInfo();
+            Assert.Contains("MyFunc", info);
+            Assert.Contains("MY_FUNC", info);
+        }
+        finally
+        {
+            if (original is not null)
+                dict["MyFunc"] = original;
+            else
+                dict.Remove("MyFunc");
+        }
+    }
 }
