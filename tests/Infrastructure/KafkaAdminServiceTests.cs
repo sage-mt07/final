@@ -30,9 +30,9 @@ public class KafkaAdminServiceTests
         {
             switch (targetMethod?.Name)
             {
-                case nameof(IAdminClient.CreateTopicsAsync):
+                case "CreateTopicsAsync":
                     return CreateHandler((IEnumerable<TopicSpecification>)args![0]!, (CreateTopicsOptions?)args[1]);
-                case nameof(IAdminClient.DescribeTopicsAsync):
+                case "DescribeTopicsAsync":
                     return DescribeHandler(
                         (TopicCollection)args![0]!,
                         (DescribeTopicsOptions?)args[1]!);
