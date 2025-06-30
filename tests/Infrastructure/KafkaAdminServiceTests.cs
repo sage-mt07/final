@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Threading;
 using Confluent.Kafka;
 using Confluent.Kafka.Admin;
 using Kafka.Ksql.Linq.Configuration;
@@ -17,7 +16,7 @@ public class KafkaAdminServiceTests
 {
     private class FakeAdminClient : DispatchProxy
     {
-        public Func<TopicCollection, DescribeTopicsOptions?, Task<List<TopicMetadata>>> DescribeHandler { get; set; } = (_, __) => Task.FromResult(new List<TopicMetadata>());
+        public Func<IEnumerable<string>, Task<List<TopicMetadata>>> DescribeHandler { get; set; } = _ => Task.FromResult(new List<TopicMetadata>());
         public Func<IEnumerable<TopicSpecification>, CreateTopicsOptions?, Task> CreateHandler { get; set; } = (_, __) => Task.CompletedTask;
 
         protected override object? Invoke(MethodInfo? targetMethod, object?[]? args)
@@ -27,7 +26,7 @@ public class KafkaAdminServiceTests
                 case nameof(IAdminClient.CreateTopicsAsync):
                     return CreateHandler((IEnumerable<TopicSpecification>)args![0]!, (CreateTopicsOptions?)args[1]);
                 case nameof(IAdminClient.DescribeTopicsAsync):
-                    return DescribeHandler((TopicCollection)args![0]!, (DescribeTopicsOptions?)args[1]!);
+                    return DescribeHandler((IEnumerable<string>)args![0]!);
                 case "Dispose":
                     return null;
                 case "get_Name":
@@ -115,7 +114,7 @@ public class KafkaAdminServiceTests
         var proxy = DispatchProxy.Create<IAdminClient, FakeAdminClient>();
         var fake = (FakeAdminClient)proxy!;
         var created = false;
-        fake.DescribeHandler = (_, __) => Task.FromResult(new List<TopicMetadata>());
+        fake.DescribeHandler = _ => Task.FromResult(new List<TopicMetadata>());
         fake.CreateHandler = (_, __) => { created = true; return Task.CompletedTask; };
 
         var svc = CreateUninitialized(options, proxy);
@@ -131,7 +130,7 @@ public class KafkaAdminServiceTests
         var proxy = DispatchProxy.Create<IAdminClient, FakeAdminClient>();
         var fake = (FakeAdminClient)proxy!;
         var meta = (TopicMetadata)RuntimeHelpers.GetUninitializedObject(typeof(TopicMetadata));
-        fake.DescribeHandler = (_, __) => Task.FromResult(new List<TopicMetadata> { meta });
+        fake.DescribeHandler = _ => Task.FromResult(new List<TopicMetadata> { meta });
         var created = false;
         fake.CreateHandler = (_, __) => { created = true; return Task.CompletedTask; };
 
@@ -147,7 +146,7 @@ public class KafkaAdminServiceTests
         var options = new KsqlDslOptions();
         var proxy = DispatchProxy.Create<IAdminClient, FakeAdminClient>();
         var fake = (FakeAdminClient)proxy!;
-        fake.DescribeHandler = (_, __) => Task.FromResult(new List<TopicMetadata>());
+        fake.DescribeHandler = _ => Task.FromResult(new List<TopicMetadata>());
         fake.CreateHandler = (_, __) => throw new KafkaException(new Error(ErrorCode.Local_Transport));
 
         var svc = CreateUninitialized(options, proxy);
