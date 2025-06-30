@@ -266,6 +266,7 @@ internal static class KsqlFunctionTranslator
             MemberExpression member => member.Member.Name,
             ConstantExpression constant => BuilderValidation.SafeToString(constant.Value),
             ParameterExpression parameter => parameter.Name ?? "param",
+            LambdaExpression lambda => TranslateExpression(lambda.Body),
             UnaryExpression unary => TranslateExpression(unary.Operand),
             BinaryExpression binary => $"({TranslateExpression(binary.Left)} {GetOperator(binary.NodeType)} {TranslateExpression(binary.Right)})",
             _ => expression.ToString()
