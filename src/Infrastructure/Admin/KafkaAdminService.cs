@@ -146,8 +146,7 @@ internal class KafkaAdminService : IDisposable
 
         var topics = await _adminClient.DescribeTopicsAsync(
             TopicCollection.OfTopicNames(new[] { topicName }),
-            null,
-            CancellationToken.None);
+            null);
         var desc = topics.FirstOrDefault();
         if (desc != null)
         {
