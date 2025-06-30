@@ -146,7 +146,8 @@ internal class KafkaAdminService : IDisposable
 
         var topicsResult = await _adminClient.DescribeTopicsAsync(
             TopicCollection.OfTopicNames(new[] { topicName }),
-            null);
+            null,
+            CancellationToken.None);
         IEnumerable<TopicMetadata>? topicMeta = null;
         var prop = typeof(DescribeTopicsResult).GetProperty("Topics");
         if (prop?.GetValue(topicsResult) is IEnumerable<TopicMetadata> list)
