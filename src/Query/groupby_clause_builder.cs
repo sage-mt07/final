@@ -178,7 +178,7 @@ internal class GroupByExpressionVisitor : ExpressionVisitor
             "DayOfWeek", "DayOfYear", "WeekOfYear",
             
             // 文字列関数（部分）
-            "Substring", "Left", "Right", "Upper", "Lower",
+            "Substring", "Left", "Right", "ToUpper", "ToLower",
             
             // 数値関数（部分）
             "Floor", "Ceiling", "Round",
@@ -214,8 +214,8 @@ internal class GroupByExpressionVisitor : ExpressionVisitor
             "Substring" => ProcessSubstringFunction(methodCall),
             "Left" => ProcessLeftFunction(methodCall),
             "Right" => ProcessRightFunction(methodCall),
-            "Upper" => ProcessSimpleFunction("UPPER", methodCall),
-            "Lower" => ProcessSimpleFunction("LOWER", methodCall),
+            "ToUpper" => ProcessSimpleFunction("UPPER", methodCall),
+            "ToLower" => ProcessSimpleFunction("LOWER", methodCall),
 
             // 数値関数
             "Floor" => ProcessSimpleFunction("FLOOR", methodCall),
