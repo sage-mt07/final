@@ -32,7 +32,16 @@ internal static class PrivateAccessor
         {
             method = method.MakeGenericMethod(genericTypes);
         }
-        return method.Invoke(target is Type ? null : target, args);
+        try
+        {
+            return method.Invoke(target is Type ? null : target, args);
+        }
+        catch (TargetInvocationException ex) when (ex.InnerException != null)
+        {
+            // Unwrap the inner exception so callers can assert on the actual
+            // exception type thrown by the invoked member.
+            throw ex.InnerException;
+        }
     }
 
     internal static T InvokePrivate<T>(
