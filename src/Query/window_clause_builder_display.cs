@@ -172,6 +172,17 @@ internal class WindowClauseBuilder : BuilderBase
         var sizeOp = operations.FirstOrDefault(op => op.Name == nameof(WindowDef.Size));
         var advanceByOp = operations.FirstOrDefault(op => op.Name == nameof(WindowDef.AdvanceBy));
         var gapOp = operations.FirstOrDefault(op => op.Name == nameof(WindowDef.Gap));
+        var retentionOp = operations.FirstOrDefault(op => op.Name == nameof(WindowDef.Retention));
+        var graceOp = operations.FirstOrDefault(op => op.Name == nameof(WindowDef.GracePeriod));
+
+        // 各TimeSpanパラメータの妥当性チェック
+        foreach (var op in new[] { sizeOp, advanceByOp, gapOp, retentionOp, graceOp })
+        {
+            if (op.Value is TimeSpan ts)
+            {
+                ValidateTimeSpan(ts);
+            }
+        }
 
         // HoppingウィンドウでAdvanceBy > Sizeは非推奨
         if (sizeOp.Value is TimeSpan size && advanceByOp.Value is TimeSpan advanceBy)
