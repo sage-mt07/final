@@ -207,6 +207,32 @@ internal static class KsqlFunctionRegistry
     }
 
     /// <summary>
+    /// メソッド名からKSQL型を推測
+    /// </summary>
+    public static string InferTypeFromMethodName(string methodName)
+    {
+        var name = methodName.ToUpperInvariant();
+
+        return name switch
+        {
+            "SUM" => "DOUBLE",
+            "AVG" => "DOUBLE",
+            "COUNT" => "BIGINT",
+            "MAX" => "ANY",
+            "MIN" => "ANY",
+            "TOPK" => "ARRAY",
+            "HISTOGRAM" => "MAP",
+            "TOINT" or "TOINT32" => "INTEGER",
+            "TOLONG" or "TOINT64" => "BIGINT",
+            "TODOUBLE" => "DOUBLE",
+            "TODECIMAL" => "DECIMAL(38, 9)",
+            "TOSTRING" => "VARCHAR",
+            "TOBOOL" or "TOBOOLEAN" => "BOOLEAN",
+            _ => "UNKNOWN"
+        };
+    }
+
+    /// <summary>
     /// カスタムマッピング追加（拡張性のため）
     /// </summary>
     public static void RegisterCustomMapping(string methodName, KsqlFunctionMapping mapping)
