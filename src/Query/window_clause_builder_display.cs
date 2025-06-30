@@ -365,3 +365,40 @@ internal class WindowExpressionVisitor : ExpressionVisitor
 
     // TimeSpanフォーマット等のメソッドは省略（既に実装済み）
 }
+
+/// <summary>
+/// Helper for processing LINQ Window method calls into KSQL WINDOW clauses.
+/// </summary>
+internal static class WindowExpressionVisitorExtensions
+{
+    internal static string ProcessWindowOperation(MethodCallExpression methodCall)
+    {
+        if (methodCall == null)
+            throw new ArgumentNullException(nameof(methodCall));
+
+        if (methodCall.Method.Name != "Window")
+            throw new InvalidOperationException("Expression is not a Window call");
+
+        if (methodCall.Arguments[0] is MethodCallExpression inner &&
+            inner.Method.Name == "Window")
+        {
+            throw new InvalidOperationException("Multiple Window calls are not supported");
+        }
+
+        if (methodCall.Arguments.Count < 2)
+            throw new InvalidOperationException("Window call missing definition");
+
+        var windowExpression = methodCall.Arguments[1];
+        var builder = new WindowClauseBuilder();
+
+        try
+        {
+            var content = builder.Build(windowExpression);
+            return $"WINDOW {content}";
+        }
+        catch (InvalidOperationException ex)
+        {
+            throw new NotSupportedException(ex.Message, ex);
+        }
+    }
+}

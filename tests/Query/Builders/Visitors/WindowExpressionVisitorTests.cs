@@ -1,104 +1,57 @@
 using System;
+using System.Linq;
+using System.Linq.Expressions;
 using Kafka.Ksql.Linq;
 using Kafka.Ksql.Linq.Query.Builders;
-using System.Linq.Expressions;
 using Xunit;
-using static Kafka.Ksql.Linq.Tests.PrivateAccessor;
 
 namespace Kafka.Ksql.Linq.Tests.Query.Builders.Visitors;
 
 public class WindowExpressionVisitorTests
 {
+    private static MethodCallExpression ToWindowCall<T>(Expression<Func<IQueryable<T>, IQueryable<T>>> expr)
+    {
+        return (MethodCallExpression)expr.Body;
+    }
+
     [Fact]
     public void ProcessWindow_Tumbling_ReturnsTumblingClause()
     {
-        var visitor = new WindowExpressionVisitor();
-        InvokePrivate(
-            visitor,
-            "ProcessWindowOperation",
-            new[] { typeof(string), typeof(object) },
-            args: new object?[] { nameof(WindowDef.TumblingWindow), null });
-        InvokePrivate(
-            visitor,
-            "ProcessWindowOperation",
-            new[] { typeof(string), typeof(object) },
-            args: new object?[] { nameof(WindowDef.Size), TimeSpan.FromMinutes(5) });
-        var result = InvokePrivate<string>(visitor, "BuildWindowClause", Type.EmptyTypes);
-        Assert.Equal("TUMBLING (SIZE 5 MINUTES)", result);
+        var mc = ToWindowCall<Order>(q => q.Window(TumblingWindow.OfMinutes(5)));
+        var clause = WindowExpressionVisitorExtensions.ProcessWindowOperation(mc);
+        Assert.Equal("WINDOW TUMBLING (SIZE 5 MINUTES)", clause);
     }
 
     [Fact]
     public void ProcessWindow_Hopping_ReturnsHoppingClause()
     {
-        var visitor = new WindowExpressionVisitor();
-        InvokePrivate(
-            visitor,
-            "ProcessWindowOperation",
-            new[] { typeof(string), typeof(object) },
-            args: new object?[] { nameof(WindowDef.HoppingWindow), null });
-        InvokePrivate(
-            visitor,
-            "ProcessWindowOperation",
-            new[] { typeof(string), typeof(object) },
-            args: new object?[] { nameof(WindowDef.Size), TimeSpan.FromMinutes(5) });
-        InvokePrivate(
-            visitor,
-            "ProcessWindowOperation",
-            new[] { typeof(string), typeof(object) },
-            args: new object?[] { nameof(WindowDef.AdvanceBy), TimeSpan.FromMinutes(1) });
-        var result = InvokePrivate<string>(visitor, "BuildWindowClause", Type.EmptyTypes);
-        Assert.Equal("HOPPING (SIZE 5 MINUTES, ADVANCE BY 1 MINUTES)", result);
+        var mc = ToWindowCall<Order>(q => q.Window(HoppingWindow.OfMinutes(5).AdvanceBy(TimeSpan.FromMinutes(1))));
+        var clause = WindowExpressionVisitorExtensions.ProcessWindowOperation(mc);
+        Assert.Equal("WINDOW HOPPING (SIZE 5 MINUTES, ADVANCE BY 1 MINUTES)", clause);
     }
 
     [Fact]
     public void ProcessWindow_Session_ReturnsSessionClause()
     {
-        var visitor = new WindowExpressionVisitor();
-        InvokePrivate(
-            visitor,
-            "ProcessWindowOperation",
-            new[] { typeof(string), typeof(object) },
-            args: new object?[] { nameof(WindowDef.SessionWindow), null });
-        InvokePrivate(
-            visitor,
-            "ProcessWindowOperation",
-            new[] { typeof(string), typeof(object) },
-            args: new object?[] { nameof(WindowDef.Gap), TimeSpan.FromMinutes(10) });
-        var result = InvokePrivate<string>(visitor, "BuildWindowClause", Type.EmptyTypes);
-        Assert.Equal("SESSION (GAP 10 MINUTES)", result);
+        var mc = ToWindowCall<Order>(q => q.Window(SessionWindow.OfMinutes(10)));
+        var clause = WindowExpressionVisitorExtensions.ProcessWindowOperation(mc);
+        Assert.Equal("WINDOW SESSION (GAP 10 MINUTES)", clause);
     }
 
     [Fact]
-    public void ProcessWindow_InvalidParameters_ReturnsClauseWithZeroSize()
+    public void ProcessWindow_InvalidSize_ThrowsNotSupported()
     {
-        var builder = new WindowClauseBuilder();
-        var def = HoppingWindow.Of(TimeSpan.Zero).AdvanceBy(TimeSpan.FromMinutes(1));
-        var expr = Expression.Constant(def);
-        var result = builder.Build(expr);
-        Assert.Equal("HOPPING (SIZE 0 SECONDS, ADVANCE BY 1 MINUTES)", result);
+        var mc = ToWindowCall<Order>(q => q.Window(TumblingWindow.OfMinutes(0)));
+        Assert.Throws<NotSupportedException>(() => WindowExpressionVisitorExtensions.ProcessWindowOperation(mc));
     }
 
     [Fact]
-    public void ProcessWindow_MultipleCalls_LastCallWins()
+    public void ProcessWindow_MultipleCalls_ThrowsInvalidOp()
     {
-        var visitor = new WindowExpressionVisitor();
-        InvokePrivate(
-            visitor,
-            "ProcessWindowOperation",
-            new[] { typeof(string), typeof(object) },
-            args: new object?[] { nameof(WindowDef.TumblingWindow), null });
-        InvokePrivate(
-            visitor,
-            "ProcessWindowOperation",
-            new[] { typeof(string), typeof(object) },
-            args: new object?[] { nameof(WindowDef.HoppingWindow), null });
-        InvokePrivate(
-            visitor,
-            "ProcessWindowOperation",
-            new[] { typeof(string), typeof(object) },
-            args: new object?[] { nameof(WindowDef.Size), TimeSpan.FromMinutes(3) });
-        var result = InvokePrivate<string>(visitor, "BuildWindowClause", Type.EmptyTypes);
-        Assert.Equal("HOPPING (SIZE 3 MINUTES)", result);
+        Expression<Func<IQueryable<Order>, IQueryable<Order>>> expr = q => q.Window(TumblingWindow.OfMinutes(1)).Window(TumblingWindow.OfMinutes(2));
+        var mc = (MethodCallExpression)expr.Body;
+        Assert.Throws<InvalidOperationException>(() => WindowExpressionVisitorExtensions.ProcessWindowOperation(mc));
     }
+
+    private class Order { }
 }
-
