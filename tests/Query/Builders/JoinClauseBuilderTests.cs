@@ -21,7 +21,8 @@ public class JoinClauseBuilderTests
         IQueryable<TestEntity> outer = new List<TestEntity>().AsQueryable();
         IQueryable<ChildEntity> inner = new List<ChildEntity>().AsQueryable();
 
-        var join = outer.Join(inner,
+        var join = Queryable.Join(outer,
+            inner,
             o => o.Id,
             i => i.ParentId,
             (o, i) => new { o.Id, i.Name });
@@ -39,7 +40,8 @@ public class JoinClauseBuilderTests
         IQueryable<TestEntity> outer = new List<TestEntity>().AsQueryable();
         IQueryable<ChildEntity> inner = new List<ChildEntity>().AsQueryable();
 
-        var join = outer.Join(inner,
+        var join = Queryable.Join(outer,
+            inner,
             o => new { o.Id, o.Type },
             i => new { i.ParentId, i.Name },
             (o, i) => new { o.Id, i.Name });
@@ -59,7 +61,7 @@ public class JoinClauseBuilderTests
         IQueryable<GrandChildEntity> t3 = new List<GrandChildEntity>().AsQueryable();
         IQueryable<FourthEntity> t4 = new List<FourthEntity>().AsQueryable();
 
-        var join = t1.Join(t2, o => o.Id, i => i.ParentId, (o, i) => new { o, i })
+        var join = Queryable.Join(t1, t2, o => o.Id, i => i.ParentId, (o, i) => new { o, i })
                      .Join(t3, x => x.o.Id, g => g.ChildId, (x, g) => new { x.o, x.i, g })
                      .Join(t4, x => x.o.Id, f => f.RefId, (x, f) => new { x.o, f });
 
