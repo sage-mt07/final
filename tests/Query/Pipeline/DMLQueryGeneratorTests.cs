@@ -540,6 +540,12 @@ public class DMLQueryGeneratorTests
         public decimal Amount { get; set; }
     }
 
+    private class NullableKeyOrder
+    {
+        public int? CustomerId { get; set; }
+        public decimal Amount { get; set; }
+    }
+
     [Fact]
     public void GenerateLinqQuery_WhereIsNullClause_ReturnsExpectedQuery()
     {
@@ -581,6 +587,29 @@ public class DMLQueryGeneratorTests
         Assert.Contains("WHERE", result);
         Assert.Contains("IS NOT NULL", result);
         Assert.Contains("CustomerId", result);
+        Assert.Contains("EMIT CHANGES", result);
+    }
+
+    [Fact]
+    public void GenerateLinqQuery_GroupByNullableKey_WithWhereNotNull_ProducesCorrectQuery()
+    {
+        var orders = new List<NullableKeyOrder>().AsQueryable();
+
+        var query = orders
+            .Where(o => o.CustomerId != null)
+            .GroupBy(o => o.CustomerId)
+            .Select(g => new
+            {
+                CustomerId = g.Key,
+                Total = g.Sum(x => x.Amount)
+            });
+
+        var generator = new DMLQueryGenerator();
+        var result = generator.GenerateLinqQuery("orders", query.Expression, false);
+
+        Assert.Contains("WHERE CustomerId IS NOT NULL", result);
+        Assert.Contains("GROUP BY CustomerId", result);
+        Assert.Contains("SUM", result);
         Assert.Contains("EMIT CHANGES", result);
     }
 
