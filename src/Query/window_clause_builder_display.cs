@@ -388,12 +388,23 @@ internal static class WindowExpressionVisitorExtensions
         if (methodCall.Arguments.Count < 2)
             throw new InvalidOperationException("Window call missing definition");
 
-        var windowExpression = methodCall.Arguments[1];
+        var argument = methodCall.Arguments[1];
+
+        // evaluate the argument expression so WindowClauseBuilder receives
+        // a simple ConstantExpression of WindowDef or TimeSpan
+        object? value = Expression.Lambda(argument).Compile().DynamicInvoke();
+        Expression constExpr = value switch
+        {
+            WindowDef def => Expression.Constant(def, typeof(WindowDef)),
+            TimeSpan ts => Expression.Constant(ts, typeof(TimeSpan)),
+            _ => argument
+        };
+
         var builder = new WindowClauseBuilder();
 
         try
         {
-            var content = builder.Build(windowExpression);
+            var content = builder.Build(constExpr);
             return $"WINDOW {content}";
         }
         catch (InvalidOperationException ex)
