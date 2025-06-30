@@ -26,12 +26,11 @@ public class FunctionTranslatorTests
     }
 
     [Fact]
-    public void TranslateMethodCall_UnknownMethod_ReturnsRawFunction()
+    public void TranslateMethodCall_UnknownMethod_Throws()
     {
         var method = typeof(FunctionTranslatorTests).GetMethod(nameof(Custom), System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)!;
         var call = Expression.Call(method);
-        var result = KsqlFunctionTranslator.TranslateMethodCall(call);
-        Assert.Equal("CUSTOM()", result);
+        Assert.Throws<NotSupportedException>(() => KsqlFunctionTranslator.TranslateMethodCall(call));
     }
 
     private static void Custom() { }

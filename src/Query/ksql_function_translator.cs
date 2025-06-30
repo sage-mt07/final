@@ -24,7 +24,7 @@ internal static class KsqlFunctionTranslator
 
         if (mapping == null)
         {
-            return HandleUnknownMethod(methodCall);
+            throw new NotSupportedException($"Function '{methodName}' is not supported.");
         }
 
         // 引数数検証
