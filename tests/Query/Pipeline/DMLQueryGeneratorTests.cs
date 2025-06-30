@@ -95,6 +95,7 @@ public class DMLQueryGeneratorTests
         public int CustomerId { get; set; }
         public string Region { get; set; } = string.Empty;
         public decimal Amount { get; set; }
+        public bool IsHighPriority { get; set; }
     }
 
     private class Customer
@@ -273,5 +274,29 @@ public class DMLQueryGeneratorTests
         Assert.Contains("Region", result);
         Assert.Contains("SUM", result);
         Assert.EndsWith("EMIT CHANGES", result);
+    }
+
+    [Fact]
+    public void GenerateLinqQuery_GroupByWithConditionalSum_ReturnsExpectedQuery()
+    {
+        var orders = new List<Order>().AsQueryable();
+
+        var query = orders
+            .GroupBy(o => o.CustomerId)
+            .Select(g => new
+            {
+                g.Key,
+                Total = g.Sum(o => o.Amount),
+                HighPriorityTotal = g.Sum(o => o.IsHighPriority ? o.Amount : 0)
+            });
+
+        var generator = new DMLQueryGenerator();
+        var result = generator.GenerateLinqQuery("orders", query.Expression, false);
+
+        Assert.Contains("GROUP BY", result);
+        Assert.Contains("CASE WHEN", result);
+        Assert.Contains("SUM", result);
+        Assert.Contains("HighPriorityTotal", result);
+        Assert.Contains("EMIT CHANGES", result);
     }
 }
