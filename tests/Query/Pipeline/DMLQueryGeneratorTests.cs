@@ -182,4 +182,34 @@ public class DMLQueryGeneratorTests
         Assert.Contains("HAVING ((COUNT(*) > 2) AND (SUM(Amount) < 10000))", result);
         Assert.EndsWith("EMIT CHANGES", result);
     }
+
+    [Fact]
+    public void GenerateLinqQuery_GroupByHavingWithMultipleAggregates_ReturnsExpectedQuery()
+    {
+        var src = new List<Order>().AsQueryable();
+
+        var query = src
+            .GroupBy(o => o.CustomerId)
+            .Having(g => g.Average(x => x.Amount) > 100 && g.Max(x => x.Amount) < 1000)
+            .Select(g => new
+            {
+                g.Key,
+                OrderCount = g.Count(),
+                TotalAmount = g.Sum(x => x.Amount),
+                AvgAmount = g.Average(x => x.Amount),
+                MaxAmount = g.Max(x => x.Amount)
+            });
+
+        var generator = new DMLQueryGenerator();
+        var result = generator.GenerateLinqQuery("multiagg", query.Expression, false);
+
+        Assert.Contains("GROUP BY", result);
+        Assert.Contains("HAVING", result);
+        Assert.Contains("AVG(", result);
+        Assert.Contains("MAX(", result);
+        Assert.Contains("COUNT(*)", result);
+        Assert.Contains("SUM(", result);
+        Assert.Contains("HAVING ((AVG(Amount) > 100) AND (MAX(Amount) < 1000))", result);
+        Assert.EndsWith("EMIT CHANGES", result);
+    }
 }
