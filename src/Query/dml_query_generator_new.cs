@@ -407,7 +407,8 @@ internal class DMLQueryGenerator : GeneratorBase, IDMLQueryGenerator
             [KsqlBuilderType.GroupBy] = new GroupByClauseBuilder(),
             [KsqlBuilderType.Having] = new HavingClauseBuilder(),
             [KsqlBuilderType.Join] = new JoinClauseBuilder(),
-            [KsqlBuilderType.Window] = new WindowClauseBuilder()
+            [KsqlBuilderType.Window] = new WindowClauseBuilder(),
+            [KsqlBuilderType.OrderBy] = new OrderByClauseBuilder()
         };
     }
 
