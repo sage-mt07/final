@@ -38,7 +38,7 @@ public class QueryBuilderAdvancedPatternsTests
         var havingSql = havingBuilder.Build(havingExpr.Body);
         var final = $"{groupSql} {havingSql}";
 
-        Assert.Equal("GROUP BY CustomerId HAVING (COUNT(*) > 10)", final);
+        Assert.Equal("CustomerId (COUNT(*) > 10)", final);
     }
 
     [Fact]
@@ -48,6 +48,6 @@ public class QueryBuilderAdvancedPatternsTests
         var builder = new SelectClauseBuilder();
         var sql = builder.Build(expr.Body);
 
-        Assert.Equal("SELECT OrderId, OrderDate AS Date", sql);
+        Assert.Equal("OrderId, OrderDate AS Date", sql);
     }
 }

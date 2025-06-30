@@ -26,6 +26,6 @@ public class SelectClauseBuilderTests
         Expression<Func<TestEntity, object>> expr = e => e.Name.ToUpper();
         var builder = new SelectClauseBuilder();
         var result = builder.Build(expr.Body);
-        Assert.Equal("SELECT UCASE(Name)", result);
+        Assert.Equal("UCASE(Name)", result);
     }
 }

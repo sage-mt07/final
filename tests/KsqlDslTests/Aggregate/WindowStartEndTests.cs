@@ -21,6 +21,6 @@ public class WindowStartEndTests
         var builder = new SelectClauseBuilder();
         var result = builder.Build(expr.Body);
 
-        Assert.Equal("SELECT WINDOWSTART AS Start, WINDOWEND AS End", result);
+        Assert.Equal("WINDOWSTART AS Start, WINDOWEND AS End", result);
     }
 }

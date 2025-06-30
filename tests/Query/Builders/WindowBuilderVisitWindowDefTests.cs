@@ -19,7 +19,7 @@ public class WindowClauseBuilderVisitWindowDefTests
         visitorType.GetMethod("VisitWindowDef")!.Invoke(visitor, new object[] { def });
         var result = (string)visitorType.GetMethod("BuildWindowClause")!.Invoke(visitor, null)!;
 
-        Assert.Equal("WINDOW UNKNOWN", result);
+        Assert.Equal("UNKNOWN_WINDOW", result);
     }
 
     [Fact]
@@ -38,7 +38,7 @@ public class WindowClauseBuilderVisitWindowDefTests
         visitorType.GetMethod("VisitWindowDef")!.Invoke(visitor, new object[] { def });
         var result = (string)visitorType.GetMethod("BuildWindowClause")!.Invoke(visitor, null)!;
 
-        Assert.Equal("WINDOW TUMBLING (SIZE 30 SECONDS, RETENTION 1 DAYS, GRACE PERIOD 1 MINUTES) EMIT FINAL", result);
+        Assert.Equal("TUMBLING (SIZE 30 SECONDS, RETENTION 1 DAYS, GRACE PERIOD 1 MINUTES) EMIT FINAL", result);
     }
 
     [Fact]
@@ -58,7 +58,7 @@ public class WindowClauseBuilderVisitWindowDefTests
         visitorType.GetMethod("VisitWindowDef")!.Invoke(visitor, new object[] { def });
         var result = (string)visitorType.GetMethod("BuildWindowClause")!.Invoke(visitor, null)!;
 
-        Assert.Equal("WINDOW HOPPING (SIZE 2 MINUTES, ADVANCE BY 1 MINUTES, RETENTION 1 HOURS, GRACE PERIOD 5 SECONDS) EMIT FINAL", result);
+        Assert.Equal("HOPPING (SIZE 2 MINUTES, ADVANCE BY 1 MINUTES, RETENTION 1 HOURS, GRACE PERIOD 5 SECONDS) EMIT FINAL", result);
     }
 
     [Fact]
@@ -74,6 +74,6 @@ public class WindowClauseBuilderVisitWindowDefTests
         visitorType.GetMethod("VisitWindowDef")!.Invoke(visitor, new object[] { def });
         var result = (string)visitorType.GetMethod("BuildWindowClause")!.Invoke(visitor, null)!;
 
-        Assert.Equal("WINDOW SESSION (GAP 45 SECONDS)", result);
+        Assert.Equal("SESSION (GAP 45 SECONDS)", result);
     }
 }

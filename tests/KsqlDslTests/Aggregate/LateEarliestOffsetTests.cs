@@ -14,7 +14,7 @@ public class LateEarliestOffsetTests
         Expression<Func<IGrouping<int, TestEntity>, object>> expr = g => new { Latest = g.LatestByOffset(x => x.Id) };
         var builder = new SelectClauseBuilder();
         var result = builder.Build(expr.Body);
-        Assert.Equal("SELECT LATEST_BY_OFFSET(Id) AS Latest", result);
+        Assert.Equal("LATEST_BY_OFFSET(Id) AS Latest", result);
     }
 
     [Fact]
@@ -23,7 +23,7 @@ public class LateEarliestOffsetTests
         Expression<Func<IGrouping<int, TestEntity>, object>> expr = g => new { First = g.EarliestByOffset(x => x.Id) };
         var builder = new SelectClauseBuilder();
         var result = builder.Build(expr.Body);
-        Assert.Equal("SELECT EARLIEST_BY_OFFSET(Id) AS First", result);
+        Assert.Equal("EARLIEST_BY_OFFSET(Id) AS First", result);
     }
 }
 

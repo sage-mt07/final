@@ -13,7 +13,7 @@ public class GroupByClauseBuilderTests
         Expression<Func<TestEntity, object>> expr = e => new { e.Id, e.Type };
         var builder = new GroupByClauseBuilder();
         var result = builder.Build(expr.Body);
-        Assert.Equal("GROUP BY Id, Type", result);
+        Assert.Equal("Id, Type", result);
     }
 
     [Fact]

@@ -32,7 +32,7 @@ public class QueryBuilderIntegrationTests
         var final = $"{joinSql} {whereSql}";
 
         Assert.Contains("JOIN", final);
-        Assert.Contains("WHERE (TotalAmount > 1000)", final);
+        Assert.Contains("(TotalAmount > 1000)", final);
     }
 
     [Fact]
@@ -78,7 +78,7 @@ public class QueryBuilderIntegrationTests
         var builder = new SelectClauseBuilder();
         var sql = builder.Build(expr.Body);
 
-        Assert.Equal("SELECT OrderId, TotalAmount, OrderDate", sql);
+        Assert.Equal("OrderId, TotalAmount, OrderDate", sql);
     }
 
     [Fact]
@@ -110,7 +110,7 @@ public class QueryBuilderIntegrationTests
 
         var final = $"{groupSql} {havingSql}";
 
-        Assert.Equal("GROUP BY CustomerId HAVING (COUNT(*) > 5)", final);
+        Assert.Equal("CustomerId (COUNT(*) > 5)", final);
     }
 
     [Fact]
@@ -120,6 +120,6 @@ public class QueryBuilderIntegrationTests
         var builder = new SelectClauseBuilder();
         var sql = builder.Build(expr.Body);
 
-        Assert.Equal("SELECT OrderId, OrderDate AS Date", sql);
+        Assert.Equal("OrderId, OrderDate AS Date", sql);
     }
 }

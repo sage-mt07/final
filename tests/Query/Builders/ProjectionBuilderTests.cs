@@ -18,7 +18,7 @@ public class SelectClauseBuilderTests
         Expression<Func<TestEntity, object>> expr = e => new { e.Id, Renamed = e.Name };
         var builder = new SelectClauseBuilder();
         var result = builder.Build(expr.Body);
-        Assert.Equal("SELECT Id, Name AS Renamed", result);
+        Assert.Equal("Id, Name AS Renamed", result);
     }
 
     [Fact]
@@ -27,7 +27,7 @@ public class SelectClauseBuilderTests
         Expression<Func<TestEntity, TestEntity>> expr = e => e;
         var builder = new SelectClauseBuilder();
         var result = builder.Build(expr.Body);
-        Assert.Equal("SELECT *", result);
+        Assert.Equal("*", result);
     }
 
     [Fact]
@@ -44,7 +44,7 @@ public class SelectClauseBuilderTests
         Expression<Func<TestEntity, object>> expr = e => e.Name.ToLower();
         var builder = new SelectClauseBuilder();
         var result = builder.Build(expr.Body);
-        Assert.Equal("SELECT LCASE(Name)", result);
+        Assert.Equal("LCASE(Name)", result);
     }
 
     [Fact]
@@ -62,7 +62,7 @@ public class SelectClauseBuilderTests
         Expression<Func<IGrouping<int, TestEntity>, object>> expr = g => g.Count();
         var builder = new SelectClauseBuilder();
         var result = builder.Build(expr.Body);
-        Assert.Equal("SELECT COUNT(*)", result);
+        Assert.Equal("COUNT(*)", result);
     }
 
     [Fact]
@@ -71,6 +71,6 @@ public class SelectClauseBuilderTests
         Expression<Func<TestEntity, object>> expr = e => e.Name.Substring(1, 3);
         var builder = new SelectClauseBuilder();
         var result = builder.Build(expr.Body);
-        Assert.Equal("SELECT SUBSTRING(Name, 1, 3)", result);
+        Assert.Equal("SUBSTRING(Name, 1, 3)", result);
     }
 }

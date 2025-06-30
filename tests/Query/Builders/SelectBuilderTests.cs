@@ -13,7 +13,7 @@ public class WhereClauseBuilderTests
         Expression<Func<TestEntity, bool>> expr = e => e.Id == 1;
         var builder = new WhereClauseBuilder();
         var result = builder.Build(expr.Body);
-        Assert.Equal("WHERE (Id = 1)", result);
+        Assert.Equal("(Id = 1)", result);
     }
 
     [Fact]

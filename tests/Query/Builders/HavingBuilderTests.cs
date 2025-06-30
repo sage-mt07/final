@@ -16,7 +16,7 @@ public class HavingClauseBuilderTests
         Expression<Func<IGrouping<int, TestEntity>, bool>> expr = g => g.Count() > 1;
         var builder = new HavingClauseBuilder();
         var result = builder.Build(expr.Body);
-        Assert.Equal("HAVING (COUNT(*) > 1)", result);
+        Assert.Equal("(COUNT(*) > 1)", result);
     }
 
     [Fact]
@@ -25,7 +25,7 @@ public class HavingClauseBuilderTests
         Expression<Func<IGrouping<int, TestEntity>, bool>> expr = g => g.Sum(x => x.Id) > 5;
         var builder = new HavingClauseBuilder();
         var result = builder.Build(expr.Body);
-        Assert.Equal("HAVING (SUM(Id) > 5)", result);
+        Assert.Equal("(SUM(Id) > 5)", result);
     }
 
     [Fact]
@@ -74,8 +74,7 @@ public class HavingClauseBuilderTests
     [InlineData("UNKNOWN", false)]
     public void IsAggregateFunction_DetectsAggregateMethods(string name, bool expected)
     {
-        var visitorType = typeof(HavingClauseBuilder).GetNestedType("HavingExpressionVisitor", BindingFlags.NonPublic)!;
-        var result = InvokePrivate<bool>(visitorType, "IsAggregateFunction", new[] { typeof(string) }, null, name);
+        var result = KsqlFunctionRegistry.IsAggregateFunction(name);
         Assert.Equal(expected, result);
     }
 }
