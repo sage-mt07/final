@@ -56,6 +56,7 @@ public class GroupByExpressionVisitorTests
         public int Id { get; set; }
         public string Category { get; set; } = string.Empty;
         public string Type { get; set; } = string.Empty;
+        public string Region { get; set; } = string.Empty;
         public int? NullableValue { get; set; }
         public List<int> List { get; set; } = new();
     }
