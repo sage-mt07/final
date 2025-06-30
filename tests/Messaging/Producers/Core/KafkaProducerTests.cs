@@ -18,6 +18,7 @@ public class KafkaProducerTests
         public string Name => "dummy";
         public Handle Handle => throw new NotImplementedException();
         public int AddBrokers(string brokers) => 0;
+        public void SetSaslCredentials(string username, string password) { }
         public void Dispose() { }
         public void Flush(CancellationToken cancellationToken = default) { }
         public int Flush(TimeSpan timeout) => 0;
@@ -27,7 +28,7 @@ public class KafkaProducerTests
             Produced.Add((topicPartition, message));
             handler?.Invoke(new DeliveryReport<object, object> { TopicPartition = topicPartition });
         }
-        public void Poll(TimeSpan timeout) { }
+        public int Poll(TimeSpan timeout) => 0;
         public Task<DeliveryResult<object, object>> ProduceAsync(string topic, Message<object, object> message, CancellationToken cancellationToken = default)
             => throw new NotImplementedException();
         public Task<DeliveryResult<object, object>> ProduceAsync(TopicPartition topicPartition, Message<object, object> message, CancellationToken cancellationToken = default)
@@ -41,6 +42,13 @@ public class KafkaProducerTests
                 Message = message
             });
         }
+        public void InitTransactions(TimeSpan timeout) { }
+        public void BeginTransaction() { }
+        public void CommitTransaction(TimeSpan timeout) { }
+        public void CommitTransaction() { }
+        public void AbortTransaction(TimeSpan timeout) { }
+        public void AbortTransaction() { }
+        public void SendOffsetsToTransaction(IEnumerable<TopicPartitionOffset> offsets, IConsumerGroupMetadata groupMetadata, TimeSpan timeout) { }
     }
 
     private class Sample
