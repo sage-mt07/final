@@ -190,7 +190,7 @@ public class DMLQueryGeneratorTests
 
         var query = src
             .GroupBy(o => o.CustomerId)
-            .Where(g => g.Average(x => x.Amount) > 100 && g.Max(x => x.Amount) < 1000)
+            .Having(g => g.Average(x => x.Amount) > 100 && g.Max(x => x.Amount) < 1000)
             .Select(g => new
             {
                 g.Key,
@@ -207,10 +207,9 @@ public class DMLQueryGeneratorTests
         Assert.Contains("HAVING", result);
         Assert.Contains("AVG(", result);
         Assert.Contains("MAX(", result);
-        Assert.Contains("HAVING AVG(", result);
-        Assert.Contains("HAVING AVG(", result);  // 二重確認
         Assert.Contains("COUNT(*)", result);
         Assert.Contains("SUM(", result);
-        Assert.EndsWith("EMIT CHANGES;", result);
+        Assert.Contains("HAVING ((AVG(Amount) > 100) AND (MAX(Amount) < 1000))", result);
+        Assert.EndsWith("EMIT CHANGES", result);
     }
 }
