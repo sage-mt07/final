@@ -42,8 +42,8 @@ public class JoinClauseBuilderTests
 
         var join = Queryable.Join(outer,
             inner,
-            o => new { o.Id, o.Type },
-            i => new { i.ParentId, i.Name },
+            o => new { Id = o.Id, Type = o.Type },
+            i => new { Id = i.ParentId, Type = i.Name },
             (o, i) => new { o.Id, i.Name });
 
         var builder = new JoinClauseBuilder();
