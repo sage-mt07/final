@@ -185,7 +185,9 @@ internal class DDLQueryGenerator : GeneratorBase, IDDLQueryGenerator
     private static QueryStructure CreateStreamAsStructure(string streamName, string baseObject)
     {
         var metadata = new QueryMetadata(DateTime.UtcNow, "DDL", baseObject);
-        return QueryStructure.CreateStreamAs(streamName, baseObject).WithMetadata(metadata);
+        var structure = QueryStructure.CreateStreamAs(streamName, baseObject).WithMetadata(metadata);
+        var fromClause = QueryClause.Required(QueryClauseType.From, $"FROM {baseObject}");
+        return structure.AddClause(fromClause);
     }
 
     /// <summary>
@@ -194,7 +196,9 @@ internal class DDLQueryGenerator : GeneratorBase, IDDLQueryGenerator
     private static QueryStructure CreateTableAsStructure(string tableName, string baseObject)
     {
         var metadata = new QueryMetadata(DateTime.UtcNow, "DDL", baseObject);
-        return QueryStructure.CreateTableAs(tableName, baseObject).WithMetadata(metadata);
+        var structure = QueryStructure.CreateTableAs(tableName, baseObject).WithMetadata(metadata);
+        var fromClause = QueryClause.Required(QueryClauseType.From, $"FROM {baseObject}");
+        return structure.AddClause(fromClause);
     }
 
     /// <summary>
@@ -204,7 +208,7 @@ internal class DDLQueryGenerator : GeneratorBase, IDDLQueryGenerator
     {
         var analysis = AnalyzeLinqExpression(linqExpression);
         
-        foreach (var methodCall in analysis.MethodCalls)
+        foreach (var methodCall in analysis.MethodCalls.AsEnumerable().Reverse())
         {
             structure = ProcessMethodCall(structure, methodCall, context);
         }

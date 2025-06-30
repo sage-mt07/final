@@ -222,6 +222,14 @@ internal static class KsqlFunctionTranslator
             args.Add(TranslateExpression(arg));
         }
 
+        // 拡張メソッドは最初の引数がレシーバなので除外
+        if (methodCall.Method.IsStatic &&
+            methodCall.Method.IsDefined(typeof(System.Runtime.CompilerServices.ExtensionAttribute), false) &&
+            args.Count > 0)
+        {
+            args.RemoveAt(0);
+        }
+
         return args;
     }
 
@@ -231,11 +239,17 @@ internal static class KsqlFunctionTranslator
     private static int GetEffectiveArgumentCount(MethodCallExpression methodCall)
     {
         var count = methodCall.Arguments.Count;
-        
+
         // インスタンスメソッドの場合、Objectも1つの引数としてカウント
         if (methodCall.Object != null && !methodCall.Method.IsStatic)
         {
             count++;
+        }
+
+        // 拡張メソッドは第1引数がレシーバに相当するため引数から除外する
+        if (methodCall.Method.IsStatic && methodCall.Method.IsDefined(typeof(System.Runtime.CompilerServices.ExtensionAttribute), false))
+        {
+            count--;
         }
 
         return count;
@@ -252,6 +266,7 @@ internal static class KsqlFunctionTranslator
             MemberExpression member => member.Member.Name,
             ConstantExpression constant => BuilderValidation.SafeToString(constant.Value),
             ParameterExpression parameter => parameter.Name ?? "param",
+            LambdaExpression lambda => TranslateExpression(lambda.Body),
             UnaryExpression unary => TranslateExpression(unary.Operand),
             BinaryExpression binary => $"({TranslateExpression(binary.Left)} {GetOperator(binary.NodeType)} {TranslateExpression(binary.Right)})",
             _ => expression.ToString()

@@ -54,9 +54,36 @@ internal record QueryStructure(
     /// <summary>
     /// 句追加
     /// </summary>
+    private static readonly QueryClauseType[] ClauseInsertionOrder = new[]
+    {
+        QueryClauseType.Select,
+        QueryClauseType.From,
+        QueryClauseType.Join,
+        QueryClauseType.Where,
+        QueryClauseType.Window,
+        QueryClauseType.GroupBy,
+        QueryClauseType.Having,
+        QueryClauseType.OrderBy,
+        QueryClauseType.Limit,
+        QueryClauseType.EmitChanges
+    };
+
     public QueryStructure AddClause(QueryClause clause)
     {
-        var newClauses = new List<QueryClause>(Clauses) { clause };
+        var newClauses = new List<QueryClause>(Clauses);
+        int insertIndex = newClauses.FindIndex(c =>
+            Array.IndexOf(ClauseInsertionOrder, clause.Type) <
+            Array.IndexOf(ClauseInsertionOrder, c.Type));
+
+        if (insertIndex >= 0)
+        {
+            newClauses.Insert(insertIndex, clause);
+        }
+        else
+        {
+            newClauses.Add(clause);
+        }
+
         return this with { Clauses = newClauses };
     }
 
@@ -65,9 +92,12 @@ internal record QueryStructure(
     /// </summary>
     public QueryStructure AddClauses(params QueryClause[] clauses)
     {
-        var newClauses = new List<QueryClause>(Clauses);
-        newClauses.AddRange(clauses);
-        return this with { Clauses = newClauses };
+        var structure = this;
+        foreach (var clause in clauses)
+        {
+            structure = structure.AddClause(clause);
+        }
+        return structure;
     }
 
     /// <summary>

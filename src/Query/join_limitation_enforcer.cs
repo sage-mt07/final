@@ -20,11 +20,12 @@ internal static class JoinLimitationEnforcer
     public static void ValidateJoinExpression(Expression expression)
     {
         var joinCount = CountJoins(expression);
-        if (joinCount > MaxJoinTables)
+        var tableCount = joinCount + 1;
+        if (tableCount > MaxJoinTables)
         {
             throw new StreamProcessingException(
                 $"Stream processing supports maximum {MaxJoinTables} table joins. " +
-                $"Found {joinCount} tables. " +
+                $"Found {tableCount} tables. " +
                 $"Consider data denormalization or use batch processing for complex relationships. " +
                 $"Alternative: Create materialized views or use event sourcing patterns.");
         }

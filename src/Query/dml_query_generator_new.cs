@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using Kafka.Ksql.Linq.Query.Abstractions;
 using Kafka.Ksql.Linq.Query.Builders;
@@ -107,7 +108,7 @@ internal class DMLQueryGenerator : GeneratorBase, IDMLQueryGenerator
     {
         try
         {
-            var context = new QueryAssemblyContext(objectName, false); // Push Query (aggregates are typically streaming)
+            var context = new QueryAssemblyContext(objectName, true); // Aggregates default to pull query
             var structure = CreateSelectStructure(objectName);
 
             // 集約式処理
@@ -156,10 +157,11 @@ internal class DMLQueryGenerator : GeneratorBase, IDMLQueryGenerator
     {
         var metadata = new QueryMetadata(DateTime.UtcNow, "DML");
         var structure = QueryStructure.CreateSelect(objectName).WithMetadata(metadata);
-        
-        // デフォルトのSELECT *句を追加
+
+        // デフォルトのSELECT *句とFROM句を追加
         var selectClause = QueryClause.Required(QueryClauseType.Select, "*");
-        return structure.AddClause(selectClause);
+        var fromClause = QueryClause.Required(QueryClauseType.From, $"FROM {objectName}");
+        return structure.AddClauses(selectClause, fromClause);
     }
 
     /// <summary>
@@ -169,10 +171,11 @@ internal class DMLQueryGenerator : GeneratorBase, IDMLQueryGenerator
     {
         var metadata = new QueryMetadata(DateTime.UtcNow, "DML");
         var structure = QueryStructure.CreateSelect(objectName).WithMetadata(metadata);
-        
-        // COUNT(*)句を追加
+
+        // COUNT(*)句とFROM句を追加
         var selectClause = QueryClause.Required(QueryClauseType.Select, "COUNT(*)");
-        return structure.AddClause(selectClause);
+        var fromClause = QueryClause.Required(QueryClauseType.From, $"FROM {objectName}");
+        return structure.AddClauses(selectClause, fromClause);
     }
 
     /// <summary>
@@ -183,7 +186,7 @@ internal class DMLQueryGenerator : GeneratorBase, IDMLQueryGenerator
         var analysis = AnalyzeLinqExpression(linqExpression);
         
         // メソッド呼び出しを順次処理
-        foreach (var methodCall in analysis.MethodCalls)
+        foreach (var methodCall in analysis.MethodCalls.AsEnumerable().Reverse())
         {
             structure = ProcessMethodCall(structure, methodCall, context);
         }
