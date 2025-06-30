@@ -35,10 +35,10 @@ internal class SelectClauseBuilder : BuilderBase
     protected override void ValidateBuilderSpecific(Expression expression)
     {
         // SELECT句特有のバリデーション
-        if (expression is MethodCallExpression methodCall)
+        BuilderValidation.ValidateNoNestedAggregates(expression);
+
+        if (expression is MethodCallExpression)
         {
-            var methodName = methodCall.Method.Name;
-            
             // 集約関数の混在チェック
             if (ContainsAggregateFunction(expression) && ContainsNonAggregateColumns(expression))
             {
