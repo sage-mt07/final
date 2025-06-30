@@ -228,7 +228,7 @@ public class DMLQueryGeneratorTests
             )
             .Window(TumblingWindow.OfMinutes(10))
             .GroupBy(x => x.c.Name)
-            .Where(g => g.Count() > 5 && g.Sum(x => x.o.Amount) > 1000)
+            .Having(g => g.Count() > 5 && g.Sum(x => x.o.Amount) > 1000)
             .Select(g => new
             {
                 g.Key,
