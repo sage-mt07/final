@@ -103,8 +103,8 @@ public class DMLQueryGeneratorTests
 
         var expr = src
             .GroupBy(o => o.CustomerId)
-            .Select(g => new { g.Key, OrderCount = g.Count(), TotalAmount = g.Sum(x => x.Amount) })
-            .Having(g => g.Count() > 10 && g.Sum(x => x.Amount) < 5000);
+            .Having(g => g.Count() > 10 && g.Sum(x => x.Amount) < 5000)
+            .Select(g => new { g.Key, OrderCount = g.Count(), TotalAmount = g.Sum(x => x.Amount) });
 
         var generator = new DMLQueryGenerator();
         var query = generator.GenerateLinqQuery("Orders", expr.Expression, false);

@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Linq.Expressions;
 using Kafka.Ksql.Linq.Query.Builders;
 using Kafka.Ksql.Linq.Tests;
