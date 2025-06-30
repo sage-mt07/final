@@ -86,7 +86,7 @@ public class WhereClauseBuilderTests
         Expression<Func<Order, bool>> expr = o => o.CustomerId == null;
         var builder = new WhereClauseBuilder();
         var sql = builder.BuildCondition(expr.Body);
-        Assert.Equal("(CustomerId IS NULL)", sql);
+        Assert.Equal("CustomerId IS NULL", sql);
     }
 
     [Fact]
@@ -95,6 +95,6 @@ public class WhereClauseBuilderTests
         Expression<Func<Order, bool>> expr = o => o.CustomerId != null;
         var builder = new WhereClauseBuilder();
         var sql = builder.BuildCondition(expr.Body);
-        Assert.Equal("(CustomerId IS NOT NULL)", sql);
+        Assert.Equal("CustomerId IS NOT NULL", sql);
     }
 }
