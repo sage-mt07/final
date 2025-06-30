@@ -212,4 +212,39 @@ public class DMLQueryGeneratorTests
         Assert.Contains("HAVING ((AVG(Amount) > 100) AND (MAX(Amount) < 1000))", result);
         Assert.EndsWith("EMIT CHANGES", result);
     }
+
+    [Fact]
+    public void GenerateLinqQuery_JoinWindowGroupByHavingCombination_ReturnsExpectedQuery()
+    {
+        var orders = new List<Order>().AsQueryable();
+        var customers = new List<Customer>().AsQueryable();
+
+        var query = orders
+            .Join(
+                customers,
+                o => o.CustomerId,
+                c => c.Id,
+                (o, c) => new { o, c }
+            )
+            .Window(TumblingWindow.OfMinutes(10))
+            .GroupBy(x => x.c.Name)
+            .Where(g => g.Count() > 5 && g.Sum(x => x.o.Amount) > 1000)
+            .Select(g => new
+            {
+                g.Key,
+                OrderCount = g.Count(),
+                TotalAmount = g.Sum(x => x.o.Amount)
+            });
+
+        var generator = new DMLQueryGenerator();
+        var result = generator.GenerateLinqQuery("joined", query.Expression, false);
+
+        Assert.Contains("JOIN", result);
+        Assert.Contains("WINDOW TUMBLING", result);
+        Assert.Contains("GROUP BY", result);
+        Assert.Contains("HAVING", result);
+        Assert.Contains("COUNT(", result);
+        Assert.Contains("SUM(", result);
+        Assert.EndsWith("EMIT CHANGES", result);
+    }
 }
