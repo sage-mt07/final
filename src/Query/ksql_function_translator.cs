@@ -284,14 +284,14 @@ internal static class KsqlFunctionTranslator
             ExpressionType.Divide => "/",
             ExpressionType.Modulo => "%",
             ExpressionType.Equal => "=",
-            ExpressionType.NotEqual => "<>",
+            ExpressionType.NotEqual => "!=",
             ExpressionType.GreaterThan => ">",
             ExpressionType.GreaterThanOrEqual => ">=",
             ExpressionType.LessThan => "<",
             ExpressionType.LessThanOrEqual => "<=",
             ExpressionType.AndAlso => "AND",
             ExpressionType.OrElse => "OR",
-            _ => nodeType.ToString()
+            _ => throw new NotSupportedException($"ExpressionType '{nodeType}' is not supported.")
         };
     }
 
@@ -309,14 +309,16 @@ internal static class KsqlFunctionTranslator
             Type t when t == typeof(long) => "BIGINT",
             Type t when t == typeof(double) => "DOUBLE",
             Type t when t == typeof(float) => "DOUBLE",
-            Type t when t == typeof(decimal) => "DECIMAL",
+            Type t when t == typeof(decimal) => "DECIMAL(38, 9)",
             Type t when t == typeof(string) => "VARCHAR",
             Type t when t == typeof(bool) => "BOOLEAN",
             Type t when t == typeof(DateTime) => "TIMESTAMP",
             Type t when t == typeof(DateTimeOffset) => "TIMESTAMP",
             Type t when t == typeof(Guid) => "VARCHAR",
             Type t when t == typeof(byte[]) => "BYTES",
-            _ => "VARCHAR"
+            _ when underlyingType.IsEnum => throw new NotSupportedException($"Type '{underlyingType.Name}' is not supported."),
+            _ when !underlyingType.IsPrimitive && underlyingType != typeof(string) && underlyingType != typeof(Guid) && underlyingType != typeof(byte[]) => throw new NotSupportedException($"Type '{underlyingType.Name}' is not supported."),
+            _ => throw new NotSupportedException($"Type '{underlyingType.Name}' is not supported.")
         };
     }
 
@@ -325,15 +327,24 @@ internal static class KsqlFunctionTranslator
     /// </summary>
     private static string InferTypeFromMethodName(string methodName)
     {
-        return methodName switch
+        var name = methodName.ToUpperInvariant();
+
+        return name switch
         {
-            "ToInt" or "ToInt32" => "INTEGER",
-            "ToLong" or "ToInt64" => "BIGINT",
-            "ToDouble" => "DOUBLE",
-            "ToDecimal" => "DECIMAL",
-            "ToString" => "VARCHAR",
-            "ToBool" or "ToBoolean" => "BOOLEAN",
-            _ => "VARCHAR"
+            "SUM" => "DOUBLE",
+            "AVG" => "DOUBLE",
+            "COUNT" => "BIGINT",
+            "MAX" => "ANY",
+            "MIN" => "ANY",
+            "TOPK" => "ARRAY",
+            "HISTOGRAM" => "MAP",
+            "TOINT" or "TOINT32" => "INTEGER",
+            "TOLONG" or "TOINT64" => "BIGINT",
+            "TODOUBLE" => "DOUBLE",
+            "TODECIMAL" => "DECIMAL(38, 9)",
+            "TOSTRING" => "VARCHAR",
+            "TOBOOL" or "TOBOOLEAN" => "BOOLEAN",
+            _ => "UNKNOWN"
         };
     }
 
