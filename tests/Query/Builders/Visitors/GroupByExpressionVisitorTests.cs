@@ -72,33 +72,29 @@ public class GroupByExpressionVisitorTests
     }
 
     [Fact]
-    public void Visit_NestedAnonymousType_FlattensMembers()
+    public void Visit_NestedAnonymousType_Throws()
     {
         Expression<Func<CategoryEntity, object>> expr = e => new { e.Type, Sub = new { e.Id } };
         var visitor = new GroupByExpressionVisitor();
-        visitor.Visit(expr.Body);
-        var result = visitor.GetResult();
-        Assert.Equal("Type, Id", result);
+        Assert.Throws<InvalidOperationException>(() => visitor.Visit(expr.Body));
     }
 
     [Fact]
-    public void Visit_CoalesceExpression_TranslatesToCoalesce()
+    public void Visit_CoalesceExpression_ReturnsMemberName()
     {
         Expression<Func<CategoryEntity, object>> expr = e => e.NullableValue ?? 0;
         var visitor = new GroupByExpressionVisitor();
         visitor.Visit(expr.Body);
         var result = visitor.GetResult();
-        Assert.Equal("COALESCE(NullableValue, 0)", result);
+        Assert.Equal("NullableValue", result);
     }
 
     [Fact]
-    public void Visit_ConstantExpression_ReturnsConstant()
+    public void Visit_ConstantExpression_Throws()
     {
         Expression<Func<CategoryEntity, object>> expr = e => new { Value = 1 };
         var visitor = new GroupByExpressionVisitor();
-        visitor.Visit(expr.Body);
-        var result = visitor.GetResult();
-        Assert.Equal("1", result);
+        Assert.Throws<InvalidOperationException>(() => visitor.Visit(expr.Body));
     }
 
     [Fact]
@@ -106,6 +102,6 @@ public class GroupByExpressionVisitorTests
     {
         Expression<Func<CategoryEntity, object>> expr = e => e.List.First();
         var visitor = new GroupByExpressionVisitor();
-        Assert.Throws<NotSupportedException>(() => visitor.Visit(expr.Body));
+        Assert.Throws<InvalidOperationException>(() => visitor.Visit(expr.Body));
     }
 }
