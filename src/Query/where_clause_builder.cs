@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Collections;
+using System.Linq;
 using System.Linq.Expressions;
 using Kafka.Ksql.Linq.Query.Abstractions;
 using Kafka.Ksql.Linq.Query.Builders.Common;
@@ -240,6 +242,12 @@ internal class WhereExpressionVisitor : ExpressionVisitor
             return $"({memberName} = false)";
         }
 
+        // IEnumerable.Contains の否定
+        if (node.Operand is MethodCallExpression method && IsEnumerableContains(method))
+        {
+            return BuildInExpression(method, negated: true);
+        }
+
         // 複雑な式の否定
         var operand = ProcessExpression(node.Operand);
         return $"NOT ({operand})";
@@ -307,13 +315,20 @@ internal class WhereExpressionVisitor : ExpressionVisitor
     /// </summary>
     private string HandleContainsMethod(MethodCallExpression node)
     {
+        // string.Contains pattern
         if (node.Object != null && node.Arguments.Count == 1)
         {
             var target = ProcessExpression(node.Object);
             var value = ProcessExpression(node.Arguments[0]);
             return $"INSTR({target}, {value}) > 0";
         }
-        
+
+        // IEnumerable.Contains pattern
+        if (IsEnumerableContains(node))
+        {
+            return BuildInExpression(node, negated: false);
+        }
+
         return KsqlFunctionTranslator.TranslateMethodCall(node);
     }
 
@@ -343,8 +358,73 @@ internal class WhereExpressionVisitor : ExpressionVisitor
             var value = ProcessExpression(node.Arguments[0]);
             return $"ENDS_WITH({target}, {value})";
         }
-        
+
         return KsqlFunctionTranslator.TranslateMethodCall(node);
+    }
+
+    /// <summary>
+    /// IEnumerable.Contains から IN / NOT IN 句生成
+    /// </summary>
+    private string BuildInExpression(MethodCallExpression node, bool negated)
+    {
+        var valuesExpr = node.Object == null ? node.Arguments[0] : node.Object;
+        var targetExpr = node.Object == null ? node.Arguments[1] : node.Arguments[0];
+
+        var values = EvaluateEnumerable(valuesExpr);
+        if (values == null)
+        {
+            return KsqlFunctionTranslator.TranslateMethodCall(node);
+        }
+
+        var joined = string.Join(", ", values.Cast<object>().Select(SafeToString));
+        var target = ProcessExpression(targetExpr);
+        var op = negated ? "NOT IN" : "IN";
+        return $"{target} {op} ({joined})";
+    }
+
+    /// <summary>
+    /// IEnumerable.Contains 判定
+    /// </summary>
+    private static bool IsEnumerableContains(MethodCallExpression node)
+    {
+        if (node.Method.Name != "Contains")
+            return false;
+
+        var enumerableType = typeof(IEnumerable);
+        if (node.Object == null && node.Arguments.Count == 2)
+        {
+            return enumerableType.IsAssignableFrom(node.Arguments[0].Type);
+        }
+
+        if (node.Object != null && node.Arguments.Count == 1)
+        {
+            return enumerableType.IsAssignableFrom(node.Object.Type);
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// 式を評価して IEnumerable を取得
+    /// </summary>
+    private static IEnumerable? EvaluateEnumerable(Expression expr)
+    {
+        if (expr is ConstantExpression constant && constant.Value is IEnumerable en)
+        {
+            return en;
+        }
+
+        try
+        {
+            var lambda = Expression.Lambda(expr);
+            var compiled = lambda.Compile();
+            var value = compiled.DynamicInvoke();
+            return value as IEnumerable;
+        }
+        catch
+        {
+            return null;
+        }
     }
 
     /// <summary>
