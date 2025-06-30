@@ -2,7 +2,6 @@ using System;
 using Kafka.Ksql.Linq.Core.Abstractions;
 using Kafka.Ksql.Linq.Core.Modeling;
 using Kafka.Ksql.Linq.Configuration;
-using Microsoft.Extensions.Logging.Abstractions;
 using Xunit;
 
 #nullable enable
@@ -38,7 +37,7 @@ public class SpecialTypeHandlingTests
     [Fact]
     public void ShortProperty_MappedAsInteger()
     {
-        var generator = new Kafka.Ksql.Linq.Query.Pipeline.DDLQueryGenerator(new NullLoggerFactory());
+        var generator = new Kafka.Ksql.Linq.Query.Pipeline.DDLQueryGenerator();
         var result = PrivateAccessor.InvokePrivate<string>(generator, "MapToKsqlType", new[] { typeof(Type) }, args: new object?[] { typeof(short) });
         Assert.Equal("INTEGER", result);
     }

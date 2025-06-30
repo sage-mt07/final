@@ -4,7 +4,6 @@ using System.Linq;
 using System.Linq.Expressions;
 using Kafka.Ksql.Linq.Query.Builders;
 using Kafka.Ksql.Linq.Query.Pipeline;
-using Microsoft.Extensions.Logging.Abstractions;
 using Xunit;
 
 namespace Kafka.Ksql.Linq.Tests.Query;
@@ -19,7 +18,7 @@ public class QueryBuilderAdvancedPatternsTests
                       .OrderBy(e => e.Id)
                       .Select(e => e.Name);
 
-        var generator = new DDLQueryGenerator(new NullLoggerFactory());
+        var generator = new DDLQueryGenerator();
         var sql = generator.GenerateCreateTableAs("t1", "Base", expr.Expression);
 
         Assert.Contains("WINDOW TUMBLING (SIZE 1 MINUTES)", sql);
