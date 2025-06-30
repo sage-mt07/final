@@ -5,9 +5,9 @@ using Xunit;
 
 namespace Kafka.Ksql.Linq.Tests.Query.Builders;
 
-public class WindowBuilderVisitWindowDefStateTests
+public class WindowClauseBuilderVisitWindowDefStateTests
 {
-    private static Type VisitorType => typeof(WindowBuilder).GetNestedType("WindowExpressionVisitor", BindingFlags.NonPublic)!;
+    private static Type VisitorType => typeof(WindowClauseBuilder).GetNestedType("WindowExpressionVisitor", BindingFlags.NonPublic)!;
 
     private static object CreateVisitor() => Activator.CreateInstance(VisitorType)!;
 

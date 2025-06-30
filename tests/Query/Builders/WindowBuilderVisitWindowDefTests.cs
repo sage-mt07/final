@@ -5,12 +5,12 @@ using Xunit;
 
 namespace Kafka.Ksql.Linq.Tests.Query.Builders;
 
-public class WindowBuilderVisitWindowDefTests
+public class WindowClauseBuilderVisitWindowDefTests
 {
     [Fact]
     public void VisitWindowDef_WhenNoWindowTypeDefined_ShouldReturnUnknownClause()
     {
-        var visitorType = typeof(WindowBuilder).GetNestedType("WindowExpressionVisitor", BindingFlags.NonPublic)!;
+        var visitorType = typeof(WindowClauseBuilder).GetNestedType("WindowExpressionVisitor", BindingFlags.NonPublic)!;
         var visitor = Activator.CreateInstance(visitorType)!;
 
         var def = new global::Kafka.Ksql.Linq.WindowDef()
@@ -25,7 +25,7 @@ public class WindowBuilderVisitWindowDefTests
     [Fact]
     public void VisitWindowDef_WhenTumblingWindowWithFullOptions_ShouldBuildExpectedClause()
     {
-        var visitorType = typeof(WindowBuilder).GetNestedType("WindowExpressionVisitor", BindingFlags.NonPublic)!;
+        var visitorType = typeof(WindowClauseBuilder).GetNestedType("WindowExpressionVisitor", BindingFlags.NonPublic)!;
         var visitor = Activator.CreateInstance(visitorType)!;
 
         var def = new global::Kafka.Ksql.Linq.WindowDef()
@@ -44,7 +44,7 @@ public class WindowBuilderVisitWindowDefTests
     [Fact]
     public void VisitWindowDef_WhenHoppingWindowWithFullOptions_ShouldBuildExpectedClause()
     {
-        var visitorType = typeof(WindowBuilder).GetNestedType("WindowExpressionVisitor", BindingFlags.NonPublic)!;
+        var visitorType = typeof(WindowClauseBuilder).GetNestedType("WindowExpressionVisitor", BindingFlags.NonPublic)!;
         var visitor = Activator.CreateInstance(visitorType)!;
 
         var def = new global::Kafka.Ksql.Linq.WindowDef()
@@ -64,7 +64,7 @@ public class WindowBuilderVisitWindowDefTests
     [Fact]
     public void VisitWindowDef_WhenSessionWindowWithGapSpecified_ShouldBuildExpectedClause()
     {
-        var visitorType = typeof(WindowBuilder).GetNestedType("WindowExpressionVisitor", BindingFlags.NonPublic)!;
+        var visitorType = typeof(WindowClauseBuilder).GetNestedType("WindowExpressionVisitor", BindingFlags.NonPublic)!;
         var visitor = Activator.CreateInstance(visitorType)!;
 
         var def = new global::Kafka.Ksql.Linq.WindowDef()

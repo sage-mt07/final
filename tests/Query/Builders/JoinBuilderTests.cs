@@ -11,7 +11,7 @@ using static Kafka.Ksql.Linq.Tests.PrivateAccessor;
 
 namespace Kafka.Ksql.Linq.Tests.Query.Builders;
 
-public class JoinBuilderTests
+public class JoinClauseBuilderTests
 {
     [Fact]
     public void Build_SimpleJoin_ReturnsJoinQuery()
@@ -19,7 +19,7 @@ public class JoinBuilderTests
         IQueryable<TestEntity> outer = new List<TestEntity>().AsQueryable();
         IQueryable<ChildEntity> inner = new List<ChildEntity>().AsQueryable();
         var expr = outer.Join(inner, o => o.Id, c => c.ParentId, (o, c) => new { o.Id, c.Name }).Expression;
-        var builder = new JoinBuilder();
+        var builder = new JoinClauseBuilder();
         var result = builder.Build(expr);
         Assert.StartsWith("SELECT o.Id, c.Name FROM TestEntity o JOIN ChildEntity c ON o.Id = c.ParentId", result);
     }
@@ -38,7 +38,7 @@ public class JoinBuilderTests
             (o, c) => new { o.Id }
         ).Expression;
 
-        var builder = new JoinBuilder();
+        var builder = new JoinClauseBuilder();
         var result = builder.Build(expr);
         Assert.Contains("JOIN構築エラー", result);
     }
@@ -46,7 +46,7 @@ public class JoinBuilderTests
     [Fact]
     public void Build_NullExpression_ThrowsArgumentNullException()
     {
-        var builder = new JoinBuilder();
+        var builder = new JoinClauseBuilder();
         Assert.Throws<ArgumentNullException>(() => builder.Build(null!));
     }
 
@@ -69,7 +69,7 @@ public class JoinBuilderTests
         var joinExpr = outer.Join(inner, o => o.Id, c => c.ParentId, (o, c) => new { o.Id, c.ParentId }).Expression;
         var ctor = typeof(Holder).GetConstructor(new[] { typeof(object) })!;
         var newExpr = Expression.New(ctor, joinExpr);
-        var builder = new JoinBuilder();
+        var builder = new JoinClauseBuilder();
         var result = InvokePrivate<MethodCallExpression?>(builder, "FindJoinCall", new[] { typeof(Expression) }, null, newExpr);
         Assert.NotNull(result);
     }
@@ -80,7 +80,7 @@ public class JoinBuilderTests
         IQueryable<TestEntity> outer = new List<TestEntity>().AsQueryable();
         IQueryable<ChildEntity> inner = new List<ChildEntity>().AsQueryable();
         Expression<Func<object>> lambda = () => outer.Join(inner, o => o.Id, c => c.ParentId, (o, c) => new { o.Id });
-        var builder = new JoinBuilder();
+        var builder = new JoinClauseBuilder();
         var result = InvokePrivate<MethodCallExpression?>(builder, "FindJoinCall", new[] { typeof(Expression) }, null, lambda);
         Assert.NotNull(result);
     }
@@ -94,7 +94,7 @@ public class JoinBuilderTests
         var memberInit = Expression.MemberInit(
             Expression.New(typeof(SettableHolder)),
             Expression.Bind(typeof(SettableHolder).GetProperty(nameof(SettableHolder.Value))!, joinExpr));
-        var builder = new JoinBuilder();
+        var builder = new JoinClauseBuilder();
         var result = InvokePrivate<MethodCallExpression?>(builder, "FindJoinCall", new[] { typeof(Expression) }, null, memberInit);
         Assert.NotNull(result);
     }
@@ -106,7 +106,7 @@ public class JoinBuilderTests
         IQueryable<ChildEntity> inner = new List<ChildEntity>().AsQueryable();
         Expression<Func<object>> lambda = () => outer.Join(inner, o => o.Id, c => c.ParentId, (o, c) => new { o.Id });
         var invoke = Expression.Invoke(lambda);
-        var builder = new JoinBuilder();
+        var builder = new JoinClauseBuilder();
         var result = InvokePrivate<MethodCallExpression?>(builder, "FindJoinCall", new[] { typeof(Expression) }, null, invoke);
         Assert.NotNull(result);
     }
@@ -117,7 +117,7 @@ public class JoinBuilderTests
         IQueryable<TestEntity> outer = new List<TestEntity>().AsQueryable();
         IQueryable<ChildEntity> inner = new List<ChildEntity>().AsQueryable();
         var joinExpr = outer.Join(inner, o => o.Id, c => c.ParentId, (o, c) => new { o.Id, c.Name }).Expression as MethodCallExpression;
-        var builder = new JoinBuilder();
+        var builder = new JoinClauseBuilder();
         var sql = InvokePrivate<string>(builder, "BuildJoinQuery", new[] { typeof(MethodCallExpression) }, null, joinExpr!);
         Assert.StartsWith("SELECT o.Id, c.Name FROM TestEntity o JOIN ChildEntity c ON o.Id = c.ParentId", sql);
     }

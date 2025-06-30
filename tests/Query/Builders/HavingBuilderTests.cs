@@ -8,13 +8,13 @@ using static Kafka.Ksql.Linq.Tests.PrivateAccessor;
 
 namespace Kafka.Ksql.Linq.Tests.Query.Builders;
 
-public class HavingBuilderTests
+public class HavingClauseBuilderTests
 {
     [Fact]
     public void Build_CountWithoutSelector_ReturnsCountAll()
     {
         Expression<Func<IGrouping<int, TestEntity>, bool>> expr = g => g.Count() > 1;
-        var builder = new HavingBuilder();
+        var builder = new HavingClauseBuilder();
         var result = builder.Build(expr.Body);
         Assert.Equal("HAVING (COUNT(*) > 1)", result);
     }
@@ -23,7 +23,7 @@ public class HavingBuilderTests
     public void Build_SumWithLambda_ReturnsAggregateCondition()
     {
         Expression<Func<IGrouping<int, TestEntity>, bool>> expr = g => g.Sum(x => x.Id) > 5;
-        var builder = new HavingBuilder();
+        var builder = new HavingClauseBuilder();
         var result = builder.Build(expr.Body);
         Assert.Equal("HAVING (SUM(Id) > 5)", result);
     }
@@ -31,7 +31,7 @@ public class HavingBuilderTests
     [Fact]
     public void Build_NullExpression_ThrowsArgumentNullException()
     {
-        var builder = new HavingBuilder();
+        var builder = new HavingClauseBuilder();
         Assert.Throws<ArgumentNullException>(() => builder.Build(null!));
     }
 
@@ -43,7 +43,7 @@ public class HavingBuilderTests
     [InlineData("AVERAGE", "AVG")]
     public void TransformMethodName_ReturnsExpected(string original, string expected)
     {
-        var visitorType = typeof(HavingBuilder).GetNestedType("HavingExpressionVisitor", BindingFlags.NonPublic)!;
+        var visitorType = typeof(HavingClauseBuilder).GetNestedType("HavingExpressionVisitor", BindingFlags.NonPublic)!;
         var result = InvokePrivate<string>(visitorType, "TransformMethodName", new[] { typeof(string) }, null, original);
         Assert.Equal(expected, result);
     }
@@ -53,7 +53,7 @@ public class HavingBuilderTests
     [InlineData(ExpressionType.AndAlso, "AND")]
     public void GetSqlOperator_ReturnsExpected(ExpressionType type, string expected)
     {
-        var visitorType = typeof(HavingBuilder).GetNestedType("HavingExpressionVisitor", BindingFlags.NonPublic)!;
+        var visitorType = typeof(HavingClauseBuilder).GetNestedType("HavingExpressionVisitor", BindingFlags.NonPublic)!;
         var result = InvokePrivate<string>(visitorType, "GetSqlOperator", new[] { typeof(ExpressionType) }, null, type);
         Assert.Equal(expected, result);
     }
@@ -61,7 +61,7 @@ public class HavingBuilderTests
     [Fact]
     public void GetSqlOperator_Unsupported_Throws()
     {
-        var visitorType = typeof(HavingBuilder).GetNestedType("HavingExpressionVisitor", BindingFlags.NonPublic)!;
+        var visitorType = typeof(HavingClauseBuilder).GetNestedType("HavingExpressionVisitor", BindingFlags.NonPublic)!;
         var ex = Assert.Throws<TargetInvocationException>(() =>
             InvokePrivate<string>(visitorType, "GetSqlOperator", new[] { typeof(ExpressionType) }, null, ExpressionType.ArrayIndex));
         Assert.IsType<NotSupportedException>(ex.InnerException);
@@ -74,7 +74,7 @@ public class HavingBuilderTests
     [InlineData("UNKNOWN", false)]
     public void IsAggregateFunction_DetectsAggregateMethods(string name, bool expected)
     {
-        var visitorType = typeof(HavingBuilder).GetNestedType("HavingExpressionVisitor", BindingFlags.NonPublic)!;
+        var visitorType = typeof(HavingClauseBuilder).GetNestedType("HavingExpressionVisitor", BindingFlags.NonPublic)!;
         var result = InvokePrivate<bool>(visitorType, "IsAggregateFunction", new[] { typeof(string) }, null, name);
         Assert.Equal(expected, result);
     }

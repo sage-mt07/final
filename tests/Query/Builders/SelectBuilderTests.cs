@@ -5,13 +5,13 @@ using Xunit;
 
 namespace Kafka.Ksql.Linq.Tests.Query.Builders;
 
-public class SelectBuilderTests
+public class WhereClauseBuilderTests
 {
     [Fact]
     public void Build_SimpleEquality_ReturnsWhereClause()
     {
         Expression<Func<TestEntity, bool>> expr = e => e.Id == 1;
-        var builder = new SelectBuilder();
+        var builder = new WhereClauseBuilder();
         var result = builder.Build(expr.Body);
         Assert.Equal("WHERE (Id = 1)", result);
     }
@@ -20,7 +20,7 @@ public class SelectBuilderTests
     public void BuildCondition_BooleanNegation_IncludesParameterPrefix()
     {
         Expression<Func<TestEntity, bool>> expr = e => !e.IsActive;
-        var builder = new SelectBuilder();
+        var builder = new WhereClauseBuilder();
         var result = builder.BuildCondition(expr.Body);
         Assert.Equal("(e.IsActive = false)", result);
     }
@@ -28,7 +28,7 @@ public class SelectBuilderTests
     [Fact]
     public void Build_NullExpression_ThrowsArgumentNullException()
     {
-        var builder = new SelectBuilder();
+        var builder = new WhereClauseBuilder();
         Assert.Throws<ArgumentNullException>(() => builder.Build(null!));
     }
 }

@@ -10,7 +10,7 @@ namespace Kafka.Ksql.Linq.Tests.KsqlDslTests.Aggregate;
 public class WindowStartEndTests
 {
     [Fact]
-    public void ProjectionBuilder_WindowStartEnd_GeneratesFunctions()
+    public void SelectClauseBuilder_WindowStartEnd_GeneratesFunctions()
     {
         Expression<Func<IGrouping<string, TestEntity>, object>> expr = g => new
         {
@@ -18,7 +18,7 @@ public class WindowStartEndTests
             End = g.WindowEnd()
         };
 
-        var builder = new ProjectionBuilder();
+        var builder = new SelectClauseBuilder();
         var result = builder.Build(expr.Body);
 
         Assert.Equal("SELECT WINDOWSTART AS Start, WINDOWEND AS End", result);

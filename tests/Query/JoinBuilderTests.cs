@@ -4,7 +4,7 @@ using Xunit;
 
 namespace Kafka.Ksql.Linq.Tests.Query;
 
-public class JoinBuilderTests
+public class JoinClauseBuilderTests
 {
     [Fact]
     public void TwoTableJoin_AllKeysMatch_ReturnsJoinedRecords()

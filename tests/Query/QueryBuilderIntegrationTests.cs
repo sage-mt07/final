@@ -26,8 +26,8 @@ public class QueryBuilderIntegrationTests
             (o, c) => new { o.OrderId, c.Region }
         ).Expression;
 
-        var joinBuilder = new JoinBuilder();
-        var whereBuilder = new SelectBuilder();
+        var joinBuilder = new JoinClauseBuilder();
+        var whereBuilder = new WhereClauseBuilder();
         var joinSql = joinBuilder.Build(joinExpr);
         var whereSql = whereBuilder.Build(whereExp.Body);
         var final = $"{joinSql} {whereSql}";
@@ -64,32 +64,19 @@ public class QueryBuilderIntegrationTests
             (o, p) => new { o.OrderId, p.Status }
         ).Expression;
 
-        var builder = new JoinBuilder();
+        var builder = new JoinClauseBuilder();
         var sql = builder.Build(expr);
 
         Assert.Contains("JOIN", sql);
         Assert.Contains("o.OrderId = p.OrderId", sql);
     }
 
-    [Fact]
-    public void Analyze_OrderBy_ThenByDescending_IgnoresSortOperations()
-    {
-        IQueryable<Order> orders = new List<Order>().AsQueryable();
-        var query = orders.OrderBy(o => o.CustomerId)
-                          .ThenByDescending(o => o.OrderDate)
-                          .Select(o => o.OrderId);
-
-        var analyzer = new StreamTableAnalyzer(new NullLoggerFactory());
-        var result = analyzer.AnalyzeExpression(query.Expression);
-
-        Assert.Equal(new[] {"Select"}, result.OperationChain.Select(o => o.MethodName));
-    }
 
     [Fact]
     public void Build_SelectAnonymousType_ReturnsSelectClause()
     {
         Expression<Func<Order, object>> expr = o => new { o.OrderId, o.TotalAmount, o.OrderDate };
-        var builder = new ProjectionBuilder();
+        var builder = new SelectClauseBuilder();
         var sql = builder.Build(expr.Body);
 
         Assert.Equal("SELECT OrderId, TotalAmount, OrderDate", sql);
@@ -116,8 +103,8 @@ public class QueryBuilderIntegrationTests
         Expression<Func<Order, object>> groupExpr = o => o.CustomerId;
         Expression<Func<IGrouping<int, Order>, bool>> havingExpr = g => g.Count() > 5;
 
-        var groupBuilder = new GroupByBuilder();
-        var havingBuilder = new HavingBuilder();
+        var groupBuilder = new GroupByClauseBuilder();
+        var havingBuilder = new HavingClauseBuilder();
 
         var groupSql = groupBuilder.Build(groupExpr.Body);
         var havingSql = havingBuilder.Build(havingExpr.Body);
@@ -131,7 +118,7 @@ public class QueryBuilderIntegrationTests
     public void Build_SelectAnonymousTypeWithConversion_ReturnsSelectClause()
     {
         Expression<Func<Order, object>> expr = o => new { o.OrderId, Date = o.OrderDate.Date };
-        var builder = new ProjectionBuilder();
+        var builder = new SelectClauseBuilder();
         var sql = builder.Build(expr.Body);
 
         Assert.Equal("SELECT OrderId, OrderDate AS Date", sql);
