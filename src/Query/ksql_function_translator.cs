@@ -231,11 +231,17 @@ internal static class KsqlFunctionTranslator
     private static int GetEffectiveArgumentCount(MethodCallExpression methodCall)
     {
         var count = methodCall.Arguments.Count;
-        
+
         // インスタンスメソッドの場合、Objectも1つの引数としてカウント
         if (methodCall.Object != null && !methodCall.Method.IsStatic)
         {
             count++;
+        }
+
+        // 拡張メソッドは第1引数がレシーバに相当するため引数から除外する
+        if (methodCall.Method.IsStatic && methodCall.Method.IsDefined(typeof(System.Runtime.CompilerServices.ExtensionAttribute), false))
+        {
+            count--;
         }
 
         return count;
