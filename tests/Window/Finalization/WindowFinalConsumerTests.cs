@@ -1,4 +1,5 @@
 using Kafka.Ksql.Linq.StateStore.Core;
+using Kafka.Ksql.Linq.StateStore.Configuration;
 using Kafka.Ksql.Linq.Window.Finalization;
 using Microsoft.Extensions.Logging.Abstractions;
 using System;

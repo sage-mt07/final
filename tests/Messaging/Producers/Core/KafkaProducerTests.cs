@@ -12,6 +12,10 @@ namespace Kafka.Ksql.Linq.Tests.Messaging.Producers.Core;
 
 public class KafkaProducerTests
 {
+    private class DummySerializer : ISerializer<object>
+    {
+        public byte[] Serialize(object data, SerializationContext context) => Array.Empty<byte>();
+    }
     private class DummyProducer : IProducer<object, object>
     {
         public List<(TopicPartition Partition, Message<object, object> Message)> Produced { get; } = new();
@@ -26,7 +30,13 @@ public class KafkaProducerTests
         public void Produce(TopicPartition topicPartition, Message<object, object> message, Action<DeliveryReport<object, object>>? handler = null)
         {
             Produced.Add((topicPartition, message));
-            handler?.Invoke(new DeliveryReport<object, object> { TopicPartition = topicPartition });
+            handler?.Invoke(new DeliveryReport<object, object>
+            {
+                Topic = topicPartition.Topic,
+                Partition = topicPartition.Partition,
+                Offset = new Offset(1),
+                Message = message
+            });
         }
         public int Poll(TimeSpan timeout) => 0;
         public Task<DeliveryResult<object, object>> ProduceAsync(string topic, Message<object, object> message, CancellationToken cancellationToken = default)
@@ -36,7 +46,8 @@ public class KafkaProducerTests
             Produced.Add((topicPartition, message));
             return Task.FromResult(new DeliveryResult<object, object>
             {
-                TopicPartition = topicPartition,
+                Topic = topicPartition.Topic,
+                Partition = topicPartition.Partition,
                 Offset = new Offset(1),
                 Status = PersistenceStatus.Persisted,
                 Message = message
@@ -71,7 +82,7 @@ public class KafkaProducerTests
     public async Task SendAsync_ProducesMessage()
     {
         var producer = new DummyProducer();
-        var kp = new KafkaProducer<Sample>(producer, new Confluent.Kafka.NullSerializer<object>(), new Confluent.Kafka.NullSerializer<object>(), "orders", CreateModel(), NullLoggerFactory.Instance);
+        var kp = new KafkaProducer<Sample>(producer, new DummySerializer(), new DummySerializer(), "orders", CreateModel(), NullLoggerFactory.Instance);
 
         var entity = new Sample { Id = 1 };
         var result = await kp.SendAsync(entity);
