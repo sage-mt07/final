@@ -144,9 +144,10 @@ internal class KafkaAdminService : IDisposable
         if (replicationFactor <= 0)
             throw new ArgumentException("replicationFactor must be > 0", nameof(replicationFactor));
 
-        var topics = await AdminClientExtensions.DescribeTopicsAsync(
-            _adminClient,
-            new[] { topicName });
+        var topics = await _adminClient.DescribeTopicsAsync(
+            TopicCollection.OfTopicNames(new[] { topicName }),
+            null,
+            CancellationToken.None);
         var desc = topics.FirstOrDefault();
         if (desc != null)
         {
