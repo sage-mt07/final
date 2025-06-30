@@ -391,7 +391,7 @@ internal class WhereExpressionVisitor : ExpressionVisitor
         return nodeType switch
         {
             ExpressionType.Equal => "=",
-            ExpressionType.NotEqual => "<>",
+            ExpressionType.NotEqual => "!=",
             ExpressionType.GreaterThan => ">",
             ExpressionType.GreaterThanOrEqual => ">=",
             ExpressionType.LessThan => "<",

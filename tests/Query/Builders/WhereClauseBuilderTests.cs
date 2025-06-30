@@ -43,4 +43,58 @@ public class WhereClauseBuilderTests
         var sql = builder.BuildCondition(expr.Body);
         Assert.Equal("((Id = 1) AND (Name = 'foo'))", sql);
     }
+
+    private class Order
+    {
+        public int Amount { get; set; }
+        public int? CustomerId { get; set; }
+    }
+
+    [Theory]
+    [InlineData("==", 100, "(Amount = 100)")]
+    [InlineData("!=", 100, "(Amount != 100)")]
+    [InlineData("<", 100, "(Amount < 100)")]
+    [InlineData("<=", 100, "(Amount <= 100)")]
+    [InlineData(">", 100, "(Amount > 100)")]
+    [InlineData(">=", 100, "(Amount >= 100)")]
+    public void BuildCondition_ComparisonOperators(string op, int value, string expected)
+    {
+        var parameter = Expression.Parameter(typeof(Order), "o");
+        var left = Expression.Property(parameter, "Amount");
+        var right = Expression.Constant(value);
+
+        Expression body = op switch
+        {
+            "==" => Expression.Equal(left, right),
+            "!=" => Expression.NotEqual(left, right),
+            "<" => Expression.LessThan(left, right),
+            "<=" => Expression.LessThanOrEqual(left, right),
+            ">" => Expression.GreaterThan(left, right),
+            ">=" => Expression.GreaterThanOrEqual(left, right),
+            _ => throw new NotSupportedException()
+        };
+
+        var builder = new WhereClauseBuilder();
+        var sql = builder.BuildCondition(body);
+
+        Assert.Equal(expected, sql);
+    }
+
+    [Fact]
+    public void BuildCondition_IsNullComparison_ReturnsIsNull()
+    {
+        Expression<Func<Order, bool>> expr = o => o.CustomerId == null;
+        var builder = new WhereClauseBuilder();
+        var sql = builder.BuildCondition(expr.Body);
+        Assert.Equal("CustomerId IS NULL", sql);
+    }
+
+    [Fact]
+    public void BuildCondition_IsNotNullComparison_ReturnsIsNotNull()
+    {
+        Expression<Func<Order, bool>> expr = o => o.CustomerId != null;
+        var builder = new WhereClauseBuilder();
+        var sql = builder.BuildCondition(expr.Body);
+        Assert.Equal("CustomerId IS NOT NULL", sql);
+    }
 }
