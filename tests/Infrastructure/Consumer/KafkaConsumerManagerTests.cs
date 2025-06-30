@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using Confluent.Kafka;
 using Kafka.Ksql.Linq.Core.Abstractions;
 using Kafka.Ksql.Linq.Messaging.Abstractions;
+using Kafka.Ksql.Linq.Messaging.Producers.Core;
+using Kafka.Ksql.Linq.Configuration.Abstractions;
 using Kafka.Ksql.Linq.Messaging.Consumers;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
