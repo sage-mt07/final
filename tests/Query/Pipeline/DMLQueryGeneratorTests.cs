@@ -347,4 +347,27 @@ public class DMLQueryGeneratorTests
         Assert.Contains("SUM", result);
         Assert.Contains("EMIT CHANGES", result);
     }
+
+    [Fact]
+    public void GenerateLinqQuery_GroupBySelectOrderBy_ReturnsExpectedQuery()
+    {
+        var orders = new List<Order>().AsQueryable();
+
+        var query = orders
+            .GroupBy(o => o.CustomerId)
+            .Select(g => new
+            {
+                g.Key,
+                Total = g.Sum(o => o.Amount)
+            })
+            .OrderBy(x => x.Total);
+
+        var generator = new DMLQueryGenerator();
+        var result = generator.GenerateLinqQuery("orders", query.Expression, false);
+
+        Assert.Contains("GROUP BY", result);
+        Assert.Contains("SUM", result);
+        Assert.Contains("ORDER BY", result);
+        Assert.Contains("EMIT CHANGES", result);
+    }
 }
