@@ -248,21 +248,45 @@ internal class DMLQueryGenerator : GeneratorBase, IDMLQueryGenerator
             var lambdaBody = ExtractLambdaBody(methodCall.Arguments[1]);
             if (lambdaBody != null)
             {
-                var whereContent = SafeCallBuilder(KsqlBuilderType.Where, lambdaBody, "WHERE processing");
-                
-                // 既存のWHERE句と結合（AND条件）
-                var existingWhere = structure.GetClause(QueryClauseType.Where);
-                if (existingWhere != null)
+                bool treatAsHaving =
+                    structure.HasClause(QueryClauseType.GroupBy) &&
+                    HasAggregateFunction(lambdaBody);
+
+                if (treatAsHaving)
                 {
-                    var combinedContent = $"WHERE ({existingWhere.Content.Substring(6)}) AND ({whereContent})";
-                    var combinedClause = QueryClause.Required(QueryClauseType.Where, combinedContent, lambdaBody);
-                    structure = structure.RemoveClause(QueryClauseType.Where);
-                    structure = structure.AddClause(combinedClause);
+                    var havingContent = SafeCallBuilder(KsqlBuilderType.Having, lambdaBody, "HAVING processing");
+                    var existingHaving = structure.GetClause(QueryClauseType.Having);
+                    if (existingHaving != null)
+                    {
+                        var combinedContent = $"HAVING ({existingHaving.Content.Substring(7)}) AND ({havingContent})";
+                        var combinedClause = QueryClause.Required(QueryClauseType.Having, combinedContent, lambdaBody);
+                        structure = structure.RemoveClause(QueryClauseType.Having);
+                        structure = structure.AddClause(combinedClause);
+                    }
+                    else
+                    {
+                        var havingClause = QueryClause.Required(QueryClauseType.Having, $"HAVING {havingContent}", lambdaBody);
+                        structure = structure.AddClause(havingClause);
+                    }
                 }
                 else
                 {
-                    var whereClause = QueryClause.Required(QueryClauseType.Where, $"WHERE {whereContent}", lambdaBody);
-                    structure = structure.AddClause(whereClause);
+                    var whereContent = SafeCallBuilder(KsqlBuilderType.Where, lambdaBody, "WHERE processing");
+
+                    // 既存のWHERE句と結合（AND条件）
+                    var existingWhere = structure.GetClause(QueryClauseType.Where);
+                    if (existingWhere != null)
+                    {
+                        var combinedContent = $"WHERE ({existingWhere.Content.Substring(6)}) AND ({whereContent})";
+                        var combinedClause = QueryClause.Required(QueryClauseType.Where, combinedContent, lambdaBody);
+                        structure = structure.RemoveClause(QueryClauseType.Where);
+                        structure = structure.AddClause(combinedClause);
+                    }
+                    else
+                    {
+                        var whereClause = QueryClause.Required(QueryClauseType.Where, $"WHERE {whereContent}", lambdaBody);
+                        structure = structure.AddClause(whereClause);
+                    }
                 }
             }
         }
@@ -418,6 +442,16 @@ internal class DMLQueryGenerator : GeneratorBase, IDMLQueryGenerator
             UnaryExpression unary => ExtractConstantValue(unary.Operand),
             _ => "0"
         };
+    }
+
+    /// <summary>
+    /// 式に集約関数が含まれるか判定
+    /// </summary>
+    private static bool HasAggregateFunction(Expression expression)
+    {
+        var visitor = new AggregateDetectionVisitor();
+        visitor.Visit(expression);
+        return visitor.HasAggregates;
     }
 
     /// <summary>
