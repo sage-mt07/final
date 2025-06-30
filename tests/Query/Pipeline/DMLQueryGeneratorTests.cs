@@ -151,4 +151,35 @@ public class DMLQueryGeneratorTests
         Assert.Contains("SUM(Amount) AS TotalAmount", query);
         Assert.EndsWith("EMIT CHANGES", query);
     }
+
+    [Fact]
+    public void GenerateLinqQuery_JoinGroupByHavingCondition_ReturnsExpectedQuery()
+    {
+        var orders = new List<Order>().AsQueryable();
+        var customers = new List<Customer>().AsQueryable();
+
+        var query =
+            (from o in orders
+             join c in customers on o.CustomerId equals c.Id
+             group o by o.CustomerId into g
+             select g)
+            .Having(g => g.Count() > 2 && g.Sum(x => x.Amount) < 10000)
+            .Select(g => new
+            {
+                g.Key,
+                OrderCount = g.Count(),
+                TotalAmount = g.Sum(x => x.Amount)
+            });
+
+        var generator = new DMLQueryGenerator();
+        var result = generator.GenerateLinqQuery("joined", query.Expression, false);
+
+        Assert.Contains("JOIN", result);
+        Assert.Contains("GROUP BY", result);
+        Assert.Contains("HAVING", result);
+        Assert.Contains("COUNT(*)", result);
+        Assert.Contains("SUM(", result);
+        Assert.Contains("HAVING ((COUNT(*) > 2) AND (SUM(Amount) < 10000))", result);
+        Assert.EndsWith("EMIT CHANGES", result);
+    }
 }
