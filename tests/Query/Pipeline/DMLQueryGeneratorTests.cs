@@ -477,4 +477,34 @@ public class DMLQueryGeneratorTests
         Assert.Contains("ELSE", result);
         Assert.Contains("EMIT CHANGES", result);
     }
+
+    [Fact]
+    public void GenerateLinqQuery_GroupByWithComplexHavingConditions_ReturnsExpectedQuery()
+    {
+        var orders = new List<Order>().AsQueryable();
+
+        var query = orders
+            .GroupBy(o => o.CustomerId)
+            .Where(g =>
+                (g.Sum(o => o.Amount) > 1000 && g.Count() > 5) ||
+                g.Average(o => o.Amount) > 500)
+            .Select(g => new
+            {
+                g.Key,
+                Total = g.Sum(o => o.Amount),
+                Count = g.Count(),
+                Avg = g.Average(o => o.Amount)
+            });
+
+        var generator = new DMLQueryGenerator();
+        var result = generator.GenerateLinqQuery("orders", query.Expression, false);
+
+        Assert.Contains("GROUP BY", result);
+        Assert.Contains("HAVING", result);
+        Assert.Contains("AND", result);
+        Assert.Contains("OR", result);
+        Assert.Contains("(", result);
+        Assert.Contains(")", result);
+        Assert.Contains("EMIT CHANGES", result);
+    }
 }
