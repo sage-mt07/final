@@ -299,4 +299,29 @@ public class DMLQueryGeneratorTests
         Assert.Contains("HighPriorityTotal", result);
         Assert.Contains("EMIT CHANGES", result);
     }
+
+    [Fact]
+    public void GenerateLinqQuery_GroupByWithAvgMinMax_ReturnsExpectedQuery()
+    {
+        var orders = new List<Order>().AsQueryable();
+
+        var query = orders
+            .GroupBy(o => o.CustomerId)
+            .Select(g => new
+            {
+                g.Key,
+                AverageAmount = g.Average(o => o.Amount),
+                MinAmount = g.Min(o => o.Amount),
+                MaxAmount = g.Max(o => o.Amount)
+            });
+
+        var generator = new DMLQueryGenerator();
+        var result = generator.GenerateLinqQuery("orders", query.Expression, false);
+
+        Assert.Contains("GROUP BY", result);
+        Assert.Contains("AVG", result);
+        Assert.Contains("MIN", result);
+        Assert.Contains("MAX", result);
+        Assert.Contains("EMIT CHANGES", result);
+    }
 }
