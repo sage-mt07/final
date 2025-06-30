@@ -48,4 +48,35 @@ public class GeneratorBaseTests
                 new[] { typeof(QueryPart[]) },
                 args: new object[] { new[] { QueryPart.Optional(string.Empty) } }));
     }
+
+    [Theory]
+    [InlineData(typeof(string), "VARCHAR")]
+    [InlineData(typeof(int), "INTEGER")]
+    [InlineData(typeof(long), "BIGINT")]
+    [InlineData(typeof(double), "DOUBLE")]
+    [InlineData(typeof(bool), "BOOLEAN")]
+    [InlineData(typeof(DateTime), "TIMESTAMP")]
+    [InlineData(typeof(decimal), "DECIMAL(38, 9)")]
+    [InlineData(typeof(byte[]), "BYTES")]
+    public void MapToKSqlType_ReturnsExpected(Type type, string expected)
+    {
+        var result = PrivateAccessor.InvokePrivate<string>(
+            typeof(GeneratorBase),
+            "MapToKSqlType",
+            new[] { typeof(Type) },
+            args: new object[] { type });
+
+        Assert.Equal(expected, result);
+    }
+
+    [Fact]
+    public void MapToKSqlType_Unknown_ThrowsNotSupported()
+    {
+        Assert.Throws<NotSupportedException>(() =>
+            PrivateAccessor.InvokePrivate<string>(
+                typeof(GeneratorBase),
+                "MapToKSqlType",
+                new[] { typeof(Type) },
+                args: new object[] { typeof(Uri) }));
+    }
 }

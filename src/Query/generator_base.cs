@@ -253,6 +253,39 @@ internal abstract class GeneratorBase
     }
 
     /// <summary>
+    /// C# 型から KSQL 型へのマッピング
+    /// </summary>
+    protected static string MapToKSqlType(Type type)
+    {
+        var underlyingType = Nullable.GetUnderlyingType(type) ?? type;
+
+        return underlyingType switch
+        {
+            Type t when t == typeof(int) => "INTEGER",
+            Type t when t == typeof(short) => "INTEGER",
+            Type t when t == typeof(long) => "BIGINT",
+            Type t when t == typeof(double) => "DOUBLE",
+            Type t when t == typeof(float) => "DOUBLE",
+            Type t when t == typeof(decimal) => "DECIMAL(38, 9)",
+            Type t when t == typeof(string) => "VARCHAR",
+            Type t when t == typeof(char) => "VARCHAR",
+            Type t when t == typeof(bool) => "BOOLEAN",
+            Type t when t == typeof(DateTime) => "TIMESTAMP",
+            Type t when t == typeof(DateTimeOffset) => "TIMESTAMP",
+            Type t when t == typeof(Guid) => "VARCHAR",
+            Type t when t == typeof(byte[]) => "BYTES",
+            _ when underlyingType.IsEnum => throw new NotSupportedException($"Type '{underlyingType.Name}' is not supported."),
+            _ when !underlyingType.IsPrimitive &&
+                   underlyingType != typeof(string) &&
+                   underlyingType != typeof(char) &&
+                   underlyingType != typeof(Guid) &&
+                   underlyingType != typeof(byte[]) =>
+                throw new NotSupportedException($"Type '{underlyingType.Name}' is not supported."),
+            _ => throw new NotSupportedException($"Type '{underlyingType.Name}' is not supported.")
+        };
+    }
+
+    /// <summary>
     /// エラーハンドリング統一メソッド
     /// </summary>
     protected string HandleGenerationError(string operation, System.Exception exception, string? context = null)
