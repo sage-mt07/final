@@ -2,6 +2,7 @@ using System;
 using System.Linq.Expressions;
 using Kafka.Ksql.Linq.Query.Builders.Functions;
 using Xunit;
+using static Kafka.Ksql.Linq.Tests.PrivateAccessor;
 
 namespace Kafka.Ksql.Linq.Tests.Query.Builders.Functions;
 
@@ -120,5 +121,67 @@ public class KsqlFunctionTranslatorTests
         var call = GetCall(expr);
         var ex = Assert.Throws<ArgumentException>(() => KsqlFunctionTranslator.TranslateMethodCall(call));
         Assert.Contains("Substring", ex.Message);
+    }
+
+    [Fact]
+    public void GetSqlOperator_Add_ReturnsPlus()
+    {
+        var result = InvokePrivate<string>(typeof(KsqlFunctionTranslator), "GetOperator", new[] { typeof(ExpressionType) }, null, ExpressionType.Add);
+        Assert.Equal("+", result);
+    }
+
+    [Fact]
+    public void GetSqlOperator_Subtract_ReturnsMinus()
+    {
+        var result = InvokePrivate<string>(typeof(KsqlFunctionTranslator), "GetOperator", new[] { typeof(ExpressionType) }, null, ExpressionType.Subtract);
+        Assert.Equal("-", result);
+    }
+
+    [Fact]
+    public void GetSqlOperator_Multiply_ReturnsAsterisk()
+    {
+        var result = InvokePrivate<string>(typeof(KsqlFunctionTranslator), "GetOperator", new[] { typeof(ExpressionType) }, null, ExpressionType.Multiply);
+        Assert.Equal("*", result);
+    }
+
+    [Fact]
+    public void GetSqlOperator_Divide_ReturnsSlash()
+    {
+        var result = InvokePrivate<string>(typeof(KsqlFunctionTranslator), "GetOperator", new[] { typeof(ExpressionType) }, null, ExpressionType.Divide);
+        Assert.Equal("/", result);
+    }
+
+    [Fact]
+    public void GetSqlOperator_Equal_ReturnsEquals()
+    {
+        var result = InvokePrivate<string>(typeof(KsqlFunctionTranslator), "GetOperator", new[] { typeof(ExpressionType) }, null, ExpressionType.Equal);
+        Assert.Equal("=", result);
+    }
+
+    [Fact]
+    public void GetSqlOperator_NotEqual_ReturnsNotEquals()
+    {
+        var result = InvokePrivate<string>(typeof(KsqlFunctionTranslator), "GetOperator", new[] { typeof(ExpressionType) }, null, ExpressionType.NotEqual);
+        Assert.Equal("!=", result);
+    }
+
+    [Fact]
+    public void GetSqlOperator_GreaterThan_ReturnsGreaterThan()
+    {
+        var result = InvokePrivate<string>(typeof(KsqlFunctionTranslator), "GetOperator", new[] { typeof(ExpressionType) }, null, ExpressionType.GreaterThan);
+        Assert.Equal(">", result);
+    }
+
+    [Fact]
+    public void GetSqlOperator_LessThanOrEqual_ReturnsLessThanEqual()
+    {
+        var result = InvokePrivate<string>(typeof(KsqlFunctionTranslator), "GetOperator", new[] { typeof(ExpressionType) }, null, ExpressionType.LessThanOrEqual);
+        Assert.Equal("<=", result);
+    }
+
+    [Fact]
+    public void GetSqlOperator_Unsupported_ThrowsNotSupported()
+    {
+        Assert.Throws<NotSupportedException>(() => InvokePrivate<string>(typeof(KsqlFunctionTranslator), "GetOperator", new[] { typeof(ExpressionType) }, null, ExpressionType.Coalesce));
     }
 }
