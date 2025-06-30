@@ -198,9 +198,7 @@ internal static class KsqlFunctionTranslator
             return $"CAST({sourceArg} AS {targetType})";
         }
 
-        // 単純な関数呼び出しとして処理
-        var argsStr = string.Join(", ", args);
-        return $"{methodName.ToUpper()}({argsStr})";
+        throw new NotSupportedException($"Function '{methodName}' is not supported.");
     }
 
     /// <summary>
