@@ -3,6 +3,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using Kafka.Ksql.Linq.Query.Builders;
+using Kafka.Ksql.Linq.Query.Builders.Functions;
 using Xunit;
 using static Kafka.Ksql.Linq.Tests.PrivateAccessor;
 
