@@ -451,4 +451,30 @@ public class DMLQueryGeneratorTests
         Assert.Contains("OR", result);
         Assert.EndsWith("EMIT CHANGES", result);
     }
+
+    [Fact]
+    public void GenerateLinqQuery_GroupByWithCaseWhen_ReturnsExpectedQuery()
+    {
+        var orders = new List<Order>().AsQueryable();
+
+        var query = orders
+            .GroupBy(o => o.CustomerId)
+            .Select(g => new
+            {
+                g.Key,
+                Total = g.Sum(o => o.Amount),
+                Status = g.Sum(o => o.Amount) > 1000 ? "VIP" : "Regular"
+            });
+
+        var generator = new DMLQueryGenerator();
+        var result = generator.GenerateLinqQuery("orders", query.Expression, false);
+
+        Assert.Contains("GROUP BY", result);
+        Assert.Contains("SUM", result);
+        Assert.Contains("CASE", result);
+        Assert.Contains("WHEN", result);
+        Assert.Contains("THEN", result);
+        Assert.Contains("ELSE", result);
+        Assert.Contains("EMIT CHANGES", result);
+    }
 }
