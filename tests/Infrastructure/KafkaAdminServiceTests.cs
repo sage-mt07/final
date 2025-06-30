@@ -17,7 +17,7 @@ public class KafkaAdminServiceTests
 {
     private class FakeAdminClient : DispatchProxy
     {
-        public Func<TopicCollection, Task<List<TopicMetadata>>> DescribeHandler { get; set; } = _ => Task.FromResult(new List<TopicMetadata>());
+        public Func<IEnumerable<string>, Task<List<TopicMetadata>>> DescribeHandler { get; set; } = _ => Task.FromResult(new List<TopicMetadata>());
         public Func<IEnumerable<TopicSpecification>, CreateTopicsOptions?, Task> CreateHandler { get; set; } = (_, __) => Task.CompletedTask;
 
         protected override object? Invoke(MethodInfo? targetMethod, object?[]? args)
@@ -27,7 +27,7 @@ public class KafkaAdminServiceTests
                 case nameof(IAdminClient.CreateTopicsAsync):
                     return CreateHandler((IEnumerable<TopicSpecification>)args![0]!, (CreateTopicsOptions?)args[1]);
                 case nameof(IAdminClient.DescribeTopicsAsync):
-                    return DescribeHandler((TopicCollection)args![0]!);
+                    return DescribeHandler((IEnumerable<string>)args![0]!);
                 case "Dispose":
                     return null;
                 case "get_Name":
