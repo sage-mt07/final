@@ -259,16 +259,17 @@ internal class GroupByExpressionVisitor : ExpressionVisitor
         var target = methodCall.Object ?? methodCall.Arguments[0];
         var columnName = ExtractColumnName(target);
         
-        if (methodCall.Arguments.Count >= 2)
+        if (methodCall.Arguments.Count >= 1)
         {
             var startIndex = ExtractConstantValue(methodCall.Arguments[methodCall.Object != null ? 0 : 1]);
-            
-            if (methodCall.Arguments.Count >= 3)
+
+            var lengthIndex = methodCall.Object != null ? 1 : 2;
+            if (methodCall.Arguments.Count > lengthIndex)
             {
-                var length = ExtractConstantValue(methodCall.Arguments[methodCall.Object != null ? 1 : 2]);
+                var length = ExtractConstantValue(methodCall.Arguments[lengthIndex]);
                 return $"SUBSTRING({columnName}, {startIndex}, {length})";
             }
-            
+
             return $"SUBSTRING({columnName}, {startIndex})";
         }
         
