@@ -394,4 +394,31 @@ public class DMLQueryGeneratorTests
         Assert.Contains("DESC", result);
         Assert.Contains("EMIT CHANGES", result);
     }
+
+    [Fact]
+    public void GenerateLinqQuery_OrderByThenByDescending_ReturnsExpectedQuery()
+    {
+        var orders = new List<Order>().AsQueryable();
+
+        var query = orders
+            .GroupBy(o => new { o.CustomerId, o.Region })
+            .Select(g => new
+            {
+                g.Key.CustomerId,
+                g.Key.Region,
+                Total = g.Sum(o => o.Amount)
+            })
+            .OrderBy(x => x.CustomerId)            // ascending
+            .ThenByDescending(x => x.Total);       // descending
+
+        var generator = new DMLQueryGenerator();
+        var result = generator.GenerateLinqQuery("orders", query.Expression, false);
+
+        Assert.Contains("GROUP BY", result);
+        Assert.Contains("ORDER BY", result);
+        Assert.Contains("CustomerId", result);
+        Assert.Contains("Total", result);
+        Assert.Contains("DESC", result);
+        Assert.Contains("EMIT CHANGES", result);
+    }
 }
