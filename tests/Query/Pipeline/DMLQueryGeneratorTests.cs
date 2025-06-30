@@ -607,4 +607,25 @@ public class DMLQueryGeneratorTests
         Assert.Contains("SUM", result);
         Assert.Contains("EMIT CHANGES", result);
     }
+
+    [Fact]
+    public void GenerateLinqQuery_NestedAggregate_ThrowsNotSupportedException()
+    {
+        var orders = new List<Order>().AsQueryable();
+
+        var query = orders
+            .GroupBy(o => o.CustomerId)
+            .Select(g => new
+            {
+                CustomerId = g.Key,
+                AvgTotal = g.Average(x => g.Sum(y => y.Amount))
+            });
+
+        var generator = new DMLQueryGenerator();
+
+        var ex = Assert.Throws<InvalidOperationException>(() =>
+            generator.GenerateLinqQuery("orders", query.Expression, false));
+
+        Assert.Contains("Nested aggregate functions are not supported", ex.Message);
+    }
 }

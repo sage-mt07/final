@@ -30,6 +30,7 @@ internal class HavingClauseBuilder : BuilderBase
     protected override void ValidateBuilderSpecific(Expression expression)
     {
         // HAVING句特有のバリデーション
+        BuilderValidation.ValidateNoNestedAggregates(expression);
         ValidateRequiresAggregateOrGroupByColumn(expression);
     }
 

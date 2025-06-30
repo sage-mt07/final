@@ -1,5 +1,6 @@
 using System;
 using System.Linq.Expressions;
+using Kafka.Ksql.Linq.Query.Builders.Functions;
 
 namespace Kafka.Ksql.Linq.Query.Builders.Common;
 
@@ -147,6 +148,50 @@ internal static class BuilderValidation
             bool b => b.ToString().ToLower(),
             _ => value.ToString() ?? "NULL"
         };
+    }
+
+    /// <summary>
+    /// ネストした集約関数の使用禁止チェック
+    /// </summary>
+    public static void ValidateNoNestedAggregates(Expression expression)
+    {
+        var visitor = new NestedAggregateDetectionVisitor();
+        visitor.Visit(expression);
+
+        if (visitor.HasNestedAggregates)
+        {
+            throw new NotSupportedException("Nested aggregate functions are not supported");
+        }
+    }
+
+    /// <summary>
+    /// 集約関数のネスト検出用Visitor
+    /// </summary>
+    private class NestedAggregateDetectionVisitor : ExpressionVisitor
+    {
+        private int _aggregateDepth;
+        public bool HasNestedAggregates { get; private set; }
+
+        protected override Expression VisitMethodCall(MethodCallExpression node)
+        {
+            var methodName = node.Method.Name;
+
+            if (KsqlFunctionRegistry.IsAggregateFunction(methodName))
+            {
+                if (_aggregateDepth > 0)
+                {
+                    HasNestedAggregates = true;
+                    return node;
+                }
+
+                _aggregateDepth++;
+                var result = base.VisitMethodCall(node);
+                _aggregateDepth--;
+                return result;
+            }
+
+            return base.VisitMethodCall(node);
+        }
     }
 
     /// <summary>
