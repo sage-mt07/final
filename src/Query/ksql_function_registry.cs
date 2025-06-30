@@ -262,7 +262,10 @@ internal static class KsqlFunctionRegistry
         }
 
         var known = new HashSet<string>(categories.SelectMany(c => c.Value));
-        var extras = _functionMappings.Keys.Where(k => !known.Contains(k)).OrderBy(k).ToList();
+        var extras = _functionMappings.Keys
+            .Where(k => !known.Contains(k))
+            .OrderBy(k => k)
+            .ToList();
 
         if (extras.Count > 0)
         {
