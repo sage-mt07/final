@@ -60,10 +60,25 @@ public class WindowedEntitySetTests
         return new WindowedEntitySet<Sample>(baseSet, 5);
     }
 
+    private class NoTimestamp
+    {
+        public int Id { get; set; }
+    }
+
     [Fact]
     public void Constructor_RequiresTimestampProperty()
     {
-        Assert.Throws<InvalidOperationException>(() => new WindowedEntitySet<WindowedEntitySetTests>(null!, 5));
+        var context = new DummyContext();
+        var model = new EntityModel
+        {
+            EntityType = typeof(NoTimestamp),
+            TopicAttribute = new TopicAttribute("orders"),
+            AllProperties = typeof(NoTimestamp).GetProperties(),
+            KeyProperties = new[] { typeof(NoTimestamp).GetProperty(nameof(NoTimestamp.Id))! }
+        };
+        var baseSet = new StubSet<NoTimestamp>(context, model);
+
+        Assert.Throws<InvalidOperationException>(() => new WindowedEntitySet<NoTimestamp>(baseSet, 5));
     }
 
     [Fact]
