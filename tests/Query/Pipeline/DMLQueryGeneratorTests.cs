@@ -623,7 +623,7 @@ public class DMLQueryGeneratorTests
 
         var generator = new DMLQueryGenerator();
 
-        var ex = Assert.Throws<NotSupportedException>(() =>
+        var ex = Assert.Throws<InvalidOperationException>(() =>
             generator.GenerateLinqQuery("orders", query.Expression, false));
 
         Assert.Contains("Nested aggregate functions are not supported", ex.Message);
