@@ -33,9 +33,8 @@ public class AvroSerializerFactoryPrimitiveTests
     public void CreatePrimitiveKeySerializer_Unsupported_Throws()
     {
         var factory = CreateFactory();
-        var ex = Assert.Throws<TargetInvocationException>(() =>
+        Assert.Throws<NotSupportedException>(() =>
             InvokePrivate<ISerializer<object>>(factory, "CreatePrimitiveKeySerializer", new[] { typeof(Type) }, null, typeof(DateTime)));
-        Assert.IsType<NotSupportedException>(ex.InnerException);
     }
 
     [Theory]
@@ -54,8 +53,7 @@ public class AvroSerializerFactoryPrimitiveTests
     public void CreatePrimitiveKeyDeserializer_Unsupported_Throws()
     {
         var factory = CreateFactory();
-        var ex = Assert.Throws<TargetInvocationException>(() =>
+        Assert.Throws<NotSupportedException>(() =>
             InvokePrivate<IDeserializer<object>>(factory, "CreatePrimitiveKeyDeserializer", new[] { typeof(Type) }, null, typeof(DateTime)));
-        Assert.IsType<NotSupportedException>(ex.InnerException);
     }
 }

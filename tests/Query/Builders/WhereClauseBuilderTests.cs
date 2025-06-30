@@ -27,6 +27,15 @@ public class WhereClauseBuilderTests
     }
 
     [Fact]
+    public void BuildCondition_NotNullComparison_ReturnsIsNotNull()
+    {
+        Expression<Func<TestEntity, bool>> expr = e => e.IsProcessed != null;
+        var builder = new WhereClauseBuilder();
+        var sql = builder.BuildCondition(expr.Body);
+        Assert.Equal("IsProcessed IS NOT NULL", sql);
+    }
+
+    [Fact]
     public void BuildCondition_AndCondition_ReturnsJoinedClause()
     {
         Expression<Func<TestEntity, bool>> expr = e => e.Id == 1 && e.Name == "foo";
