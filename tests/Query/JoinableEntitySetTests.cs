@@ -39,7 +39,7 @@ public class JoinableEntitySetTests
         var outer = new JoinableEntitySet<TestEntity>(new DummySet<TestEntity>());
         var inner = new DummySet<ChildEntity>();
 
-        var result = outer.Join(inner, o => o.Id, i => i.ParentId)
+        var result = outer.Join<ChildEntity, object>(inner, o => (object)o.Id, i => (object)i.ParentId)
                           .Select((o, i) => new { o.Id, i.Name });
 
         var list = await result.ToListAsync();
@@ -53,8 +53,8 @@ public class JoinableEntitySetTests
         var inner = new DummySet<ChildEntity>();
         var third = new DummySet<GrandChildEntity>();
 
-        var result = outer.Join(inner, o => o.Id, i => i.ParentId)
-                          .Join(third, (Expression<Func<TestEntity, int>>)(o => o.Id), g => g.ChildId)
+        var result = outer.Join<ChildEntity, object>(inner, o => (object)o.Id, i => (object)i.ParentId)
+                          .Join<GrandChildEntity, object>(third, o => (object)o.Id, g => (object)g.ChildId)
                           .Select((o, i, g) => new { o.Id, g.Description });
 
         var list = await result.ToListAsync();
