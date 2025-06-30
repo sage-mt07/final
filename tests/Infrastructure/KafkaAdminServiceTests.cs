@@ -10,6 +10,7 @@ using Kafka.Ksql.Linq.Infrastructure.Admin;
 using Xunit;
 using static Kafka.Ksql.Linq.Tests.PrivateAccessor;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Kafka.Ksql.Linq.Tests.Infrastructure;
 
