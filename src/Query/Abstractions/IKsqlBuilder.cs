@@ -1,4 +1,4 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 
 namespace Kafka.Ksql.Linq.Query.Abstractions;
 /// <summary>
@@ -31,5 +31,6 @@ public enum KsqlBuilderType
     Having,
     Join,
     Window,
-    Projection
+    Projection,
+    OrderBy
 }

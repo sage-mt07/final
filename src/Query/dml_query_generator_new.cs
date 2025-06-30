@@ -1,0 +1,428 @@
+using System;
+using System.Collections.Generic;
+using System.Linq.Expressions;
+using Kafka.Ksql.Linq.Query.Abstractions;
+using Kafka.Ksql.Linq.Query.Builders;
+using Kafka.Ksql.Linq.Query.Builders.Common;
+using Kafka.Ksql.Linq.Query.Pipeline;
+
+namespace Kafka.Ksql.Linq.Query.Pipeline;
+
+/// <summary>
+/// DMLクエリ生成器（新Builder使用版）
+/// 設計理由：責務分離設計に準拠、Builder統合型でSELECT文生成
+/// </summary>
+internal class DMLQueryGenerator : GeneratorBase, IDMLQueryGenerator
+{
+    /// <summary>
+    /// コンストラクタ（Builder依存注入）
+    /// </summary>
+    public DMLQueryGenerator(IReadOnlyDictionary<KsqlBuilderType, IKsqlBuilder> builders)
+        : base(builders)
+    {
+    }
+
+    /// <summary>
+    /// 簡易コンストラクタ（標準Builder使用）
+    /// </summary>
+    public DMLQueryGenerator() : this(CreateStandardBuilders())
+    {
+    }
+
+    protected override KsqlBuilderType[] GetRequiredBuilderTypes()
+    {
+        return new[]
+        {
+            KsqlBuilderType.Where,
+            KsqlBuilderType.Select
+        };
+    }
+
+    /// <summary>
+    /// SELECT * クエリ生成
+    /// </summary>
+    public string GenerateSelectAll(string objectName, bool isPullQuery = true)
+    {
+        try
+        {
+            var context = new QueryAssemblyContext(objectName, isPullQuery);
+            var structure = CreateSelectStructure(objectName);
+
+            var query = AssembleStructuredQuery(structure);
+            return ApplyQueryPostProcessing(query, context);
+        }
+        catch (System.Exception ex)
+        {
+            return HandleGenerationError("SELECT ALL generation", ex, $"Object: {objectName}");
+        }
+    }
+
+    /// <summary>
+    /// 条件付きSELECTクエリ生成
+    /// </summary>
+    public string GenerateSelectWithCondition(string objectName, Expression whereExpression, bool isPullQuery = true)
+    {
+        try
+        {
+            var context = new QueryAssemblyContext(objectName, isPullQuery);
+            var structure = CreateSelectStructure(objectName);
+
+            // WHERE句追加
+            var whereContent = SafeCallBuilder(KsqlBuilderType.Where, whereExpression, "WHERE condition processing");
+            var whereClause = QueryClause.Required(QueryClauseType.Where, $"WHERE {whereContent}", whereExpression);
+            structure = structure.AddClause(whereClause);
+
+            var query = AssembleStructuredQuery(structure);
+            return ApplyQueryPostProcessing(query, context);
+        }
+        catch (System.Exception ex)
+        {
+            return HandleGenerationError("SELECT with condition generation", ex, $"Object: {objectName}");
+        }
+    }
+
+    /// <summary>
+    /// COUNTクエリ生成
+    /// </summary>
+    public string GenerateCountQuery(string objectName)
+    {
+        try
+        {
+            var context = new QueryAssemblyContext(objectName, true); // Pull Query
+            var structure = CreateCountStructure(objectName);
+
+            var query = AssembleStructuredQuery(structure);
+            return query; // COUNTクエリにはEMIT CHANGESは不要
+        }
+        catch (System.Exception ex)
+        {
+            return HandleGenerationError("COUNT query generation", ex, $"Object: {objectName}");
+        }
+    }
+
+    /// <summary>
+    /// 集約クエリ生成
+    /// </summary>
+    public string GenerateAggregateQuery(string objectName, Expression aggregateExpression)
+    {
+        try
+        {
+            var context = new QueryAssemblyContext(objectName, false); // Push Query (aggregates are typically streaming)
+            var structure = CreateSelectStructure(objectName);
+
+            // 集約式処理
+            var selectContent = SafeCallBuilder(KsqlBuilderType.Select, aggregateExpression, "aggregate expression processing");
+            var selectClause = QueryClause.Required(QueryClauseType.Select, selectContent, aggregateExpression);
+            
+            // デフォルトのSELECT *を置き換え
+            structure = structure.RemoveClause(QueryClauseType.Select);
+            structure = structure.AddClause(selectClause);
+
+            var query = AssembleStructuredQuery(structure);
+            return ApplyQueryPostProcessing(query, context);
+        }
+        catch (System.Exception ex)
+        {
+            return HandleGenerationError("aggregate query generation", ex, $"Object: {objectName}");
+        }
+    }
+
+    /// <summary>
+    /// 複雑なLINQクエリ生成
+    /// </summary>
+    public string GenerateLinqQuery(string objectName, Expression linqExpression, bool isPullQuery = false)
+    {
+        try
+        {
+            var context = new QueryAssemblyContext(objectName, isPullQuery);
+            var structure = CreateSelectStructure(objectName);
+
+            // LINQ式を解析してクエリ句を構築
+            structure = ProcessLinqExpression(structure, linqExpression, context);
+
+            var query = AssembleStructuredQuery(structure);
+            return ApplyQueryPostProcessing(query, context);
+        }
+        catch (System.Exception ex)
+        {
+            return HandleGenerationError("LINQ query generation", ex, $"Object: {objectName}");
+        }
+    }
+
+    /// <summary>
+    /// 基本SELECT構造作成
+    /// </summary>
+    private static QueryStructure CreateSelectStructure(string objectName)
+    {
+        var metadata = new QueryMetadata(DateTime.UtcNow, "DML");
+        var structure = QueryStructure.CreateSelect(objectName).WithMetadata(metadata);
+        
+        // デフォルトのSELECT *句を追加
+        var selectClause = QueryClause.Required(QueryClauseType.Select, "*");
+        return structure.AddClause(selectClause);
+    }
+
+    /// <summary>
+    /// COUNT構造作成
+    /// </summary>
+    private static QueryStructure CreateCountStructure(string objectName)
+    {
+        var metadata = new QueryMetadata(DateTime.UtcNow, "DML");
+        var structure = QueryStructure.CreateSelect(objectName).WithMetadata(metadata);
+        
+        // COUNT(*)句を追加
+        var selectClause = QueryClause.Required(QueryClauseType.Select, "COUNT(*)");
+        return structure.AddClause(selectClause);
+    }
+
+    /// <summary>
+    /// LINQ式処理
+    /// </summary>
+    private QueryStructure ProcessLinqExpression(QueryStructure structure, Expression linqExpression, QueryAssemblyContext context)
+    {
+        var analysis = AnalyzeLinqExpression(linqExpression);
+        
+        // メソッド呼び出しを順次処理
+        foreach (var methodCall in analysis.MethodCalls)
+        {
+            structure = ProcessMethodCall(structure, methodCall, context);
+        }
+
+        return structure;
+    }
+
+    /// <summary>
+    /// メソッド呼び出し処理
+    /// </summary>
+    private QueryStructure ProcessMethodCall(QueryStructure structure, MethodCallExpression methodCall, QueryAssemblyContext context)
+    {
+        var methodName = methodCall.Method.Name;
+
+        return methodName switch
+        {
+            "Select" => ProcessSelectMethod(structure, methodCall),
+            "Where" => ProcessWhereMethod(structure, methodCall),
+            "GroupBy" => ProcessGroupByMethod(structure, methodCall),
+            "Having" => ProcessHavingMethod(structure, methodCall),
+            "OrderBy" or "OrderByDescending" or "ThenBy" or "ThenByDescending" => ProcessOrderByMethod(structure, methodCall),
+            "Take" => ProcessTakeMethod(structure, methodCall),
+            "Skip" => ProcessSkipMethod(structure, methodCall),
+            _ => structure // 未対応メソッドは無視
+        };
+    }
+
+    /// <summary>
+    /// SELECT メソッド処理
+    /// </summary>
+    private QueryStructure ProcessSelectMethod(QueryStructure structure, MethodCallExpression methodCall)
+    {
+        if (methodCall.Arguments.Count >= 2)
+        {
+            var lambdaBody = ExtractLambdaBody(methodCall.Arguments[1]);
+            if (lambdaBody != null)
+            {
+                var selectContent = SafeCallBuilder(KsqlBuilderType.Select, lambdaBody, "SELECT processing");
+                var clause = QueryClause.Required(QueryClauseType.Select, selectContent, lambdaBody);
+                
+                // 既存のSELECT句を置き換え
+                structure = structure.RemoveClause(QueryClauseType.Select);
+                structure = structure.AddClause(clause);
+            }
+        }
+
+        return structure;
+    }
+
+    /// <summary>
+    /// WHERE メソッド処理
+    /// </summary>
+    private QueryStructure ProcessWhereMethod(QueryStructure structure, MethodCallExpression methodCall)
+    {
+        if (methodCall.Arguments.Count >= 2)
+        {
+            var lambdaBody = ExtractLambdaBody(methodCall.Arguments[1]);
+            if (lambdaBody != null)
+            {
+                var whereContent = SafeCallBuilder(KsqlBuilderType.Where, lambdaBody, "WHERE processing");
+                
+                // 既存のWHERE句と結合（AND条件）
+                var existingWhere = structure.GetClause(QueryClauseType.Where);
+                if (existingWhere != null)
+                {
+                    var combinedContent = $"WHERE ({existingWhere.Content.Substring(6)}) AND ({whereContent})";
+                    var combinedClause = QueryClause.Required(QueryClauseType.Where, combinedContent, lambdaBody);
+                    structure = structure.RemoveClause(QueryClauseType.Where);
+                    structure = structure.AddClause(combinedClause);
+                }
+                else
+                {
+                    var whereClause = QueryClause.Required(QueryClauseType.Where, $"WHERE {whereContent}", lambdaBody);
+                    structure = structure.AddClause(whereClause);
+                }
+            }
+        }
+
+        return structure;
+    }
+
+    /// <summary>
+    /// GROUP BY メソッド処理
+    /// </summary>
+    private QueryStructure ProcessGroupByMethod(QueryStructure structure, MethodCallExpression methodCall)
+    {
+        if (methodCall.Arguments.Count >= 2)
+        {
+            var lambdaBody = ExtractLambdaBody(methodCall.Arguments[1]);
+            if (lambdaBody != null)
+            {
+                var groupByContent = SafeCallBuilder(KsqlBuilderType.GroupBy, lambdaBody, "GROUP BY processing");
+                var clause = QueryClause.Required(QueryClauseType.GroupBy, $"GROUP BY {groupByContent}", lambdaBody);
+                structure = structure.AddClause(clause);
+            }
+        }
+
+        return structure;
+    }
+
+    /// <summary>
+    /// HAVING メソッド処理
+    /// </summary>
+    private QueryStructure ProcessHavingMethod(QueryStructure structure, MethodCallExpression methodCall)
+    {
+        if (HasBuilder(KsqlBuilderType.Having) && methodCall.Arguments.Count >= 2)
+        {
+            var lambdaBody = ExtractLambdaBody(methodCall.Arguments[1]);
+            if (lambdaBody != null)
+            {
+                var havingContent = SafeCallBuilder(KsqlBuilderType.Having, lambdaBody, "HAVING processing");
+                var clause = QueryClause.Required(QueryClauseType.Having, $"HAVING {havingContent}", lambdaBody);
+                structure = structure.AddClause(clause);
+            }
+        }
+
+        return structure;
+    }
+
+    /// <summary>
+    /// ORDER BY メソッド処理
+    /// </summary>
+    private QueryStructure ProcessOrderByMethod(QueryStructure structure, MethodCallExpression methodCall)
+    {
+        if (HasBuilder(KsqlBuilderType.OrderBy))
+        {
+            var orderByContent = SafeCallBuilder(KsqlBuilderType.OrderBy, methodCall, "ORDER BY processing");
+            var clause = QueryClause.Optional(QueryClauseType.OrderBy, $"ORDER BY {orderByContent}", methodCall);
+            structure = structure.AddClause(clause);
+        }
+
+        return structure;
+    }
+
+    /// <summary>
+    /// TAKE メソッド処理（LIMIT句）
+    /// </summary>
+    private QueryStructure ProcessTakeMethod(QueryStructure structure, MethodCallExpression methodCall)
+    {
+        if (methodCall.Arguments.Count >= 2)
+        {
+            var limitValue = ExtractConstantValue(methodCall.Arguments[1]);
+            var clause = QueryClause.Optional(QueryClauseType.Limit, $"LIMIT {limitValue}", methodCall);
+            structure = structure.AddClause(clause);
+        }
+
+        return structure;
+    }
+
+    /// <summary>
+    /// SKIP メソッド処理（KSQL未対応のため警告）
+    /// </summary>
+    private QueryStructure ProcessSkipMethod(QueryStructure structure, MethodCallExpression methodCall)
+    {
+        Console.WriteLine("[KSQL-LINQ WARNING] SKIP/OFFSET is not supported in KSQL. Use WHERE conditions for filtering instead.");
+        return structure;
+    }
+
+    /// <summary>
+    /// LINQ式解析
+    /// </summary>
+    private ExpressionAnalysisResult AnalyzeLinqExpression(Expression expression)
+    {
+        var result = new ExpressionAnalysisResult();
+        var visitor = new MethodCallCollectorVisitor();
+        visitor.Visit(expression);
+        result.MethodCalls = visitor.MethodCalls;
+        return result;
+    }
+
+    /// <summary>
+    /// Lambda Body抽出
+    /// </summary>
+    private static Expression? ExtractLambdaBody(Expression expression)
+    {
+        return BuilderValidation.ExtractLambdaBody(expression);
+    }
+
+    /// <summary>
+    /// 定数値抽出
+    /// </summary>
+    private static string ExtractConstantValue(Expression expression)
+    {
+        return expression switch
+        {
+            ConstantExpression constant => constant.Value?.ToString() ?? "0",
+            UnaryExpression unary => ExtractConstantValue(unary.Operand),
+            _ => "0"
+        };
+    }
+
+    /// <summary>
+    /// 標準Builder作成
+    /// </summary>
+    private static IReadOnlyDictionary<KsqlBuilderType, IKsqlBuilder> CreateStandardBuilders()
+    {
+        return new Dictionary<KsqlBuilderType, IKsqlBuilder>
+        {
+            [KsqlBuilderType.Select] = new SelectClauseBuilder(),
+            [KsqlBuilderType.Where] = new WhereClauseBuilder(),
+            [KsqlBuilderType.GroupBy] = new GroupByClauseBuilder(),
+            [KsqlBuilderType.Having] = new HavingClauseBuilder(),
+            [KsqlBuilderType.Join] = new JoinClauseBuilder(),
+            [KsqlBuilderType.Window] = new WindowClauseBuilder()
+        };
+    }
+
+    /// <summary>
+    /// 最適化ヒント適用
+    /// </summary>
+    protected override string ApplyOptimizationHints(string query, QueryAssemblyContext context)
+    {
+        var optimizedQuery = query;
+
+        // Pull Queryの最適化
+        if (context.IsPullQuery)
+        {
+            // Pull Queryには適切なインデックスヒント
+            if (query.Contains("WHERE") && !query.Contains("LIMIT"))
+            {
+                Console.WriteLine("[KSQL-LINQ HINT] Consider adding LIMIT clause for Pull Query performance");
+            }
+        }
+
+        // Push Queryの最適化
+        if (!context.IsPullQuery)
+        {
+            // ストリーミングクエリのパフォーマンスヒント
+            if (query.Contains("ORDER BY"))
+            {
+                Console.WriteLine("[KSQL-LINQ WARNING] ORDER BY in Push Queries may impact performance. Consider using windowing.");
+            }
+
+            if (!query.Contains("EMIT CHANGES"))
+            {
+                optimizedQuery = ApplyQueryPostProcessing(optimizedQuery, context);
+            }
+        }
+
+        return optimizedQuery;
+    }
+}

@@ -1,4 +1,5 @@
 using Kafka.Ksql.Linq.Core.Abstractions;
+using Kafka.Ksql.Linq.Query.Abstractions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,8 +9,10 @@ using System.Threading.Tasks;
 
 namespace Kafka.Ksql.Linq.Query.Linq;
 
-
-
+/// <summary>
+/// JOIN操作対応EntitySet（document index 21の補完版）
+/// 設計理由：既存実装の不足部分を補完し、新アーキテクチャとの統合を実現
+/// </summary>
 public class JoinableEntitySet<T> : IEntitySet<T>, IJoinableEntitySet<T> where T : class
 {
     private readonly IEntitySet<T> _baseEntitySet;
@@ -19,7 +22,7 @@ public class JoinableEntitySet<T> : IEntitySet<T>, IJoinableEntitySet<T> where T
         _baseEntitySet = baseEntitySet ?? throw new ArgumentNullException(nameof(baseEntitySet));
     }
 
-    // ✅ IEntitySet<T> の必須実装
+    // ✅ IEntitySet<T>の必須実装
     public async Task AddAsync(T entity, CancellationToken cancellationToken = default)
     {
         await _baseEntitySet.AddAsync(entity, cancellationToken);
@@ -41,7 +44,7 @@ public class JoinableEntitySet<T> : IEntitySet<T>, IJoinableEntitySet<T> where T
 
     public IKsqlContext GetContext() => _baseEntitySet.GetContext();
 
-    // ✅ IAsyncEnumerable<T> の実装
+    // ✅ IAsyncEnumerable<T>の実装
     public async IAsyncEnumerator<T> GetAsyncEnumerator(CancellationToken cancellationToken = default)
     {
         await foreach (var item in _baseEntitySet.WithCancellation(cancellationToken))
@@ -50,7 +53,7 @@ public class JoinableEntitySet<T> : IEntitySet<T>, IJoinableEntitySet<T> where T
         }
     }
 
-    // ✅ IJoinableEntitySet<T> の JOIN機能実装（重複削除）
+    // ✅ IJoinableEntitySet<T>のJOIN機能実装
     public IJoinResult<T, TInner> Join<TInner, TKey>(
         IEntitySet<TInner> inner,
         Expression<Func<T, TKey>> outerKeySelector,
@@ -72,7 +75,43 @@ public class JoinableEntitySet<T> : IEntitySet<T>, IJoinableEntitySet<T> where T
     }
 }
 
-// ✅ JoinResult の実装クラス
+/// <summary>
+/// JOIN可能EntitySetインターフェース（補完版）
+/// </summary>
+public interface IJoinableEntitySet<T> where T : class
+{
+    IJoinResult<T, TInner> Join<TInner, TKey>(
+        IEntitySet<TInner> inner,
+        Expression<Func<T, TKey>> outerKeySelector,
+        Expression<Func<TInner, TKey>> innerKeySelector) where TInner : class;
+}
+
+/// <summary>
+/// JOIN結果インターフェース（補完版）
+/// </summary>
+public interface IJoinResult<TOuter, TInner>
+    where TOuter : class
+    where TInner : class
+{
+    IEntitySet<TResult> Select<TResult>(Expression<Func<TOuter, TInner, TResult>> resultSelector) where TResult : class;
+    IJoinResult<TOuter, TInner, TThird> Join<TThird, TKey>(IEntitySet<TThird> third, Expression<Func<TOuter, TKey>> outerKeySelector, Expression<Func<TThird, TKey>> thirdKeySelector) where TThird : class;
+    IJoinResult<TOuter, TInner, TThird> Join<TThird, TKey>(IEntitySet<TThird> third, Expression<Func<TInner, TKey>> innerKeySelector, Expression<Func<TThird, TKey>> thirdKeySelector) where TThird : class;
+}
+
+/// <summary>
+/// 3-way JOIN結果インターフェース（補完版）
+/// </summary>
+public interface IJoinResult<TOuter, TInner, TThird>
+    where TOuter : class
+    where TInner : class
+    where TThird : class
+{
+    IEntitySet<TResult> Select<TResult>(Expression<Func<TOuter, TInner, TThird, TResult>> resultSelector) where TResult : class;
+}
+
+/// <summary>
+/// JOIN結果実装（document index 21からの移植・改良版）
+/// </summary>
 internal class JoinResult<TOuter, TInner> : IJoinResult<TOuter, TInner>
     where TOuter : class
     where TInner : class
@@ -159,7 +198,9 @@ internal class JoinResult<TOuter, TInner> : IJoinResult<TOuter, TInner>
     }
 }
 
-// ✅ ThreeWayJoinResult の実装クラス  
+/// <summary>
+/// 3-way JOIN結果実装（document index 21からの移植・改良版）
+/// </summary>
 internal class ThreeWayJoinResult<TOuter, TInner, TThird> : IJoinResult<TOuter, TInner, TThird>
     where TOuter : class
     where TInner : class
@@ -222,6 +263,10 @@ internal class ThreeWayJoinResult<TOuter, TInner, TThird> : IJoinResult<TOuter, 
         };
     }
 }
+
+/// <summary>
+/// 型安全なJOIN結果EntitySet（document index 21からの移植・改良版）
+/// </summary>
 internal class TypedJoinResultEntitySet<TOuter, TInner, TResult> : IEntitySet<TResult>
        where TOuter : class
        where TInner : class
@@ -284,7 +329,9 @@ internal class TypedJoinResultEntitySet<TOuter, TInner, TResult> : IEntitySet<TR
     }
 }
 
-// ✅ 型安全なThreeWayJoinResultEntitySet実装
+/// <summary>
+/// 型安全な3-way JOIN結果EntitySet（document index 21からの移植・改良版）
+/// </summary>
 internal class TypedThreeWayJoinResultEntitySet<TOuter, TInner, TThird, TResult> : IEntitySet<TResult>
     where TOuter : class
     where TInner : class
@@ -351,52 +398,6 @@ internal class TypedThreeWayJoinResultEntitySet<TOuter, TInner, TThird, TResult>
     {
         var results = await ToListAsync(cancellationToken);
         foreach (var item in results)
-        {
-            yield return item;
-        }
-    }
-}
-
-// ✅ 型変換用のAdapterクラス
-internal class EntitySetAdapter<T> : IEntitySet<object> where T : class
-{
-    private readonly IEntitySet<T> _inner;
-
-    public EntitySetAdapter(IEntitySet<T> inner)
-    {
-        _inner = inner ?? throw new ArgumentNullException(nameof(inner));
-    }
-
-    public async Task AddAsync(object entity, CancellationToken cancellationToken = default)
-    {
-        if (entity is T typedEntity)
-        {
-            await _inner.AddAsync(typedEntity, cancellationToken);
-        }
-        else
-        {
-            throw new ArgumentException($"Entity must be of type {typeof(T).Name}");
-        }
-    }
-
-    public async Task<List<object>> ToListAsync(CancellationToken cancellationToken = default)
-    {
-        var typedResults = await _inner.ToListAsync(cancellationToken);
-        return typedResults.Cast<object>().ToList();
-    }
-
-    public async Task ForEachAsync(Func<object, Task> action, TimeSpan timeout = default, CancellationToken cancellationToken = default)
-    {
-        await _inner.ForEachAsync(entity => action(entity), timeout, cancellationToken);
-    }
-
-    public string GetTopicName() => _inner.GetTopicName();
-    public EntityModel GetEntityModel() => _inner.GetEntityModel();
-    public IKsqlContext GetContext() => _inner.GetContext();
-
-    public async IAsyncEnumerator<object> GetAsyncEnumerator(CancellationToken cancellationToken = default)
-    {
-        await foreach (var item in _inner.WithCancellation(cancellationToken))
         {
             yield return item;
         }
