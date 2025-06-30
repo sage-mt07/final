@@ -329,17 +329,13 @@ internal class JoinExpressionVisitor : ExpressionVisitor
     {
         return nodeType switch
         {
-            ExpressionType.Add => "+",
-            ExpressionType.Subtract => "-",
-            ExpressionType.Multiply => "*",
-            ExpressionType.Divide => "/",
             ExpressionType.Equal => "=",
-            ExpressionType.NotEqual => "<>",
+            ExpressionType.NotEqual => "!=",
             ExpressionType.GreaterThan => ">",
             ExpressionType.GreaterThanOrEqual => ">=",
             ExpressionType.LessThan => "<",
             ExpressionType.LessThanOrEqual => "<=",
-            _ => nodeType.ToString()
+            _ => throw new NotSupportedException($"Operator {nodeType} is not supported in JOIN clause")
         };
     }
 
