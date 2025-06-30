@@ -1,5 +1,6 @@
 using Kafka.Ksql.Linq.Query.Linq;
 using Kafka.Ksql.Linq.Core.Abstractions;
+using Kafka.Ksql.Linq.Tests;
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
@@ -78,21 +79,4 @@ public class JoinableEntitySetTests
         var str = outer.ToString();
         Assert.Contains("JoinableEntitySet", str);
     }
-}
-
-public class TestEntity
-{
-    public int Id { get; set; }
-}
-
-public class ChildEntity
-{
-    public int ParentId { get; set; }
-    public string Name { get; set; } = string.Empty;
-}
-
-public class GrandChildEntity
-{
-    public int ChildId { get; set; }
-    public string Description { get; set; } = string.Empty;
 }

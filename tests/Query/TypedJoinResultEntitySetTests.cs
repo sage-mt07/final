@@ -1,5 +1,6 @@
 using Kafka.Ksql.Linq.Query.Linq;
 using Kafka.Ksql.Linq.Core.Abstractions;
+using Kafka.Ksql.Linq.Tests;
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
@@ -62,6 +63,3 @@ public class TypedJoinResultEntitySetTests
         Assert.Throws<NotSupportedException>(() => set.ForEachAsync(_ => Task.CompletedTask));
     }
 }
-
-public class TestEntity { public int Id { get; set; } }
-public class ChildEntity { public int ParentId { get; set; } public string Name { get; set; } = string.Empty; }
