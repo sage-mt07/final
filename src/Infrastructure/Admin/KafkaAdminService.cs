@@ -147,7 +147,7 @@ internal class KafkaAdminService : IDisposable
         var topics = await _adminClient.DescribeTopicsAsync(
             TopicCollection.OfTopicNames(new[] { topicName }),
             null);
-        var desc = topics.FirstOrDefault();
+        var desc = topics.Topics.FirstOrDefault();
         if (desc != null)
         {
             _logger?.LogDebug("DB topic already exists: {Topic}", topicName);
