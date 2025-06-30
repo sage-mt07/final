@@ -197,8 +197,10 @@ internal class JoinQueryGenerator : GeneratorBase
         Expression? resultSelector)
     {
         // キーセレクタのラムダを抽出し、型情報を取得
-        var outerLambda = (LambdaExpression)BuilderValidation.ExtractLambdaBody(outerKeySelector)!;
-        var innerLambda = (LambdaExpression)BuilderValidation.ExtractLambdaBody(innerKeySelector)!;
+        var outerLambda = ExtractLambdaExpression(outerKeySelector)
+            ?? throw new InvalidOperationException("Outer key selector must be a lambda expression");
+        var innerLambda = ExtractLambdaExpression(innerKeySelector)
+            ?? throw new InvalidOperationException("Inner key selector must be a lambda expression");
 
         var outerType = outerLambda.Parameters[0].Type;
         var innerType = innerLambda.Parameters[0].Type;
@@ -223,6 +225,19 @@ internal class JoinQueryGenerator : GeneratorBase
             outerLambda,
             innerLambda,
             defaultSelector);
+    }
+
+    /// <summary>
+    /// Lambda式抽出
+    /// </summary>
+    private static LambdaExpression? ExtractLambdaExpression(Expression expr)
+    {
+        return expr switch
+        {
+            UnaryExpression { Operand: LambdaExpression lambda } => lambda,
+            LambdaExpression lambda => lambda,
+            _ => null
+        };
     }
 
     /// <summary>
