@@ -272,6 +272,6 @@ public class DMLQueryGeneratorTests
         Assert.Contains("CustomerId", result);
         Assert.Contains("Region", result);
         Assert.Contains("SUM", result);
-        Assert.Contains("EMIT CHANGES;", result);
+        Assert.EndsWith("EMIT CHANGES", result);
     }
 }
