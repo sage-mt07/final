@@ -507,4 +507,29 @@ public class DMLQueryGeneratorTests
         Assert.Contains(")", result);
         Assert.Contains("EMIT CHANGES", result);
     }
+
+    [Fact]
+    public void GenerateLinqQuery_WhereNotInClause_ReturnsExpectedQuery()
+    {
+        var excludedRegions = new[] { "CN", "RU" };
+        var orders = new List<Order>().AsQueryable();
+
+        var query = orders
+            .Where(o => !excludedRegions.Contains(o.Region))
+            .Select(o => new
+            {
+                o.CustomerId,
+                o.Region,
+                o.Amount
+            });
+
+        var generator = new DMLQueryGenerator();
+        var result = generator.GenerateLinqQuery("orders", query.Expression, false);
+
+        Assert.Contains("WHERE", result);
+        Assert.Contains("NOT IN", result);
+        Assert.Contains("'CN'", result);
+        Assert.Contains("'RU'", result);
+        Assert.Contains("EMIT CHANGES", result);
+    }
 }
