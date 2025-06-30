@@ -111,21 +111,23 @@ public class GroupByExpressionVisitorTests
     }
 
     [Fact]
-    public void Visit_NestedAnonymousType_Throws()
+    public void NestedAnonymousType_FlattensProperties()
     {
-        Expression<Func<CategoryEntity, object>> expr = e => new { e.Type, Sub = new { e.Id } };
+        Expression<Func<CategoryEntity, object>> expr = e => new { e.Id, Sub = new { e.Region } };
         var visitor = new GroupByExpressionVisitor();
-        Assert.Throws<InvalidOperationException>(() => visitor.Visit(expr.Body));
+        visitor.Visit(expr.Body);
+        var result = visitor.GetResult();
+        Assert.Equal("Id, Region", result);
     }
 
     [Fact]
-    public void Visit_CoalesceExpression_ReturnsMemberName()
+    public void NullCoalesce_ReturnsCoalesceFunction()
     {
         Expression<Func<CategoryEntity, object>> expr = e => e.NullableValue ?? 0;
         var visitor = new GroupByExpressionVisitor();
         visitor.Visit(expr.Body);
         var result = visitor.GetResult();
-        Assert.Equal("NullableValue", result);
+        Assert.Equal("COALESCE(NullableValue, 0)", result);
     }
 
     [Fact]
@@ -215,10 +217,12 @@ public class GroupByExpressionVisitorTests
     }
 
     [Fact]
-    public void BinaryExpression_ThrowsNotSupportedException()
+    public void BinaryExpression_ReturnsExpression()
     {
         Expression<Func<NumericEntity, object>> expr = e => e.Value + 1;
         var visitor = new GroupByExpressionVisitor();
-        Assert.Throws<InvalidOperationException>(() => visitor.Visit(expr.Body));
+        visitor.Visit(expr.Body);
+        var result = visitor.GetResult();
+        Assert.Equal("Value + 1", result);
     }
 }
