@@ -21,6 +21,16 @@ public class GroupByExpressionVisitorTests
         Assert.Equal("Id, Type", result);
     }
 
+    [Fact]
+    public void SimpleMember_ReturnsMemberName()
+    {
+        Expression<Func<Customer, object>> expr = e => e.Id;
+        var visitor = new GroupByExpressionVisitor();
+        visitor.Visit(expr.Body);
+        var result = visitor.GetResult();
+        Assert.Equal("Id", result);
+    }
+
     private class Parent
     {
         public Child Child { get; set; } = new();
@@ -68,6 +78,16 @@ public class GroupByExpressionVisitorTests
     private class NumericEntity
     {
         public double Value { get; set; }
+    }
+
+    [Fact]
+    public void AnonymousType_ReturnsCommaSeparated()
+    {
+        Expression<Func<Customer, object>> expr = e => new { e.Id, e.Region };
+        var visitor = new GroupByExpressionVisitor();
+        visitor.Visit(expr.Body);
+        var result = visitor.GetResult();
+        Assert.Equal("Id, Region", result);
     }
 
     [Fact]
@@ -192,5 +212,13 @@ public class GroupByExpressionVisitorTests
         var visitor = new GroupByExpressionVisitor();
         var result = InvokePrivate<string>(visitor, "ProcessGroupByFunction", new[] { typeof(MethodCallExpression) }, args: new object[] { call });
         Assert.Equal("FLOOR(Value)", result);
+    }
+
+    [Fact]
+    public void BinaryExpression_ThrowsNotSupportedException()
+    {
+        Expression<Func<NumericEntity, object>> expr = e => e.Value + 1;
+        var visitor = new GroupByExpressionVisitor();
+        Assert.Throws<InvalidOperationException>(() => visitor.Visit(expr.Body));
     }
 }
