@@ -28,7 +28,7 @@ public class TypedJoinResultEntitySetTests
         public Task<List<T>> ToListAsync(CancellationToken cancellationToken = default) => Task.FromResult(new List<T>());
         public Task ForEachAsync(Func<T, Task> action, TimeSpan timeout = default, CancellationToken cancellationToken = default) => Task.CompletedTask;
         public string GetTopicName() => typeof(T).Name;
-        public EntityModel GetEntityModel() => new EntityModel { EntityType = typeof(T), TopicAttribute = new TopicAttribute(typeof(T).Name), AllProperties = typeof(T).GetProperties(), KeyProperties = Array.Empty<System.Reflection.PropertyInfo>(), ValidationResult = new ValidationResult(true, new()) };
+        public EntityModel GetEntityModel() => new EntityModel { EntityType = typeof(T), TopicAttribute = new TopicAttribute(typeof(T).Name), AllProperties = typeof(T).GetProperties(), KeyProperties = Array.Empty<System.Reflection.PropertyInfo>(), ValidationResult = new ValidationResult { IsValid = true } };
         public IKsqlContext GetContext() => _context;
         public async IAsyncEnumerator<T> GetAsyncEnumerator(CancellationToken cancellationToken = default) { await Task.CompletedTask; yield break; }
     }
@@ -41,7 +41,7 @@ public class TypedJoinResultEntitySetTests
         var ctx = new DummyContext();
         var outer = new DummySet<TestEntity>();
         var inner = new DummySet<ChildEntity>();
-        var model = new EntityModel { EntityType = typeof(Result), TopicAttribute = new TopicAttribute("R"), AllProperties = typeof(Result).GetProperties(), KeyProperties = Array.Empty<System.Reflection.PropertyInfo>(), ValidationResult = new ValidationResult(true, new()) };
+        var model = new EntityModel { EntityType = typeof(Result), TopicAttribute = new TopicAttribute("R"), AllProperties = typeof(Result).GetProperties(), KeyProperties = Array.Empty<System.Reflection.PropertyInfo>(), ValidationResult = new ValidationResult { IsValid = true } };
 
         Expression<Func<TestEntity, ChildEntity, Result>> selector = (o, i) => new Result(o.Id, i.Name);
         var set = new TypedJoinResultEntitySet<TestEntity, ChildEntity, Result>(ctx, model, outer, inner, o => o.Id, i => i.ParentId, selector);
@@ -51,15 +51,15 @@ public class TypedJoinResultEntitySetTests
     }
 
     [Fact]
-    public void UnsupportedOperations_Throw()
+    public async Task UnsupportedOperations_Throw()
     {
         var ctx = new DummyContext();
         var outer = new DummySet<TestEntity>();
         var inner = new DummySet<ChildEntity>();
-        var model = new EntityModel { EntityType = typeof(Result), TopicAttribute = new TopicAttribute("R"), AllProperties = typeof(Result).GetProperties(), KeyProperties = Array.Empty<System.Reflection.PropertyInfo>(), ValidationResult = new ValidationResult(true, new()) };
+        var model = new EntityModel { EntityType = typeof(Result), TopicAttribute = new TopicAttribute("R"), AllProperties = typeof(Result).GetProperties(), KeyProperties = Array.Empty<System.Reflection.PropertyInfo>(), ValidationResult = new ValidationResult { IsValid = true } };
         Expression<Func<TestEntity, ChildEntity, Result>> selector = (o, i) => new Result(o.Id, i.Name);
         var set = new TypedJoinResultEntitySet<TestEntity, ChildEntity, Result>(ctx, model, outer, inner, o => o.Id, i => i.ParentId, selector);
-        Assert.Throws<NotSupportedException>(() => set.AddAsync(new Result(1, "a")));
-        Assert.Throws<NotSupportedException>(() => set.ForEachAsync(_ => Task.CompletedTask));
+        await Assert.ThrowsAsync<NotSupportedException>(() => set.AddAsync(new Result(1, "a")));
+        await Assert.ThrowsAsync<NotSupportedException>(() => set.ForEachAsync(_ => Task.CompletedTask));
     }
 }

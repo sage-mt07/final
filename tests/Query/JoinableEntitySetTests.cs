@@ -28,7 +28,7 @@ public class JoinableEntitySetTests
         public Task<List<T>> ToListAsync(CancellationToken cancellationToken = default) => Task.FromResult(new List<T>());
         public Task ForEachAsync(Func<T, Task> action, TimeSpan timeout = default, CancellationToken cancellationToken = default) => Task.CompletedTask;
         public string GetTopicName() => typeof(T).Name;
-        public EntityModel GetEntityModel() => new EntityModel { EntityType = typeof(T), TopicAttribute = new TopicAttribute(typeof(T).Name), AllProperties = typeof(T).GetProperties(), KeyProperties = Array.Empty<System.Reflection.PropertyInfo>(), ValidationResult = new ValidationResult(true, new()) };
+        public EntityModel GetEntityModel() => new EntityModel { EntityType = typeof(T), TopicAttribute = new TopicAttribute(typeof(T).Name), AllProperties = typeof(T).GetProperties(), KeyProperties = Array.Empty<System.Reflection.PropertyInfo>(), ValidationResult = new ValidationResult { IsValid = true } };
         public IKsqlContext GetContext() => _context;
         public async IAsyncEnumerator<T> GetAsyncEnumerator(CancellationToken cancellationToken = default) { await Task.CompletedTask; yield break; }
     }
@@ -54,7 +54,7 @@ public class JoinableEntitySetTests
         var third = new DummySet<GrandChildEntity>();
 
         var result = outer.Join(inner, o => o.Id, i => i.ParentId)
-                          .Join(third, o => o.Id, g => g.ChildId)
+                          .Join(third, (Expression<Func<TestEntity, int>>)(o => o.Id), g => g.ChildId)
                           .Select((o, i, g) => new { o.Id, g.Description });
 
         var list = await result.ToListAsync();

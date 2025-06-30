@@ -1,4 +1,4 @@
-using Kafka.Ksql.Linq.Query;
+using Kafka.Ksql.Linq.Query.Pipeline;
 using System.Linq;
 using Xunit;
 

@@ -29,7 +29,7 @@ public class RetryReadyChainTests
         internal override EventSet<TestEntity> WithErrorPolicy(ErrorHandlingPolicy policy) { LastPolicy = policy; return this; }
     }
 
-    private static EntityModel CreateModel() => new() { EntityType = typeof(TestEntity), TopicAttribute = new TopicAttribute("t"), AllProperties = typeof(TestEntity).GetProperties(), KeyProperties = Array.Empty<PropertyInfo>(), ValidationResult = ValidationResult.Success };
+    private static EntityModel CreateModel() => new() { EntityType = typeof(TestEntity), TopicAttribute = new TopicAttribute("t"), AllProperties = typeof(TestEntity).GetProperties(), KeyProperties = Array.Empty<PropertyInfo>(), ValidationResult = new ValidationResult { IsValid = true } };
 
     [Fact]
     public void WithRetry_SetsPolicyAndReturnsSet()
