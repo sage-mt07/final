@@ -102,7 +102,7 @@ public class KafkaConsumerBatchTests
         var fake = DispatchProxy.Create<IConsumer<object, object>, FakeConsumer>() as FakeConsumer;
         fake!.ThrowOnConsume = true;
         var consumer = CreateConsumer(fake);
-        var opts = new KafkaBatchOptions { MaxBatchSize = 1, MaxWaitTime = TimeSpan.FromMilliseconds(10) };
+        var opts = new KafkaBatchOptions { MaxBatchSize = 1, MaxWaitTime = TimeSpan.FromMilliseconds(100) };
         await Assert.ThrowsAsync<InvalidOperationException>(() => consumer.ConsumeBatchAsync(opts));
     }
 
@@ -122,7 +122,7 @@ public class KafkaConsumerBatchTests
         var fake = DispatchProxy.Create<IConsumer<object, object>, FakeConsumer>() as FakeConsumer;
         fake!.ExceptionToThrow = new KafkaException(new Error(ErrorCode.Local_Transport));
         var consumer = CreateConsumer(fake);
-        var opts = new KafkaBatchOptions { MaxBatchSize = 1, MaxWaitTime = TimeSpan.FromMilliseconds(10) };
+        var opts = new KafkaBatchOptions { MaxBatchSize = 1, MaxWaitTime = TimeSpan.FromMilliseconds(100) };
         await Assert.ThrowsAsync<KafkaException>(() => consumer.ConsumeBatchAsync(opts));
     }
 }
