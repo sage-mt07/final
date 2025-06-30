@@ -532,4 +532,55 @@ public class DMLQueryGeneratorTests
         Assert.Contains("'RU'", result);
         Assert.Contains("EMIT CHANGES", result);
     }
+
+    private class NullableOrder
+    {
+        public int? CustomerId { get; set; }
+        public string Region { get; set; } = string.Empty;
+        public decimal Amount { get; set; }
+    }
+
+    [Fact]
+    public void GenerateLinqQuery_WhereIsNullClause_ReturnsExpectedQuery()
+    {
+        var orders = new List<NullableOrder>().AsQueryable();
+
+        var query = orders
+            .Where(o => o.CustomerId == null)
+            .Select(o => new
+            {
+                o.Region,
+                o.Amount
+            });
+
+        var generator = new DMLQueryGenerator();
+        var result = generator.GenerateLinqQuery("orders", query.Expression, false);
+
+        Assert.Contains("WHERE", result);
+        Assert.Contains("IS NULL", result);
+        Assert.Contains("CustomerId", result);
+        Assert.Contains("EMIT CHANGES", result);
+    }
+
+    [Fact]
+    public void GenerateLinqQuery_WhereIsNotNullClause_ReturnsExpectedQuery()
+    {
+        var orders = new List<NullableOrder>().AsQueryable();
+
+        var query = orders
+            .Where(o => o.CustomerId != null)
+            .Select(o => new
+            {
+                o.Region,
+                o.Amount
+            });
+
+        var generator = new DMLQueryGenerator();
+        var result = generator.GenerateLinqQuery("orders", query.Expression, false);
+
+        Assert.Contains("WHERE", result);
+        Assert.Contains("IS NOT NULL", result);
+        Assert.Contains("CustomerId", result);
+        Assert.Contains("EMIT CHANGES", result);
+    }
 }
