@@ -583,4 +583,28 @@ public class DMLQueryGeneratorTests
         Assert.Contains("CustomerId", result);
         Assert.Contains("EMIT CHANGES", result);
     }
+
+    [Fact]
+    public void GenerateLinqQuery_GroupByWithExpressionKey_ReturnsExpectedQuery()
+    {
+        var orders = new List<Order>().AsQueryable();
+
+        var query = orders
+            .GroupBy(o => o.Region.ToUpper())
+            .Where(g => g.Sum(x => x.Amount) > 500)
+            .Select(g => new
+            {
+                RegionUpper = g.Key,
+                TotalAmount = g.Sum(x => x.Amount)
+            });
+
+        var generator = new DMLQueryGenerator();
+        var result = generator.GenerateLinqQuery("orders", query.Expression, false);
+
+        Assert.Contains("GROUP BY", result);
+        Assert.Contains("UPPER", result);
+        Assert.Contains("HAVING", result);
+        Assert.Contains("SUM", result);
+        Assert.Contains("EMIT CHANGES", result);
+    }
 }
