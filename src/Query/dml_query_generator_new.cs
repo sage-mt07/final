@@ -207,6 +207,7 @@ internal class DMLQueryGenerator : GeneratorBase, IDMLQueryGenerator
             "Where" => ProcessWhereMethod(structure, methodCall),
             "GroupBy" => ProcessGroupByMethod(structure, methodCall),
             "Having" => ProcessHavingMethod(structure, methodCall),
+            "Window" => ProcessWindowMethod(structure, methodCall),
             "OrderBy" or "OrderByDescending" or "ThenBy" or "ThenByDescending" => ProcessOrderByMethod(structure, methodCall),
             "Take" => ProcessTakeMethod(structure, methodCall),
             "Skip" => ProcessSkipMethod(structure, methodCall),
@@ -307,6 +308,22 @@ internal class DMLQueryGenerator : GeneratorBase, IDMLQueryGenerator
     }
 
     /// <summary>
+    /// WINDOW メソッド処理
+    /// </summary>
+    private QueryStructure ProcessWindowMethod(QueryStructure structure, MethodCallExpression methodCall)
+    {
+        if (HasBuilder(KsqlBuilderType.Window) && methodCall.Arguments.Count >= 2)
+        {
+            var windowExpr = methodCall.Arguments[1];
+            var windowContent = SafeCallBuilder(KsqlBuilderType.Window, windowExpr, "WINDOW processing");
+            var clause = QueryClause.Required(QueryClauseType.Window, $"WINDOW {windowContent}", windowExpr);
+            structure = structure.AddClause(clause);
+        }
+
+        return structure;
+    }
+
+    /// <summary>
     /// ORDER BY メソッド処理
     /// </summary>
     private QueryStructure ProcessOrderByMethod(QueryStructure structure, MethodCallExpression methodCall)
@@ -390,7 +407,8 @@ internal class DMLQueryGenerator : GeneratorBase, IDMLQueryGenerator
             [KsqlBuilderType.GroupBy] = new GroupByClauseBuilder(),
             [KsqlBuilderType.Having] = new HavingClauseBuilder(),
             [KsqlBuilderType.Join] = new JoinClauseBuilder(),
-            [KsqlBuilderType.Window] = new WindowClauseBuilder()
+            [KsqlBuilderType.Window] = new WindowClauseBuilder(),
+            [KsqlBuilderType.OrderBy] = new OrderByClauseBuilder()
         };
     }
 

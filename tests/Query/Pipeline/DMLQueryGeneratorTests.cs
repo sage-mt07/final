@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using Kafka.Ksql.Linq;
 using Kafka.Ksql.Linq.Query.Pipeline;
 using Xunit;
 
@@ -59,5 +61,32 @@ public class DMLQueryGeneratorTests
         var generator = new DMLQueryGenerator();
         var query = generator.GenerateAggregateQuery("t1", expr.Body);
         Assert.Equal("SELECT EARLIEST_BY_OFFSET(Id) AS First FROM t1", query);
+    }
+
+    [Fact]
+    public void GenerateLinqQuery_FullClauseCombination()
+    {
+        IQueryable<TestEntity> src = new List<TestEntity>().AsQueryable();
+        var expr = src
+            .Where(e => e.IsActive)
+            .Window(TumblingWindow.OfMinutes(5))
+            .GroupBy(e => e.Type)
+            .Having(g => g.Count() > 1)
+            .Select(g => new { g.Key, Count = g.Count() })
+            .OrderBy(x => x.Key);
+
+        var generator = new DMLQueryGenerator();
+        var query = generator.GenerateLinqQuery("s1", expr.Expression, false);
+
+        Assert.True(
+            query.Contains("SELECT g.Key") || query.Contains("SELECT Key"));
+        Assert.Contains("COUNT(*) AS Count", query);
+        Assert.Contains("FROM s1", query);
+        Assert.Contains("WHERE (IsActive = true)", query);
+        Assert.Contains("WINDOW TUMBLING", query);
+        Assert.Contains("GROUP BY Type", query);
+        Assert.Contains("HAVING (COUNT(*) > 1)", query);
+        Assert.Contains("ORDER BY", query);
+        Assert.EndsWith("EMIT CHANGES", query);
     }
 }

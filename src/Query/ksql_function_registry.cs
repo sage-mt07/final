@@ -60,7 +60,7 @@ internal static class KsqlFunctionRegistry
 
         // 集約関数（完全対応）
         ["Sum"] = new("SUM", 1),
-        ["Count"] = new("COUNT", 0, 1),
+        ["Count"] = new("COUNT", 0, 1, true),
         ["Max"] = new("MAX", 1),
         ["Min"] = new("MIN", 1),
         ["Average"] = new("AVG", 1),
