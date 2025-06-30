@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Linq.Expressions;
 using Kafka.Ksql.Linq.Query.Builders;
 using Kafka.Ksql.Linq.Tests;
@@ -33,5 +34,22 @@ public class SelectClauseBuilderTests
         var builder = new SelectClauseBuilder();
         var sql = builder.Build(expr.Body);
         Assert.Equal("UPPER(Name) AS NameUpper", sql);
+    }
+
+    private class Order
+    {
+        public decimal Amount { get; set; }
+    }
+
+    [Fact]
+    public void Build_AggregateFunctions_ReturnsAggregateExpressions()
+    {
+        Expression<Func<IGrouping<int, Order>, object>> expr =
+            g => new { OrderCount = g.Count(), TotalAmount = g.Sum(x => x.Amount) };
+
+        var builder = new SelectClauseBuilder();
+        var sql = builder.Build(expr.Body);
+
+        Assert.Equal("COUNT(*) AS OrderCount, SUM(Amount) AS TotalAmount", sql);
     }
 }
