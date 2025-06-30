@@ -146,25 +146,29 @@ internal abstract class GeneratorBase
     private static void ValidateQueryBalance(string query)
     {
         var parenthesesCount = 0;
-        var singleQuoteCount = 0;
         var inString = false;
 
-        foreach (var ch in query)
+        for (var i = 0; i < query.Length; i++)
         {
+            var ch = query[i];
             switch (ch)
             {
                 case '\'':
-                    if (!inString || singleQuoteCount % 2 == 0)
+                    // handle '' escape sequence
+                    if (i + 1 < query.Length && query[i + 1] == '\'')
+                    {
+                        i++; // skip escaped quote
+                    }
+                    else
                     {
                         inString = !inString;
                     }
-                    singleQuoteCount++;
                     break;
-                    
+
                 case '(':
                     if (!inString) parenthesesCount++;
                     break;
-                    
+
                 case ')':
                     if (!inString) parenthesesCount--;
                     break;
