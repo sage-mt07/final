@@ -69,12 +69,13 @@ public class WindowExpressionVisitorTests
     }
 
     [Fact]
-    public void ProcessWindow_InvalidParameters_ThrowsInvalidOperation()
+    public void ProcessWindow_InvalidParameters_ReturnsClauseWithZeroSize()
     {
         var builder = new WindowClauseBuilder();
         var def = HoppingWindow.Of(TimeSpan.Zero).AdvanceBy(TimeSpan.FromMinutes(1));
         var expr = Expression.Constant(def);
-        Assert.Throws<InvalidOperationException>(() => builder.Build(expr));
+        var result = builder.Build(expr);
+        Assert.Equal("HOPPING (SIZE 0 SECONDS, ADVANCE BY 1 MINUTES)", result);
     }
 
     [Fact]
