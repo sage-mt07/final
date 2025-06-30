@@ -93,6 +93,7 @@ public class DMLQueryGeneratorTests
     private class Order
     {
         public int CustomerId { get; set; }
+        public string Region { get; set; } = string.Empty;
         public decimal Amount { get; set; }
     }
 
@@ -246,5 +247,31 @@ public class DMLQueryGeneratorTests
         Assert.Contains("COUNT(", result);
         Assert.Contains("SUM(", result);
         Assert.EndsWith("EMIT CHANGES", result);
+    }
+
+    [Fact]
+    public void GenerateLinqQuery_MultiKeyGroupByWithHaving_ReturnsExpectedQuery()
+    {
+        var orders = new List<Order>().AsQueryable();
+
+        var query = orders
+            .GroupBy(o => new { o.CustomerId, o.Region })
+            .Having(g => g.Sum(x => x.Amount) > 1000)
+            .Select(g => new
+            {
+                g.Key.CustomerId,
+                g.Key.Region,
+                Total = g.Sum(x => x.Amount)
+            });
+
+        var generator = new DMLQueryGenerator();
+        var result = generator.GenerateLinqQuery("orders", query.Expression, false);
+
+        Assert.Contains("GROUP BY", result);
+        Assert.Contains("HAVING", result);
+        Assert.Contains("CustomerId", result);
+        Assert.Contains("Region", result);
+        Assert.Contains("SUM", result);
+        Assert.Contains("EMIT CHANGES;", result);
     }
 }
