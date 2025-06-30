@@ -144,22 +144,7 @@ internal class KafkaAdminService : IDisposable
         if (replicationFactor <= 0)
             throw new ArgumentException("replicationFactor must be > 0", nameof(replicationFactor));
 
-        var topicsResult = await _adminClient.DescribeTopicsAsync(
-            TopicCollection.OfTopicNames(new[] { topicName }),
-            null,
-            CancellationToken.None);
-        IEnumerable<TopicMetadata>? topicMeta = null;
-        var prop = typeof(DescribeTopicsResult).GetProperty("Topics");
-        if (prop?.GetValue(topicsResult) is IEnumerable<TopicMetadata> list)
-        {
-            topicMeta = list;
-        }
-        else if (topicsResult is IEnumerable<TopicMetadata> enumerable)
-        {
-            topicMeta = enumerable;
-        }
-        var desc = topicMeta?.FirstOrDefault();
-        if (desc != null)
+        if (TopicExists(topicName, CancellationToken.None))
         {
             _logger?.LogDebug("DB topic already exists: {Topic}", topicName);
             return;
