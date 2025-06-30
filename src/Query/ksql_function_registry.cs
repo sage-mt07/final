@@ -261,6 +261,19 @@ internal static class KsqlFunctionRegistry
             }
         }
 
+        var known = new HashSet<string>(categories.SelectMany(c => c.Value));
+        var extras = _functionMappings.Keys.Where(k => !known.Contains(k)).OrderBy(k).ToList();
+
+        if (extras.Count > 0)
+        {
+            result.AppendLine($"\n[Custom] ({extras.Count} functions)");
+            foreach (var func in extras)
+            {
+                var mapping = GetMapping(func);
+                result.AppendLine($"  • {func} → {mapping?.KsqlFunction} (args: {mapping?.MinArgs}-{mapping?.MaxArgs})");
+            }
+        }
+
         return result.ToString();
     }
 }
