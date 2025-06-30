@@ -267,8 +267,20 @@ internal static class KsqlFunctionTranslator
             LambdaExpression lambda => TranslateExpression(lambda.Body),
             UnaryExpression unary => TranslateExpression(unary.Operand),
             BinaryExpression binary => $"({TranslateExpression(binary.Left)} {GetOperator(binary.NodeType)} {TranslateExpression(binary.Right)})",
+            ConditionalExpression conditional => TranslateConditionalExpression(conditional),
             _ => expression.ToString()
         };
+    }
+
+    /// <summary>
+    /// 条件式変換
+    /// </summary>
+    private static string TranslateConditionalExpression(ConditionalExpression conditional)
+    {
+        var test = TranslateExpression(conditional.Test);
+        var ifTrue = TranslateExpression(conditional.IfTrue);
+        var ifFalse = TranslateExpression(conditional.IfFalse);
+        return $"CASE WHEN {test} THEN {ifTrue} ELSE {ifFalse} END";
     }
 
     /// <summary>
