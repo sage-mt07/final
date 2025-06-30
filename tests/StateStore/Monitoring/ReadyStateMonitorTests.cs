@@ -15,10 +15,12 @@ public class ReadyStateMonitorTests
     {
         public List<TopicPartition> Assignment { get; } = new();
         public void Assign(TopicPartition partition) { }
+        public void Assign(TopicPartitionOffset partition) { }
         public void Assign(IEnumerable<TopicPartitionOffset> partitions) { }
         public void Assign(IEnumerable<TopicPartition> partitions) { }
         public void IncrementalAssign(IEnumerable<TopicPartitionOffset> partitions) { }
         public void IncrementalAssign(IEnumerable<TopicPartition> partitions) { }
+        public void IncrementalUnassign(IEnumerable<TopicPartitionOffset> partitions) { }
         public void IncrementalUnassign(IEnumerable<TopicPartition> partitions) { }
         public void Close() { }
         public void Dispose() { }
@@ -38,7 +40,7 @@ public class ReadyStateMonitorTests
         public List<TopicPartitionOffset> OffsetsForTimes(IEnumerable<TopicPartitionTimestamp> timestamps, TimeSpan timeout) => new();
         public WatermarkOffsets GetWatermarkOffsets(TopicPartition partition) => new WatermarkOffsets(0, 0);
         public List<TopicPartitionOffset> Committed(IEnumerable<TopicPartition> partitions, TimeSpan timeout) => new();
-        public List<TopicPartition> Commit(IEnumerable<TopicPartitionOffset> offsets) => new();
+        public List<TopicPartitionOffset> Committed(TimeSpan timeout) => new();
         public void Subscribe(string topic) { }
         public void Subscribe(IEnumerable<string> topics) { }
         public void Unassign() { }
@@ -50,7 +52,7 @@ public class ReadyStateMonitorTests
         public void SetSaslCredentials(string username, string password) { }
         public event EventHandler<Error>? Error;
         public void OnError(Error error) => Error?.Invoke(this, error);
-        public void Commit() { }
+        public List<TopicPartitionOffset> Commit() => new();
         public void Commit(ConsumeResult<object, object> result) { }
         public void Commit(IEnumerable<TopicPartitionOffset> offsets) { }
     }
