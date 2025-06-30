@@ -96,6 +96,12 @@ public class DMLQueryGeneratorTests
         public decimal Amount { get; set; }
     }
 
+    private class Customer
+    {
+        public int Id { get; set; }
+        public string Name { get; set; } = string.Empty;
+    }
+
     [Fact]
     public void GenerateLinqQuery_GroupBySelectHaving_ComplexCondition()
     {
@@ -115,6 +121,34 @@ public class DMLQueryGeneratorTests
         Assert.Contains("FROM Orders", query);
         Assert.Contains("GROUP BY CustomerId", query);
         Assert.Contains("HAVING ((COUNT(*) > 10) AND (SUM(Amount) < 5000))", query);
+        Assert.EndsWith("EMIT CHANGES", query);
+    }
+
+    [Fact]
+    public void GenerateLINQQuery_JoinGroupByHavingCondition_ReturnsExpectedQuery()
+    {
+        IQueryable<Order> orders = new List<Order>().AsQueryable();
+        IQueryable<Customer> customers = new List<Customer>().AsQueryable();
+
+        var expr = orders
+            .Join(customers, o => o.CustomerId, c => c.Id, (o, c) => new { o, c })
+            .GroupBy(x => x.o.CustomerId)
+            .Having(g => g.Count() > 2 && g.Sum(x => x.o.Amount) < 10000)
+            .Select(g => new
+            {
+                g.Key,
+                OrderCount = g.Count(),
+                TotalAmount = g.Sum(x => x.o.Amount)
+            });
+
+        var generator = new DMLQueryGenerator();
+        var query = generator.GenerateLinqQuery("Orders", expr.Expression, false);
+
+        Assert.Contains("JOIN", query);
+        Assert.Contains("GROUP BY CustomerId", query);
+        Assert.Contains("HAVING ((COUNT(*) > 2) AND (SUM(Amount) < 10000))", query);
+        Assert.Contains("COUNT(*) AS OrderCount", query);
+        Assert.Contains("SUM(Amount) AS TotalAmount", query);
         Assert.EndsWith("EMIT CHANGES", query);
     }
 }
