@@ -176,3 +176,9 @@ Ready = true は最初のKafka処理が正常に終わってから
 finally では後始末だけに集中、状態制御は避けよう
 
 おかしいことが起きたら、アプリが止まってもいいくらいの潔さで！
+
+### Integration テスト
+
+1. `docker-compose -f tools/docker-compose.kafka.yml up -d` を実行して Kafka/ksqlDB 環境を起動
+2. `dotnet test physicalTests/Kafka.Ksql.Linq.Tests.Integration.csproj --filter Category=Integration` で構文検証テストを実行
+3. テスト完了後、`docker-compose -f tools/docker-compose.kafka.yml down` で環境を停止

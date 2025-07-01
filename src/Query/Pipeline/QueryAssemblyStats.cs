@@ -1,0 +1,22 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace Kafka.Ksql.Linq.Query.Pipeline;
+internal record QueryAssemblyStats(
+    int TotalParts,
+    int RequiredParts,
+    int OptionalParts,
+    int QueryLength,
+    DateTime AssemblyTime)
+{
+    /// <summary>
+    /// 統計サマリー
+    /// </summary>
+    public string GetSummary()
+    {
+        return $"Parts: {TotalParts} (Req:{RequiredParts}, Opt:{OptionalParts}), " +
+               $"Length: {QueryLength}, " +
+               $"Time: {AssemblyTime:HH:mm:ss.fff}";
+    }
+}

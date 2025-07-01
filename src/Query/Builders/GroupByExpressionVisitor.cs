@@ -6,79 +6,6 @@ using Kafka.Ksql.Linq.Query.Abstractions;
 using Kafka.Ksql.Linq.Query.Builders.Common;
 
 namespace Kafka.Ksql.Linq.Query.Builders;
-
-/// <summary>
-/// GROUP BY句内容構築ビルダー
-/// 設計理由：責務分離設計に準拠、キーワード除外で純粋なグループ化キー内容のみ生成
-/// 出力例: "col1, col2" (GROUP BY除外)
-/// </summary>
-internal class GroupByClauseBuilder : BuilderBase
-{
-    public override KsqlBuilderType BuilderType => KsqlBuilderType.GroupBy;
-
-    protected override KsqlBuilderType[] GetRequiredBuilderTypes()
-    {
-        return Array.Empty<KsqlBuilderType>(); // 他Builderに依存しない
-    }
-
-    protected override string BuildInternal(Expression expression)
-    {
-        var visitor = new GroupByExpressionVisitor();
-        visitor.Visit(expression);
-        
-        var result = visitor.GetResult();
-        
-        if (string.IsNullOrWhiteSpace(result))
-        {
-            throw new InvalidOperationException("Unable to extract GROUP BY keys from expression");
-        }
-
-        return result;
-    }
-
-    protected override void ValidateBuilderSpecific(Expression expression)
-    {
-        // GROUP BY句特有のバリデーション
-        ValidateNoAggregateInGroupBy(expression);
-        ValidateGroupByKeyCount(expression);
-    }
-
-    /// <summary>
-    /// GROUP BY句での集約関数使用禁止チェック
-    /// </summary>
-    private static void ValidateNoAggregateInGroupBy(Expression expression)
-    {
-        var visitor = new AggregateDetectionVisitor();
-        visitor.Visit(expression);
-        
-        if (visitor.HasAggregates)
-        {
-            throw new InvalidOperationException(
-                "Aggregate functions are not allowed in GROUP BY clause");
-        }
-    }
-
-    /// <summary>
-    /// GROUP BYキー数制限チェック
-    /// </summary>
-    private static void ValidateGroupByKeyCount(Expression expression)
-    {
-        var visitor = new GroupByKeyCountVisitor();
-        visitor.Visit(expression);
-        
-        const int maxKeys = 10; // KSQL推奨制限
-        if (visitor.KeyCount > maxKeys)
-        {
-            throw new InvalidOperationException(
-                $"GROUP BY supports maximum {maxKeys} keys for optimal performance. " +
-                $"Found {visitor.KeyCount} keys. Consider using composite keys or data denormalization.");
-        }
-    }
-}
-
-/// <summary>
-/// GROUP BY句専用ExpressionVisitor
-/// </summary>
 internal class GroupByExpressionVisitor : ExpressionVisitor
 {
     private readonly List<string> _keys = new();
@@ -90,28 +17,26 @@ internal class GroupByExpressionVisitor : ExpressionVisitor
 
     protected override Expression VisitNew(NewExpression node)
     {
-        // 複合キーの処理（匿名型）
         foreach (var arg in node.Arguments)
         {
-            var key = ExtractGroupByKey(arg);
-            if (!string.IsNullOrEmpty(key))
+            if (arg is NewExpression nested)
             {
+                Visit(nested);
+            }
+            else
+            {
+                var key = ProcessKeyExpression(arg);
                 _keys.Add(key);
             }
         }
-        
+
         return node;
     }
 
     protected override Expression VisitMember(MemberExpression node)
     {
-        // 単一キーの処理
-        var key = ExtractGroupByKey(node);
-        if (!string.IsNullOrEmpty(key))
-        {
-            _keys.Add(key);
-        }
-        
+        var key = ProcessKeyExpression(node);
+        _keys.Add(key);
         return node;
     }
 
@@ -128,9 +53,8 @@ internal class GroupByExpressionVisitor : ExpressionVisitor
 
     protected override Expression VisitMethodCall(MethodCallExpression node)
     {
-        // GROUP BYで使用可能な関数（日付部分抽出等）
         var methodName = node.Method.Name;
-        
+
         if (IsAllowedGroupByFunction(methodName))
         {
             var functionCall = ProcessGroupByFunction(node);
@@ -138,22 +62,72 @@ internal class GroupByExpressionVisitor : ExpressionVisitor
             return node;
         }
 
-        // 許可されていない関数
         throw new InvalidOperationException(
             $"Function '{methodName}' is not allowed in GROUP BY clause");
     }
 
-    /// <summary>
-    /// GROUP BYキー抽出
-    /// </summary>
-    private string ExtractGroupByKey(Expression expr)
+    protected override Expression VisitBinary(BinaryExpression node)
+    {
+        var expression = ProcessBinaryExpression(node);
+        _keys.Add(expression);
+        return node;
+    }
+
+    private string ProcessKeyExpression(Expression expr)
+    {
+        if (expr is ConstantExpression)
+        {
+            throw new InvalidOperationException("Constant expression is not supported in GROUP BY");
+        }
+
+        return ProcessExpression(expr);
+    }
+
+    private string ProcessExpression(Expression expr)
     {
         return expr switch
         {
             MemberExpression member => GetMemberName(member),
-            UnaryExpression unary when unary.NodeType == ExpressionType.Convert => ExtractGroupByKey(unary.Operand),
+            ConstantExpression constant => constant.Value?.ToString() ?? "NULL",
+            UnaryExpression unary when unary.NodeType == ExpressionType.Convert || unary.NodeType == ExpressionType.ConvertChecked => ProcessExpression(unary.Operand),
             MethodCallExpression method when IsAllowedGroupByFunction(method.Method.Name) => ProcessGroupByFunction(method),
+            BinaryExpression binary => ProcessBinaryExpression(binary),
             _ => throw new InvalidOperationException($"Expression type '{expr.GetType().Name}' is not supported in GROUP BY")
+        };
+    }
+
+    private string ProcessBinaryExpression(BinaryExpression binary)
+    {
+        var left = ProcessExpression(binary.Left);
+        var right = ProcessExpression(binary.Right);
+
+        if (binary.NodeType == ExpressionType.Coalesce)
+        {
+            return $"COALESCE({left}, {right})";
+        }
+
+        var op = GetOperator(binary.NodeType);
+        return $"{left} {op} {right}";
+    }
+
+    private static string GetOperator(ExpressionType nodeType)
+    {
+        return nodeType switch
+        {
+            ExpressionType.Add => "+",
+            ExpressionType.Subtract => "-",
+            ExpressionType.Multiply => "*",
+            ExpressionType.Divide => "/",
+            ExpressionType.Modulo => "%",
+            ExpressionType.Equal => "=",
+            ExpressionType.NotEqual => "<>",
+            ExpressionType.GreaterThan => ">",
+            ExpressionType.GreaterThanOrEqual => ">=",
+            ExpressionType.LessThan => "<",
+            ExpressionType.LessThanOrEqual => "<=",
+            ExpressionType.AndAlso => "AND",
+            ExpressionType.OrElse => "OR",
+            _ => throw new NotSupportedException($"Operator {nodeType} is not supported in GROUP BY")
         };
     }
 
@@ -349,29 +323,5 @@ internal class GroupByExpressionVisitor : ExpressionVisitor
             UnaryExpression unary => ExtractConstantValue(unary.Operand),
             _ => throw new InvalidOperationException($"Expected constant value but got {expression.GetType().Name}")
         };
-    }
-}
-
-/// <summary>
-/// GROUP BYキー数カウントVisitor
-/// </summary>
-internal class GroupByKeyCountVisitor : ExpressionVisitor
-{
-    public int KeyCount { get; private set; }
-
-    protected override Expression VisitNew(NewExpression node)
-    {
-        KeyCount += node.Arguments.Count;
-        return base.VisitNew(node);
-    }
-
-    protected override Expression VisitMember(MemberExpression node)
-    {
-        // NewExpression内でない単独のMemberは1つのキー
-        if (KeyCount == 0)
-        {
-            KeyCount = 1;
-        }
-        return base.VisitMember(node);
     }
 }
