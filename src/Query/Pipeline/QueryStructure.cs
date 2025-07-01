@@ -5,7 +5,6 @@ using System.Linq.Expressions;
 
 namespace Kafka.Ksql.Linq.Query.Pipeline;
 
-/// <summary>
 /// クエリ構造定義
 /// 設計理由：Generator層でのクエリ構造統一管理
 /// </summary>
@@ -226,119 +225,5 @@ internal record QueryStructure(
             }
             lastValidIndex = Math.Max(lastValidIndex, expectedIndex);
         }
-    }
-}
-
-/// <summary>
-/// クエリ句定義
-/// </summary>
-internal record QueryClause(
-    QueryClauseType Type,
-    string Content,
-    Expression? SourceExpression = null,
-    int Priority = 0)
-{
-    /// <summary>
-    /// 必須句作成
-    /// </summary>
-    public static QueryClause Required(QueryClauseType type, string content, Expression? sourceExpression = null)
-    {
-        return new QueryClause(type, content, sourceExpression, 100);
-    }
-
-    /// <summary>
-    /// 任意句作成
-    /// </summary>
-    public static QueryClause Optional(QueryClauseType type, string content, Expression? sourceExpression = null)
-    {
-        return new QueryClause(type, content, sourceExpression, 50);
-    }
-
-    /// <summary>
-    /// 空句判定
-    /// </summary>
-    public bool IsEmpty => string.IsNullOrWhiteSpace(Content);
-
-    /// <summary>
-    /// 有効句判定
-    /// </summary>
-    public bool IsValid => !IsEmpty;
-}
-
-/// <summary>
-/// クエリ句タイプ列挙
-/// </summary>
-internal enum QueryClauseType
-{
-    Select,
-    From,
-    Join,
-    Where,
-    GroupBy,
-    Having,
-    Window,
-    OrderBy,
-    Limit,
-    EmitChanges
-}
-
-/// <summary>
-/// クエリメタデータ
-/// </summary>
-internal record QueryMetadata(
-    DateTime CreatedAt,
-    string Category,
-    string? BaseObject = null,
-    Dictionary<string, object>? Properties = null)
-{
-    /// <summary>
-    /// プロパティ追加
-    /// </summary>
-    public QueryMetadata WithProperty(string key, object value)
-    {
-        var newProperties = new Dictionary<string, object>(Properties ?? new Dictionary<string, object>())
-        {
-            [key] = value
-        };
-        return this with { Properties = newProperties };
-    }
-
-    /// <summary>
-    /// プロパティ取得
-    /// </summary>
-    public T? GetProperty<T>(string key)
-    {
-        if (Properties?.TryGetValue(key, out var value) == true && value is T typedValue)
-        {
-            return typedValue;
-        }
-        return default;
-    }
-}
-
-/// <summary>
-/// 検証結果
-/// </summary>
-internal record ValidationResult(bool IsValid, List<string> Errors)
-{
-    /// <summary>
-    /// 成功結果
-    /// </summary>
-    public static ValidationResult Success => new(true, new List<string>());
-
-    /// <summary>
-    /// 失敗結果作成
-    /// </summary>
-    public static ValidationResult Failure(params string[] errors)
-    {
-        return new ValidationResult(false, errors.ToList());
-    }
-
-    /// <summary>
-    /// エラーメッセージ結合
-    /// </summary>
-    public string GetErrorMessage()
-    {
-        return Errors.Count > 0 ? string.Join("; ", Errors) : string.Empty;
     }
 }

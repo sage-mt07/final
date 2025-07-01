@@ -19,18 +19,3 @@ public interface IKsqlBuilder
     /// </summary>
     KsqlBuilderType BuilderType { get; }
 }
-
-/// <summary>
-/// ビルダー種別列挙
-/// </summary>
-public enum KsqlBuilderType
-{
-    Select,
-    Where,
-    GroupBy,
-    Having,
-    Join,
-    Window,
-    Projection,
-    OrderBy
-}
