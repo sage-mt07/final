@@ -24,10 +24,11 @@
 | DSL メソッド | 説明 | 戻り値型 | 対象レイヤ | 実装状態 |
 |---------------|------|-----------|------------|---------|
 | `.Where(predicate)` | 条件フィルタ | `IEventSet<T>` | Stream/Table | ✅ |
-| `.Window(int \| TimeSpan)` | タイムウィンドウ指定 | `IQueryable<T>` | Stream | ✅ |
+| `.Window(WindowDef \| TimeSpan)` | タイムウィンドウ指定 | `IQueryable<T>` | Stream | ✅ |
 | `.GroupBy(...)` | グループ化および集約 | `IEventSet<IGrouping<TKey, T>>` | Stream/Table | ✅ |
 | `.OnError(ErrorAction)` | エラー処理方針指定 | `EventSet<T>` | Stream | ✅ |
 | `.WithRetry(int)` | リトライ設定 | `EventSet<T>` | Stream | ✅ |
+| `.StartErrorHandling()` | エラーチェーン開始 | `IErrorHandlingChain<T>` | Stream | ✅ |
 | `.WithManualCommit()` | 手動コミットモード切替 | `IEntityBuilder<T>` | Subscription | ✅ |
 
 - `ToList`/`ToListAsync` は Pull Query として実行されます【F:src/Query/Pipeline/DMLQueryGenerator.cs†L27-L34】。
@@ -57,6 +58,8 @@
 | `KsqlDslOptions` | DLQ 設定や ValidationMode など DSL 全体の構成を保持 | ✅ |
 | `ModelBuilder` | POCO から `EntityModel` を構築するビルダー | ✅ |
 | `KafkaAdminService` | DLQ トピック作成などの管理操作 | ✅ |
+| `AvroOperationRetrySettings` | Avro操作ごとのリトライ設定 | ✅ |
+| `AvroRetryPolicy` | リトライ回数や遅延などの詳細ポリシー | ✅ |
 
 `KsqlDslOptions.DlqTopicName` は既定で `"dead.letter.queue"` です【F:src/Configuration/KsqlDslOptions.cs†L31-L34】。
 
@@ -77,12 +80,16 @@
 | `ReadyStateMonitor` | トピック同期状態の監視 | ✅ |
 | `StateStoreBinding` | Kafka トピックと StateStore の双方向バインディング | ✅ |
 | `SchemaRegistryClient` | スキーマ管理クライアント | ✅ |
+| `ResilientAvroSerializerManager` | Avro操作のリトライ管理 | ✅ |
+| `WindowFinalizationManager` | Window最終化処理のタイマー管理 | ✅ |
 
 ## 各 API の備考
 
 - `IEventSet<T>.WithRetry()` の実装例は `EventSetErrorHandlingExtensions.cs` にあります【F:src/EventSetErrorHandlingExtensions.cs†L120-L156】。
 - `OnError` の拡張は同ファイルで提供されています【F:src/EventSetErrorHandlingExtensions.cs†L14-L37】。
 - 手動コミットの利用例は [manual_commit.md](manual_commit.md) を参照してください。
+- `StartErrorHandling()` → `.Map()` → `.WithRetry()` の流れで細かいエラー処理を構築できます。
+- `AvroOperationRetrySettings` で SchemaRegistry 操作のリトライ方針を制御します【F:src/Configuration/Options/AvroOperationRetrySettings.cs†L8-L33】。
 
 ## 実装・設計整合性一覧
 
