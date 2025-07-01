@@ -11,6 +11,6 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="../../src/Kafka.Ksql.Linq.csproj" />
+    <ProjectReference Include="../src/Kafka.Ksql.Linq.csproj" />
   </ItemGroup>
 </Project>

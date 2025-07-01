@@ -10,7 +10,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{0AB3BF05-4346-4AA6-1389-037BE0695223}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kafka.Ksql.Linq.Tests", "tests\Kafka.Ksql.Linq.Tests.csproj", "{CDD782BE-B899-4E79-8836-FC312129B2EF}"
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kafka.Ksql.Linq.Tests.Integration", "tests\Integration\Kafka.Ksql.Linq.Tests.Integration.csproj", "{fd40d9b6-cb0b-426a-af8f-f5542c5ff07d}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kafka.Ksql.Linq.Tests.Integration", "physicalTests\Kafka.Ksql.Linq.Tests.Integration.csproj", "{fd40d9b6-cb0b-426a-af8f-f5542c5ff07d}"
 EndProject
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kafka.Ksql.Linq.Importer", "Kafka.Ksql.Linq.Importer\Kafka.Ksql.Linq.Importer.csproj", "{75EC30A2-C4DF-4B1F-A676-EB16AEB71E1F}"
