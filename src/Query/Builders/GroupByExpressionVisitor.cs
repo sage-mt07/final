@@ -325,4 +325,3 @@ internal class GroupByExpressionVisitor : ExpressionVisitor
         };
     }
 }
-}
