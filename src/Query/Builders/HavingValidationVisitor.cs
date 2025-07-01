@@ -27,3 +27,17 @@ internal class HavingValidationVisitor : ExpressionVisitor
         return base.VisitMember(node);
     }
 
+    
+    protected override Expression VisitMethodCall(MethodCallExpression node)
+    {
+        var wasInside = _insideAggregateFunction;
+        if (KsqlFunctionRegistry.IsAggregateFunction(node.Method.Name))
+        {
+            _insideAggregateFunction = true;
+        }
+
+        var result = base.VisitMethodCall(node);
+        _insideAggregateFunction = wasInside;
+        return result;
+    }
+}

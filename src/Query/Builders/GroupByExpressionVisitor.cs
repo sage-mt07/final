@@ -324,3 +324,5 @@ internal class GroupByExpressionVisitor : ExpressionVisitor
             _ => throw new InvalidOperationException($"Expected constant value but got {expression.GetType().Name}")
         };
     }
+}
+}
