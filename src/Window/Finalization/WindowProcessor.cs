@@ -21,7 +21,7 @@ internal class WindowProcessor<T> : WindowProcessor where T : class
     }
 
     /// <summary>
-    /// 新しいデータを受信してWindowに追加
+    /// Add new data to its corresponding window
     /// </summary>
     public void AddToWindow(T entity, DateTime eventTime)
     {
@@ -61,7 +61,7 @@ internal class WindowProcessor<T> : WindowProcessor where T : class
     {
         var windowsToFinalize = new List<(string key, WindowState<T> state)>();
 
-        // 確定対象Windowを特定
+        // Identify windows ready for finalization
         foreach (var kvp in _windowStates)
         {
             var windowState = kvp.Value;
@@ -71,28 +71,28 @@ internal class WindowProcessor<T> : WindowProcessor where T : class
             }
         }
 
-        // 確定処理実行
+        // Execute finalization
         foreach (var (windowKey, windowState) in windowsToFinalize)
         {
             await FinalizeWindow(windowKey, windowState);
         }
 
-        // 古いWindowの清掃
+        // Clean up old windows
         await CleanupOldWindows(currentTime);
     }
 
     /// <summary>
-    /// Window確定判定
+    /// Determine whether a window should be finalized
     /// </summary>
     private bool ShouldFinalizeWindow(WindowState<T> windowState, DateTime currentTime)
     {
-        // Windowの終了時刻 + Grace Period を過ぎた場合に確定
+        // Finalize once WindowEnd plus the grace period has elapsed
         var finalizeAt = windowState.WindowEnd.Add(_config.GracePeriod);
         return currentTime >= finalizeAt;
     }
 
     /// <summary>
-    /// Window確定実行
+    /// Finalize an individual window
     /// </summary>
     private async Task FinalizeWindow(string windowKey, WindowState<T> windowState)
     {
@@ -100,7 +100,7 @@ internal class WindowProcessor<T> : WindowProcessor where T : class
         {
             if (windowState.IsFinalized)
             {
-                return; // 既に確定済み
+                return; // Already finalized
             }
 
             windowState.IsFinalized = true;
@@ -108,10 +108,10 @@ internal class WindowProcessor<T> : WindowProcessor where T : class
 
         try
         {
-            // 集約データ生成
+            // Generate aggregated data
             var finalizedData = _config.AggregationFunc(windowState.Events);
 
-            // orders_window_final トピックに送信
+            // Send to the orders_window_final topic
             await SendToFinalTopic(windowKey, finalizedData, windowState);
 
             _logger.LogInformation("Finalized window: {WindowKey}, Events: {EventCount}, " +
@@ -123,7 +123,7 @@ internal class WindowProcessor<T> : WindowProcessor where T : class
         {
             _logger.LogError(ex, "Failed to finalize window: {WindowKey}", windowKey);
 
-            // 確定フラグをリセット（再試行可能にする）
+            // Reset the finalized flag so the process can be retried
             lock (windowState.Lock)
             {
                 windowState.IsFinalized = false;
@@ -132,7 +132,7 @@ internal class WindowProcessor<T> : WindowProcessor where T : class
     }
 
     /// <summary>
-    /// 確定足を最終トピックに送信
+    /// Publish the finalized result to the final topic
     /// </summary>
     private async Task SendToFinalTopic(string windowKey, object finalizedData, WindowState<T> windowState)
     {
@@ -145,11 +145,11 @@ internal class WindowProcessor<T> : WindowProcessor where T : class
             EventCount = windowState.Events.Count,
             AggregatedData = finalizedData,
             FinalizedAt = DateTime.UtcNow,
-            PodId = Environment.MachineName // POD識別用
+            PodId = Environment.MachineName // Used for POD identification
         };
 
-        // KafkaProducerを使用して送信
-        // 重複送信対策：同一キーの場合は最初に到着したものが有効
+        // Send using KafkaProducer
+        // Deduplicate: if the same key arrives multiple times, keep the first
         var finalTopic = _config.GetFinalTopicName(windowState.WindowMinutes);
 
         await _config.FinalTopicProducer.SendAsync(
@@ -162,7 +162,7 @@ internal class WindowProcessor<T> : WindowProcessor where T : class
     }
 
     /// <summary>
-    /// 古いWindowの清掃
+    /// Remove expired windows from memory
     /// </summary>
     private async Task CleanupOldWindows(DateTime currentTime)
     {
@@ -211,7 +211,7 @@ internal class WindowProcessor<T> : WindowProcessor where T : class
 
     private string ExtractEntityKey(T entity)
     {
-        // エンティティのキープロパティから一意キーを生成
+        // Build a unique key from the entity's key properties
         if (entity == null) return Guid.NewGuid().ToString();
 
         var keyProperties = typeof(T).GetProperties()

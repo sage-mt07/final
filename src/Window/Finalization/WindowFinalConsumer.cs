@@ -25,7 +25,7 @@ internal class WindowFinalConsumer : IDisposable
     }
 
     /// <summary>
-    /// 確定足データを購読してRocksDBに保存
+    /// Subscribe to finalized messages and persist them in RocksDB
     /// </summary>
     public async Task SubscribeToFinalizedWindows(string topicName,
         int windowMinutes,
@@ -42,25 +42,25 @@ internal class WindowFinalConsumer : IDisposable
         //     await HandleFinalizedWindowWithRocksDB(message, messageHandler);
         // }
 
-        await Task.CompletedTask; // 仮実装
+        await Task.CompletedTask; // placeholder implementation
     }
 
     /// <summary>
-    /// 確定足メッセージ処理（重複排除 + RocksDB保存）
+    /// Handle a finalized message with deduplication and RocksDB persistence
     /// </summary>
     private async Task HandleFinalizedWindowWithRocksDB(WindowFinalMessage message,
         Func<WindowFinalMessage, Task> messageHandler)
     {
-        // 重複チェック：同一キーの場合は最初に到着したものを採用
+        // Deduplicate: keep the first message for the same key
         if (_finalizedWindows.TryAdd(message.WindowKey, message))
         {
             _logger.LogDebug("Processing new finalized window: {WindowKey} from POD: {PodId}",
                 message.WindowKey, message.PodId);
 
-            // RocksDBに保存
+            // Save to RocksDB
             _rocksDbStore.Put(message.WindowKey, message);
 
-            // 外部ハンドラー実行
+            // Execute external handler
             await messageHandler(message);
         }
         else
@@ -73,21 +73,21 @@ internal class WindowFinalConsumer : IDisposable
     }
 
     /// <summary>
-    /// 過去の確定足データ参照（RocksDB優先）
+    /// Retrieve historical finalized data, preferring RocksDB
     /// </summary>
     public WindowFinalMessage? GetFinalizedWindow(string windowKey)
     {
-        // まずメモリキャッシュを確認
+        // Check the in-memory cache first
         if (_finalizedWindows.TryGetValue(windowKey, out var cachedWindow))
         {
             return cachedWindow;
         }
 
-        // RocksDBから取得
+        // Retrieve from RocksDB
         var persistedWindow = _rocksDbStore.Get(windowKey);
         if (persistedWindow != null)
         {
-            // メモリキャッシュにも保存
+            // Store in memory cache as well
             _finalizedWindows.TryAdd(windowKey, persistedWindow);
             return persistedWindow;
         }
@@ -96,13 +96,13 @@ internal class WindowFinalConsumer : IDisposable
     }
 
     /// <summary>
-    /// 指定期間の確定足データ取得（RocksDB検索）
+    /// Get finalized data within a date range using RocksDB search
     /// </summary>
     public List<WindowFinalMessage> GetFinalizedWindowsInRange(DateTime start, DateTime end)
     {
         var results = new List<WindowFinalMessage>();
 
-        // RocksDBから全データを取得して期間フィルタ
+        // Retrieve all data from RocksDB then filter by the range
         foreach (var kvp in _rocksDbStore.All())
         {
             var window = kvp.Value;
@@ -116,12 +116,12 @@ internal class WindowFinalConsumer : IDisposable
     }
 
     /// <summary>
-    /// 特定ウィンドウサイズの確定足データ取得
+    /// Get finalized data for a specific window size
     /// </summary>
     public List<WindowFinalMessage> GetFinalizedWindowsBySize(int windowMinutes, DateTime? since = null)
     {
         var results = new List<WindowFinalMessage>();
-        var cutoffTime = since ?? DateTime.UtcNow.AddDays(-7); // デフォルト7日前
+        var cutoffTime = since ?? DateTime.UtcNow.AddDays(-7); // default is seven days ago
 
         foreach (var kvp in _rocksDbStore.All())
         {
@@ -141,7 +141,7 @@ internal class WindowFinalConsumer : IDisposable
         {
             _disposed = true;
 
-            // RocksDBをフラッシュしてから解放
+            // Flush RocksDB before disposing
             _rocksDbStore?.Flush();
             _rocksDbStore?.Dispose();
 
