@@ -1,3 +1,5 @@
+using System;
+
 namespace Kafka.Ksql.Linq.Query.Builders.Common;
 
 /// <summary>
