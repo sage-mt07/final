@@ -6,69 +6,6 @@ using Kafka.Ksql.Linq.Query.Builders.Common;
 using Kafka.Ksql.Linq.Query.Builders.Functions;
 
 namespace Kafka.Ksql.Linq.Query.Builders;
-
-/// <summary>
-/// SELECT句内容構築ビルダー
-/// 設計理由：責務分離設計に準拠、キーワード除外で純粋な句内容のみ生成
-/// 出力例: "col1, col2 AS alias" (SELECT除外)
-/// </summary>
-internal class SelectClauseBuilder : BuilderBase
-{
-    public override KsqlBuilderType BuilderType => KsqlBuilderType.Select;
-
-    protected override KsqlBuilderType[] GetRequiredBuilderTypes()
-    {
-        return Array.Empty<KsqlBuilderType>(); // 他Builderに依存しない
-    }
-
-    protected override string BuildInternal(Expression expression)
-    {
-        var visitor = new SelectExpressionVisitor();
-        visitor.Visit(expression);
-        
-        var result = visitor.GetResult();
-        
-        // 空の場合は * を返す
-        return string.IsNullOrWhiteSpace(result) ? "*" : result;
-    }
-
-    protected override void ValidateBuilderSpecific(Expression expression)
-    {
-        // SELECT句特有のバリデーション
-        BuilderValidation.ValidateNoNestedAggregates(expression);
-
-        if (expression is MethodCallExpression)
-        {
-            // 集約関数の混在チェック
-            if (ContainsAggregateFunction(expression) && ContainsNonAggregateColumns(expression))
-            {
-                throw new InvalidOperationException(
-                    "SELECT clause cannot mix aggregate functions with non-aggregate columns without GROUP BY");
-            }
-        }
-    }
-
-    /// <summary>
-    /// 集約関数含有チェック
-    /// </summary>
-    private static bool ContainsAggregateFunction(Expression expression)
-    {
-        var visitor = new AggregateDetectionVisitor();
-        visitor.Visit(expression);
-        return visitor.HasAggregates;
-    }
-
-    /// <summary>
-    /// 非集約カラム含有チェック
-    /// </summary>
-    private static bool ContainsNonAggregateColumns(Expression expression)
-    {
-        var visitor = new NonAggregateColumnVisitor();
-        visitor.Visit(expression);
-        return visitor.HasNonAggregateColumns;
-    }
-}
-
 /// <summary>
 /// SELECT句専用ExpressionVisitor
 /// </summary>
@@ -280,59 +217,5 @@ internal class SelectExpressionVisitor : ExpressionVisitor
     private static string SafeToString(object? value)
     {
         return BuilderValidation.SafeToString(value);
-    }
-}
-
-/// <summary>
-/// 集約関数検出Visitor
-/// </summary>
-internal class AggregateDetectionVisitor : ExpressionVisitor
-{
-    public bool HasAggregates { get; private set; }
-
-    protected override Expression VisitMethodCall(MethodCallExpression node)
-    {
-        var methodName = node.Method.Name;
-        if (KsqlFunctionRegistry.IsAggregateFunction(methodName))
-        {
-            HasAggregates = true;
-        }
-        
-        return base.VisitMethodCall(node);
-    }
-}
-
-/// <summary>
-/// 非集約カラム検出Visitor
-/// </summary>
-internal class NonAggregateColumnVisitor : ExpressionVisitor
-{
-    public bool HasNonAggregateColumns { get; private set; }
-    private bool _insideAggregateFunction;
-
-    protected override Expression VisitMember(MemberExpression node)
-    {
-        if (!_insideAggregateFunction && node.Expression is ParameterExpression)
-        {
-            HasNonAggregateColumns = true;
-        }
-        
-        return base.VisitMember(node);
-    }
-
-    protected override Expression VisitMethodCall(MethodCallExpression node)
-    {
-        var methodName = node.Method.Name;
-        var wasInsideAggregate = _insideAggregateFunction;
-        
-        if (KsqlFunctionRegistry.IsAggregateFunction(methodName))
-        {
-            _insideAggregateFunction = true;
-        }
-        
-        var result = base.VisitMethodCall(node);
-        _insideAggregateFunction = wasInsideAggregate;
-        
-        return result;
     }
 }

@@ -7,50 +7,6 @@ using Kafka.Ksql.Linq.Query.Builders.Functions;
 namespace Kafka.Ksql.Linq.Query.Builders;
 
 /// <summary>
-/// HAVING句内容構築ビルダー
-/// 設計理由：責務分離設計に準拠、キーワード除外で純粋な集約条件内容のみ生成
-/// 出力例: "SUM(amount) > 100 AND COUNT(*) > 5" (HAVING除外)
-/// </summary>
-internal class HavingClauseBuilder : BuilderBase
-{
-    public override KsqlBuilderType BuilderType => KsqlBuilderType.Having;
-
-    protected override KsqlBuilderType[] GetRequiredBuilderTypes()
-    {
-        return Array.Empty<KsqlBuilderType>(); // 他Builderに依存しない
-    }
-
-    protected override string BuildInternal(Expression expression)
-    {
-        var visitor = new HavingExpressionVisitor();
-        visitor.Visit(expression);
-        return visitor.GetResult();
-    }
-
-    protected override void ValidateBuilderSpecific(Expression expression)
-    {
-        // HAVING句特有のバリデーション
-        BuilderValidation.ValidateNoNestedAggregates(expression);
-        ValidateRequiresAggregateOrGroupByColumn(expression);
-    }
-
-    /// <summary>
-    /// HAVING句では集約関数またはGROUP BYカラムのみ許可
-    /// </summary>
-    private static void ValidateRequiresAggregateOrGroupByColumn(Expression expression)
-    {
-        var visitor = new HavingValidationVisitor();
-        visitor.Visit(expression);
-        
-        if (visitor.HasInvalidReferences)
-        {
-            throw new InvalidOperationException(
-                "HAVING clause can only reference aggregate functions or columns in GROUP BY clause");
-        }
-    }
-}
-
-/// <summary>
 /// HAVING句専用ExpressionVisitor
 /// </summary>
 internal class HavingExpressionVisitor : ExpressionVisitor
@@ -322,43 +278,5 @@ internal class HavingExpressionVisitor : ExpressionVisitor
     private static string SafeToString(object? value)
     {
         return BuilderValidation.SafeToString(value);
-    }
-}
-
-/// <summary>
-/// HAVING句バリデーション用Visitor
-/// </summary>
-internal class HavingValidationVisitor : ExpressionVisitor
-{
-    public bool HasInvalidReferences { get; private set; }
-    private bool _insideAggregateFunction;
-
-    protected override Expression VisitMember(MemberExpression node)
-    {
-        // 集約関数内でないメンバーアクセスは、GROUP BYカラムである必要がある
-        // この実装では簡略化（実際にはGROUP BYカラムリストとの照合が必要）
-        if (!_insideAggregateFunction && node.Expression is ParameterExpression)
-        {
-            // ここで実際のGROUP BYカラムとの照合を行う（実装簡略化）
-            // 実際の実装では、GROUP BYで使用されたカラムのリストと照合
-        }
-
-        return base.VisitMember(node);
-    }
-
-    protected override Expression VisitMethodCall(MethodCallExpression node)
-    {
-        var methodName = node.Method.Name;
-        var wasInsideAggregate = _insideAggregateFunction;
-
-        if (KsqlFunctionRegistry.IsAggregateFunction(methodName))
-        {
-            _insideAggregateFunction = true;
-        }
-
-        var result = base.VisitMethodCall(node);
-        _insideAggregateFunction = wasInsideAggregate;
-
-        return result;
     }
 }
