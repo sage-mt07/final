@@ -23,7 +23,7 @@ public class WindowFinalizationManager : IDisposable
         _logger = loggerFactory?.CreateLogger<WindowFinalizationManager>()
                  ?? Microsoft.Extensions.Logging.Abstractions.NullLogger<WindowFinalizationManager>.Instance;
 
-        // 定期的にWindow確定を実行（デフォルト1秒間隔）
+        // Periodically finalize windows (default: every second)
         _finalizationTimer = new Timer(ProcessWindowFinalization, null,
             _options.FinalizationInterval, _options.FinalizationInterval);
 
@@ -32,7 +32,7 @@ public class WindowFinalizationManager : IDisposable
     }
 
     /// <summary>
-    /// エンティティのWindow処理を登録
+    /// Register window processing for an entity type
     /// </summary>
     public void RegisterWindowProcessor<T>(WindowConfiguration<T> config) where T : class
     {
@@ -52,7 +52,7 @@ public class WindowFinalizationManager : IDisposable
     }
 
     /// <summary>
-    /// Window確定処理（タイマー駆動）
+    /// Timer-driven window finalization
     /// </summary>
     private void ProcessWindowFinalization(object? state)
     {
