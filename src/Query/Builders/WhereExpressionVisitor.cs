@@ -1,11 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Collections;
-using System.Linq;
-using System.Linq.Expressions;
-using Kafka.Ksql.Linq.Query.Abstractions;
 using Kafka.Ksql.Linq.Query.Builders.Common;
 using Kafka.Ksql.Linq.Query.Builders.Functions;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
 
 /// <summary>
 /// WHERE句専用ExpressionVisitor
@@ -275,7 +274,7 @@ internal class WhereExpressionVisitor : ExpressionVisitor
             var value = ProcessExpression(node.Arguments[0]);
             return $"STARTS_WITH({target}, {value})";
         }
-        
+
         return KsqlFunctionTranslator.TranslateMethodCall(node);
     }
 

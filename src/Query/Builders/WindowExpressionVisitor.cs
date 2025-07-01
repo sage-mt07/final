@@ -1,9 +1,5 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using Kafka.Ksql.Linq.Query.Abstractions;
-using Kafka.Ksql.Linq.Query.Builders.Common;
 
 namespace Kafka.Ksql.Linq.Query.Builders;
 /// <summary>
@@ -40,35 +36,35 @@ internal class WindowExpressionVisitor : ExpressionVisitor
             case nameof(WindowDef.TumblingWindow):
                 _windowType = "TUMBLING";
                 break;
-                
+
             case nameof(WindowDef.HoppingWindow):
                 _windowType = "HOPPING";
                 break;
-                
+
             case nameof(WindowDef.SessionWindow):
                 _windowType = "SESSION";
                 break;
-                
+
             case nameof(WindowDef.Size):
                 _size = FormatTimeSpan((TimeSpan)value!);
                 break;
-                
+
             case nameof(WindowDef.AdvanceBy):
                 _advanceBy = FormatTimeSpan((TimeSpan)value!);
                 break;
-                
+
             case nameof(WindowDef.Gap):
                 _gap = FormatTimeSpan((TimeSpan)value!);
                 break;
-                
+
             case nameof(WindowDef.Retention):
                 _retention = FormatTimeSpan((TimeSpan)value!);
                 break;
-                
+
             case nameof(WindowDef.GracePeriod):
                 _gracePeriod = FormatTimeSpan((TimeSpan)value!);
                 break;
-                
+
             case nameof(WindowDef.EmitFinal):
                 _emitBehavior = "FINAL";
                 break;

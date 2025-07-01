@@ -1,4 +1,3 @@
-using Kafka.Ksql.Linq.Query.Abstractions;
 using Kafka.Ksql.Linq.Query.Builders.Common;
 using System;
 using System.Collections.Generic;

@@ -1,8 +1,7 @@
-using System;
-using System.Linq.Expressions;
-using Kafka.Ksql.Linq.Query.Abstractions;
 using Kafka.Ksql.Linq.Query.Builders.Common;
 using Kafka.Ksql.Linq.Query.Builders.Functions;
+using System;
+using System.Linq.Expressions;
 
 namespace Kafka.Ksql.Linq.Query.Builders;
 
@@ -213,7 +212,7 @@ internal class HavingExpressionVisitor : ExpressionVisitor
     {
         return expression switch
         {
-            MethodCallExpression methodCall when KsqlFunctionRegistry.IsAggregateFunction(methodCall.Method.Name) 
+            MethodCallExpression methodCall when KsqlFunctionRegistry.IsAggregateFunction(methodCall.Method.Name)
                 => ProcessAggregateFunction(methodCall),
             MethodCallExpression methodCall => KsqlFunctionTranslator.TranslateMethodCall(methodCall),
             MemberExpression member => member.Member.Name,

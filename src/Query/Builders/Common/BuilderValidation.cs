@@ -1,6 +1,6 @@
+using Kafka.Ksql.Linq.Query.Builders.Functions;
 using System;
 using System.Linq.Expressions;
-using Kafka.Ksql.Linq.Query.Builders.Functions;
 
 namespace Kafka.Ksql.Linq.Query.Builders.Common;
 
@@ -49,7 +49,7 @@ internal static class BuilderValidation
             case MethodCallExpression methodCall:
                 if (methodCall.Object != null)
                     ValidateExpressionDepth(methodCall.Object, maxDepth, currentDepth + 1);
-                
+
                 foreach (var arg in methodCall.Arguments)
                     ValidateExpressionDepth(arg, maxDepth, currentDepth + 1);
                 break;

@@ -1,14 +1,12 @@
+using Kafka.Ksql.Linq.Core.Abstractions;
+using Kafka.Ksql.Linq.Query.Abstractions;
+using Kafka.Ksql.Linq.Query.Builders;
+using Kafka.Ksql.Linq.Query.Builders.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Text;
-using Kafka.Ksql.Linq.Core.Abstractions;
-using Kafka.Ksql.Linq.Query.Abstractions;
-using Kafka.Ksql.Linq.Query.Builders;
-using Kafka.Ksql.Linq.Query.Builders.Common;
-using Kafka.Ksql.Linq.Query.Pipeline;
 
 namespace Kafka.Ksql.Linq.Query.Pipeline;
 
@@ -71,14 +69,14 @@ internal class DDLQueryGenerator : GeneratorBase, IDDLQueryGenerator
         {
             var columns = GenerateColumnDefinitions(entityModel);
             var keyColumns = string.Join(", ", entityModel.KeyProperties.Select(p => p.Name.ToUpper()));
-            
+
             var query = $"CREATE TABLE {tableName} ({columns}) WITH (KAFKA_TOPIC='{topicName}', VALUE_FORMAT='AVRO'";
-            
+
             if (!string.IsNullOrEmpty(keyColumns))
             {
                 query += $", KEY='{keyColumns}'";
             }
-            
+
             query += ")";
 
             return query;
@@ -98,7 +96,7 @@ internal class DDLQueryGenerator : GeneratorBase, IDDLQueryGenerator
         {
             var context = new QueryAssemblyContext(baseObject, false); // Push Query
             var structure = CreateStreamAsStructure(streamName, baseObject);
-            
+
             // LINQ式を解析してクエリ句を構築
             structure = ProcessLinqExpression(structure, linqExpression, context);
 
@@ -120,7 +118,7 @@ internal class DDLQueryGenerator : GeneratorBase, IDDLQueryGenerator
         {
             var context = new QueryAssemblyContext(baseObject, false); // Push Query
             var structure = CreateTableAsStructure(tableName, baseObject);
-            
+
             // LINQ式を解析してクエリ句を構築
             structure = ProcessLinqExpression(structure, linqExpression, context);
 
@@ -209,7 +207,7 @@ internal class DDLQueryGenerator : GeneratorBase, IDDLQueryGenerator
     private QueryStructure ProcessLinqExpression(QueryStructure structure, Expression linqExpression, QueryAssemblyContext context)
     {
         var analysis = AnalyzeLinqExpression(linqExpression);
-        
+
         foreach (var methodCall in analysis.MethodCalls.AsEnumerable().Reverse())
         {
             structure = ProcessMethodCall(structure, methodCall, context);

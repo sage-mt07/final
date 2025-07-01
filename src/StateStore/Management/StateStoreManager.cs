@@ -1,7 +1,6 @@
 using Kafka.Ksql.Linq.Configuration;
 using Kafka.Ksql.Linq.StateStore.Configuration;
 using Kafka.Ksql.Linq.StateStore.Core;
-using Kafka.Ksql.Linq.StateStore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;

@@ -71,9 +71,9 @@ internal static class JoinLimitationEnforcer
     /// JOIN実行時制約の検証
     /// </summary>
     public static void ValidateJoinConstraints(
-        Type outerType, 
-        Type innerType, 
-        Expression outerKeySelector, 
+        Type outerType,
+        Type innerType,
+        Expression outerKeySelector,
         Expression innerKeySelector)
     {
         // キー型一致性チェック
@@ -152,14 +152,14 @@ internal static class JoinLimitationEnforcer
             if (node.Method.Name == "Join")
             {
                 JoinCount++;
-                
+
                 // ネストしたJOINもカウント
                 if (node.Object != null)
                     Visit(node.Object);
-                
+
                 foreach (var arg in node.Arguments)
                     Visit(arg);
-                
+
                 return node;
             }
 

@@ -1,11 +1,10 @@
+using Kafka.Ksql.Linq.Query.Abstractions;
+using Kafka.Ksql.Linq.Query.Builders;
+using Kafka.Ksql.Linq.Query.Builders.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using Kafka.Ksql.Linq.Query.Abstractions;
-using Kafka.Ksql.Linq.Query.Builders;
-using Kafka.Ksql.Linq.Query.Builders.Common;
-using Kafka.Ksql.Linq.Query.Pipeline;
 
 namespace Kafka.Ksql.Linq.Query.Pipeline;
 
@@ -44,10 +43,10 @@ internal class JoinQueryGenerator : GeneratorBase
     /// 2テーブルJOINクエリ生成
     /// </summary>
     public string GenerateTwoTableJoin(
-        string outerTable, 
-        string innerTable, 
-        Expression outerKeySelector, 
-        Expression innerKeySelector, 
+        string outerTable,
+        string innerTable,
+        Expression outerKeySelector,
+        Expression innerKeySelector,
         Expression? resultSelector = null,
         Expression? whereCondition = null,
         bool isPullQuery = true)
@@ -63,7 +62,7 @@ internal class JoinQueryGenerator : GeneratorBase
             // JOIN条件構築
             var joinExpression = BuildJoinExpression(outerTable, innerTable, outerKeySelector, innerKeySelector, resultSelector);
             var joinContent = SafeCallBuilder(KsqlBuilderType.Join, joinExpression, "JOIN processing");
-            
+
             // JOIN句は完全なクエリとして返される（JoinClauseBuilderが完全なSELECT文を生成）
             return ApplyQueryPostProcessing(joinContent, context);
         }
@@ -78,7 +77,7 @@ internal class JoinQueryGenerator : GeneratorBase
     /// </summary>
     public string GenerateThreeTableJoin(
         string firstTable,
-        string secondTable, 
+        string secondTable,
         string thirdTable,
         Expression firstSecondKeySelector,
         Expression secondFirstKeySelector,
@@ -94,7 +93,7 @@ internal class JoinQueryGenerator : GeneratorBase
                 Expression.Constant($"THREE_TABLE_JOIN:{firstTable},{secondTable},{thirdTable}"));
 
             var context = new QueryAssemblyContext($"{firstTable}_JOIN_{secondTable}_JOIN_{thirdTable}", isPullQuery);
-            
+
             // 段階的JOIN構築
             var query = BuildThreeTableJoinQuery(
                 firstTable, secondTable, thirdTable,
@@ -106,7 +105,7 @@ internal class JoinQueryGenerator : GeneratorBase
         }
         catch (System.Exception ex)
         {
-            return HandleGenerationError("three-table JOIN generation", ex, 
+            return HandleGenerationError("three-table JOIN generation", ex,
                 $"Tables: {firstTable}, {secondTable}, {thirdTable}");
         }
     }
@@ -122,10 +121,10 @@ internal class JoinQueryGenerator : GeneratorBase
             JoinLimitationEnforcer.ValidateJoinExpression(joinExpression);
 
             var context = new QueryAssemblyContext("LINQ_JOIN", isPullQuery);
-            
+
             // JoinBuilderに委譲（完全なクエリを生成）
             var joinQuery = SafeCallBuilder(KsqlBuilderType.Join, joinExpression, "LINQ JOIN processing");
-            
+
             return ApplyQueryPostProcessing(joinQuery, context);
         }
         catch (System.Exception ex)
@@ -150,10 +149,10 @@ internal class JoinQueryGenerator : GeneratorBase
             ValidateJoinConstraints(outerTable, innerTable);
 
             var context = new QueryAssemblyContext($"{outerTable}_LEFT_JOIN_{innerTable}", isPullQuery);
-            
+
             // LEFT JOINの手動構築（KSQLの制限により）
             var query = BuildLeftJoinQuery(outerTable, innerTable, outerKeySelector, innerKeySelector, resultSelector);
-            
+
             return ApplyQueryPostProcessing(query, context);
         }
         catch (System.Exception ex)
@@ -169,7 +168,7 @@ internal class JoinQueryGenerator : GeneratorBase
     {
         if (string.IsNullOrWhiteSpace(outerTable))
             throw new ArgumentException("Outer table name cannot be null or empty");
-        
+
         if (string.IsNullOrWhiteSpace(innerTable))
             throw new ArgumentException("Inner table name cannot be null or empty");
 
@@ -283,8 +282,8 @@ internal class JoinQueryGenerator : GeneratorBase
         var join2Conditions = BuildJoinConditions(secondThirdKeys, thirdSecondKeys, t2Alias, t3Alias);
 
         // プロジェクション構築
-        var projection = resultSelector != null ? 
-            ProcessResultSelector(resultSelector, t1Alias, t2Alias, t3Alias) : 
+        var projection = resultSelector != null ?
+            ProcessResultSelector(resultSelector, t1Alias, t2Alias, t3Alias) :
             $"{t1Alias}.*, {t2Alias}.*, {t3Alias}.*";
 
         // 完全なクエリ組み立て
@@ -306,14 +305,14 @@ internal class JoinQueryGenerator : GeneratorBase
     {
         var outerKeys = ExtractKeys(outerKeySelector);
         var innerKeys = ExtractKeys(innerKeySelector);
-        
+
         var outerAlias = "o";
         var innerAlias = "i";
-        
+
         var joinConditions = BuildJoinConditions(outerKeys, innerKeys, outerAlias, innerAlias);
-        
-        var projection = resultSelector != null ? 
-            ProcessResultSelector(resultSelector, outerAlias, innerAlias) : 
+
+        var projection = resultSelector != null ?
+            ProcessResultSelector(resultSelector, outerAlias, innerAlias) :
             $"{outerAlias}.*, {innerAlias}.*";
 
         return $"SELECT {projection} " +
@@ -327,7 +326,7 @@ internal class JoinQueryGenerator : GeneratorBase
     private List<string> ExtractKeys(Expression keySelector)
     {
         var keys = new List<string>();
-        
+
         var lambdaBody = BuilderValidation.ExtractLambdaBody(keySelector);
         if (lambdaBody == null) return keys;
 
@@ -342,7 +341,7 @@ internal class JoinQueryGenerator : GeneratorBase
                     }
                 }
                 break;
-                
+
             case MemberExpression member:
                 keys.Add(member.Member.Name);
                 break;
@@ -418,7 +417,7 @@ internal class JoinQueryGenerator : GeneratorBase
 
         // JOIN固有の最適化ヒント
         Console.WriteLine("[KSQL-LINQ HINT] Ensure joined tables are co-partitioned for optimal performance");
-        
+
         if (query.Contains("LEFT JOIN"))
         {
             Console.WriteLine("[KSQL-LINQ HINT] LEFT JOIN may impact performance. Consider data denormalization if possible");

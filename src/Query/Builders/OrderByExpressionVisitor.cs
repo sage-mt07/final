@@ -1,9 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using Kafka.Ksql.Linq.Query.Abstractions;
-using Kafka.Ksql.Linq.Query.Builders.Common;
 
 namespace Kafka.Ksql.Linq.Query.Builders;
 internal class OrderByExpressionVisitor : ExpressionVisitor
@@ -142,19 +139,19 @@ internal class OrderByExpressionVisitor : ExpressionVisitor
             "WindowStart" => "WINDOWSTART",
             "WindowEnd" => "WINDOWEND",
             "RowTime" => "ROWTIME",
-            
+
             // 文字列関数（部分的）
             "ToUpper" => ProcessSimpleFunction("UPPER", methodCall),
             "ToLower" => ProcessSimpleFunction("LOWER", methodCall),
-            
+
             // 数値関数（部分的）
             "Abs" => ProcessSimpleFunction("ABS", methodCall),
-            
+
             // 日付関数（部分的）
             "Year" => ProcessSimpleFunction("YEAR", methodCall),
             "Month" => ProcessSimpleFunction("MONTH", methodCall),
             "Day" => ProcessSimpleFunction("DAY", methodCall),
-            
+
             _ => throw new InvalidOperationException($"Function '{methodName}' is not supported in ORDER BY clause")
         };
     }

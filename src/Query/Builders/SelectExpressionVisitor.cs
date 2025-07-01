@@ -1,9 +1,8 @@
+using Kafka.Ksql.Linq.Query.Builders.Common;
+using Kafka.Ksql.Linq.Query.Builders.Functions;
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
-using Kafka.Ksql.Linq.Query.Abstractions;
-using Kafka.Ksql.Linq.Query.Builders.Common;
-using Kafka.Ksql.Linq.Query.Builders.Functions;
 
 namespace Kafka.Ksql.Linq.Query.Builders;
 /// <summary>
@@ -26,10 +25,10 @@ internal class SelectExpressionVisitor : ExpressionVisitor
         {
             var arg = node.Arguments[i];
             var memberName = node.Members?[i]?.Name ?? $"col{i}";
-            
+
             var columnExpression = ProcessProjectionArgument(arg);
             var alias = GenerateUniqueAlias(memberName);
-            
+
             if (columnExpression != alias)
             {
                 _columns.Add($"{columnExpression} AS {alias}");
@@ -39,7 +38,7 @@ internal class SelectExpressionVisitor : ExpressionVisitor
                 _columns.Add(columnExpression);
             }
         }
-        
+
         return node;
     }
 
@@ -72,7 +71,7 @@ internal class SelectExpressionVisitor : ExpressionVisitor
         var left = ProcessExpression(node.Left);
         var right = ProcessExpression(node.Right);
         var varoperator = GetOperator(node.NodeType);
-        
+
         var expression = $"({left} {varoperator} {right})";
         _columns.Add(expression);
         return node;
@@ -84,7 +83,7 @@ internal class SelectExpressionVisitor : ExpressionVisitor
         var test = ProcessExpression(node.Test);
         var ifTrue = ProcessExpression(node.IfTrue);
         var ifFalse = ProcessExpression(node.IfFalse);
-        
+
         var caseExpression = $"CASE WHEN {test} THEN {ifTrue} ELSE {ifFalse} END";
         _columns.Add(caseExpression);
         return node;
@@ -153,19 +152,19 @@ internal class SelectExpressionVisitor : ExpressionVisitor
         // ネストしたプロパティアクセスの処理
         var path = new List<string>();
         var current = member;
-        
+
         while (current != null)
         {
             path.Insert(0, current.Member.Name);
             current = current.Expression as MemberExpression;
         }
-        
+
         // ルートがParameterの場合は最後の要素のみ使用
         if (member.Expression is ParameterExpression)
         {
             return member.Member.Name;
         }
-        
+
         return string.Join(".", path);
     }
 
@@ -176,13 +175,13 @@ internal class SelectExpressionVisitor : ExpressionVisitor
     {
         var alias = baseName;
         var counter = 1;
-        
+
         while (_usedAliases.Contains(alias))
         {
             alias = $"{baseName}_{counter}";
             counter++;
         }
-        
+
         _usedAliases.Add(alias);
         return alias;
     }

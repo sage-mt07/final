@@ -1,5 +1,3 @@
-using System.Linq.Expressions;
-
 namespace Kafka.Ksql.Linq.Query.Abstractions;
 /// <summary>
 /// ビルダー種別列挙

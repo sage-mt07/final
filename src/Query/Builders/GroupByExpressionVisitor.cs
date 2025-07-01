@@ -2,8 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using Kafka.Ksql.Linq.Query.Abstractions;
-using Kafka.Ksql.Linq.Query.Builders.Common;
 
 namespace Kafka.Ksql.Linq.Query.Builders;
 internal class GroupByExpressionVisitor : ExpressionVisitor
@@ -232,7 +230,7 @@ internal class GroupByExpressionVisitor : ExpressionVisitor
     {
         var target = methodCall.Object ?? methodCall.Arguments[0];
         var columnName = ExtractColumnName(target);
-        
+
         if (methodCall.Arguments.Count >= 1)
         {
             var startIndex = ExtractConstantValue(methodCall.Arguments[methodCall.Object != null ? 0 : 1]);
@@ -246,7 +244,7 @@ internal class GroupByExpressionVisitor : ExpressionVisitor
 
             return $"SUBSTRING({columnName}, {startIndex})";
         }
-        
+
         throw new InvalidOperationException("SUBSTRING requires at least start index parameter");
     }
 
@@ -279,13 +277,13 @@ internal class GroupByExpressionVisitor : ExpressionVisitor
     {
         var target = methodCall.Object ?? methodCall.Arguments[0];
         var columnName = ExtractColumnName(target);
-        
+
         if (methodCall.Arguments.Count >= 2)
         {
             var precision = ExtractConstantValue(methodCall.Arguments[methodCall.Object != null ? 0 : 1]);
             return $"ROUND({columnName}, {precision})";
         }
-        
+
         return $"ROUND({columnName})";
     }
 

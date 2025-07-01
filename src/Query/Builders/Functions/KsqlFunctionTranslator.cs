@@ -1,8 +1,8 @@
+using Kafka.Ksql.Linq.Query.Builders.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Text;
-using Kafka.Ksql.Linq.Query.Builders.Common;
 
 namespace Kafka.Ksql.Linq.Query.Builders.Functions;
 
@@ -83,7 +83,7 @@ internal static class KsqlFunctionTranslator
             var objectArg = TranslateExpression(methodCall.Object);
             return $"CAST({objectArg} AS VARCHAR)";
         }
-        
+
         return $"CAST({args[0]} AS VARCHAR)";
     }
 
@@ -95,7 +95,7 @@ internal static class KsqlFunctionTranslator
         var targetType = methodCall.Method.ReturnType;
         var ksqlType = MapToKsqlType(targetType);
         var args = ExtractArguments(methodCall);
-        
+
         return $"CAST({args[0]} AS {ksqlType})";
     }
 
@@ -118,7 +118,7 @@ internal static class KsqlFunctionTranslator
                 "ToBoolean" => "BOOLEAN",
                 _ => "VARCHAR"
             };
-            
+
             var args = ExtractArguments(methodCall);
             return $"CAST({args[0]} AS {ksqlType})";
         }
@@ -172,7 +172,7 @@ internal static class KsqlFunctionTranslator
             {
                 return "COUNT(*)";
             }
-            
+
             return $"COUNT({args[0]})";
         }
 
@@ -193,7 +193,7 @@ internal static class KsqlFunctionTranslator
         {
             // ToXxx系メソッドをCAST変換として処理
             var targetType = InferTypeFromMethodName(methodName);
-            var sourceArg = args.Count > 0 ? args[0] : 
+            var sourceArg = args.Count > 0 ? args[0] :
                            methodCall.Object != null ? TranslateExpression(methodCall.Object) : "NULL";
             return $"CAST({sourceArg} AS {targetType})";
         }
@@ -372,7 +372,7 @@ internal static class KsqlFunctionTranslator
         result.AppendLine($"Is Static: {methodCall.Method.IsStatic}");
         result.AppendLine($"Object: {methodCall.Object?.Type.Name ?? "null"}");
         result.AppendLine($"Arguments: {methodCall.Arguments.Count}");
-        
+
         for (int i = 0; i < methodCall.Arguments.Count; i++)
         {
             result.AppendLine($"  Arg[{i}]: {methodCall.Arguments[i].Type.Name} - {methodCall.Arguments[i]}");

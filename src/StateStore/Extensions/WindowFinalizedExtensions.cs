@@ -1,8 +1,3 @@
-using Kafka.Ksql.Linq.Core.Abstractions;
-using Kafka.Ksql.Linq.StateStore.Management;
-using Kafka.Ksql.Linq.StateStore.Core;
-using Kafka.Ksql.Linq.StateStore;
-
 namespace Kafka.Ksql.Linq.StateStore.Extensions;
 
 internal static class WindowFinalizedExtensions

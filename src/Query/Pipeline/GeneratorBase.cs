@@ -1,5 +1,4 @@
 using Kafka.Ksql.Linq.Query.Abstractions;
-using Kafka.Ksql.Linq.Query.Builders.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,7 +33,7 @@ internal abstract class GeneratorBase
     {
         // 基底クラスでは最低限のBuilderのみチェック
         var requiredBuilders = GetRequiredBuilderTypes();
-        
+
         foreach (var builderType in requiredBuilders)
         {
             if (!Builders.ContainsKey(builderType))
@@ -59,7 +58,7 @@ internal abstract class GeneratorBase
         {
             return builder;
         }
-        
+
         throw new InvalidOperationException(
             $"Builder {type} is not available in {GetType().Name}");
     }
@@ -96,10 +95,10 @@ internal abstract class GeneratorBase
         }
 
         var result = string.Join(" ", validParts);
-        
+
         // 基本的な構文チェック
         ValidateAssembledQuery(result);
-        
+
         return result;
     }
 
@@ -115,7 +114,7 @@ internal abstract class GeneratorBase
 
         // 基本的なKSQL構文チェック
         var upperQuery = query.Trim().ToUpper();
-        
+
         if (!IsValidKsqlQueryStart(upperQuery))
         {
             throw new InvalidOperationException(
@@ -291,12 +290,12 @@ internal abstract class GeneratorBase
     protected string HandleGenerationError(string operation, System.Exception exception, string? context = null)
     {
         var errorMessage = $"{GetType().Name} failed during {operation}";
-        
+
         if (!string.IsNullOrEmpty(context))
         {
             errorMessage += $" (Context: {context})";
         }
-        
+
         errorMessage += $": {exception.Message}";
 
         // 開発環境でのデバッグ情報追加

@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-
 namespace Kafka.Ksql.Linq.Query.Pipeline;
 /// <summary>
 /// クエリパーツ情報

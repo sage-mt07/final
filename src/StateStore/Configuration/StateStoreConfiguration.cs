@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Kafka.Ksql.Linq.StateStore;
 
 namespace Kafka.Ksql.Linq.StateStore.Configuration;
 

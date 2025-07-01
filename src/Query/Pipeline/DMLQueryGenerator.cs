@@ -1,11 +1,10 @@
+using Kafka.Ksql.Linq.Query.Abstractions;
+using Kafka.Ksql.Linq.Query.Builders;
+using Kafka.Ksql.Linq.Query.Builders.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using Kafka.Ksql.Linq.Query.Abstractions;
-using Kafka.Ksql.Linq.Query.Builders;
-using Kafka.Ksql.Linq.Query.Builders.Common;
-using Kafka.Ksql.Linq.Query.Pipeline;
 
 namespace Kafka.Ksql.Linq.Query.Pipeline;
 
@@ -114,7 +113,7 @@ internal class DMLQueryGenerator : GeneratorBase, IDMLQueryGenerator
             // 集約式処理
             var selectContent = SafeCallBuilder(KsqlBuilderType.Select, aggregateExpression, "aggregate expression processing");
             var selectClause = QueryClause.Required(QueryClauseType.Select, selectContent, aggregateExpression);
-            
+
             // デフォルトのSELECT *を置き換え
             structure = structure.RemoveClause(QueryClauseType.Select);
             structure = structure.AddClause(selectClause);
@@ -184,7 +183,7 @@ internal class DMLQueryGenerator : GeneratorBase, IDMLQueryGenerator
     private QueryStructure ProcessLinqExpression(QueryStructure structure, Expression linqExpression, QueryAssemblyContext context)
     {
         var analysis = AnalyzeLinqExpression(linqExpression);
-        
+
         // メソッド呼び出しを順次処理
         foreach (var methodCall in analysis.MethodCalls.AsEnumerable().Reverse())
         {
@@ -228,7 +227,7 @@ internal class DMLQueryGenerator : GeneratorBase, IDMLQueryGenerator
             {
                 var selectContent = SafeCallBuilder(KsqlBuilderType.Select, lambdaBody, "SELECT processing");
                 var clause = QueryClause.Required(QueryClauseType.Select, selectContent, lambdaBody);
-                
+
                 // 既存のSELECT句を置き換え
                 structure = structure.RemoveClause(QueryClauseType.Select);
                 structure = structure.AddClause(clause);

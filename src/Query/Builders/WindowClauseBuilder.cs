@@ -1,9 +1,9 @@
+using Kafka.Ksql.Linq.Query.Abstractions;
+using Kafka.Ksql.Linq.Query.Builders.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using Kafka.Ksql.Linq.Query.Abstractions;
-using Kafka.Ksql.Linq.Query.Builders.Common;
 
 namespace Kafka.Ksql.Linq.Query.Builders;
 
@@ -24,18 +24,18 @@ internal class WindowClauseBuilder : BuilderBase
     protected override string BuildInternal(Expression expression)
     {
         var visitor = new WindowExpressionVisitor();
-        
+
         // 式の種類に応じた処理
         switch (expression)
         {
             case ConstantExpression { Value: WindowDef def }:
                 visitor.VisitWindowDef(def);
                 break;
-                
+
             case ConstantExpression { Value: TimeSpan ts }:
                 visitor.VisitWindowDef(TumblingWindow.Of(ts));
                 break;
-                
+
             default:
                 visitor.Visit(expression);
                 break;
@@ -89,13 +89,13 @@ internal class WindowClauseBuilder : BuilderBase
     private static void ValidateWindowDef(WindowDef windowDef)
     {
         var operations = windowDef.Operations;
-        
+
         // 基本的なウィンドウタイプの存在確認
-        var hasWindowType = operations.Any(op => 
+        var hasWindowType = operations.Any(op =>
             op.Name == nameof(WindowDef.TumblingWindow) ||
             op.Name == nameof(WindowDef.HoppingWindow) ||
             op.Name == nameof(WindowDef.SessionWindow));
-            
+
         if (!hasWindowType)
         {
             throw new InvalidOperationException("Window definition must specify window type (Tumbling, Hopping, or Session)");

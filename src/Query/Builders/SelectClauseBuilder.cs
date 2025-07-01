@@ -1,9 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Linq.Expressions;
 using Kafka.Ksql.Linq.Query.Abstractions;
 using Kafka.Ksql.Linq.Query.Builders.Common;
-using Kafka.Ksql.Linq.Query.Builders.Functions;
+using System;
+using System.Linq.Expressions;
 
 namespace Kafka.Ksql.Linq.Query.Builders;
 
@@ -25,9 +23,9 @@ internal class SelectClauseBuilder : BuilderBase
     {
         var visitor = new SelectExpressionVisitor();
         visitor.Visit(expression);
-        
+
         var result = visitor.GetResult();
-        
+
         // 空の場合は * を返す
         return string.IsNullOrWhiteSpace(result) ? "*" : result;
     }

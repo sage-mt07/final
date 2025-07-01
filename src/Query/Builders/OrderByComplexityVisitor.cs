@@ -1,9 +1,6 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using Kafka.Ksql.Linq.Query.Abstractions;
-using Kafka.Ksql.Linq.Query.Builders.Common;
 
 namespace Kafka.Ksql.Linq.Query.Builders;
 internal class OrderByComplexityVisitor : ExpressionVisitor
@@ -27,7 +24,7 @@ internal class OrderByComplexityVisitor : ExpressionVisitor
     protected override Expression VisitMethodCall(MethodCallExpression node)
     {
         var methodName = node.Method.Name;
-        
+
         // 許可された関数以外は複雑とみなす
         var allowedMethods = new[]
         {

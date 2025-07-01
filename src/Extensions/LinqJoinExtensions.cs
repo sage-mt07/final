@@ -1,8 +1,3 @@
-using Kafka.Ksql.Linq.Core.Abstractions;
-using Kafka.Ksql.Linq.Query.Linq;
-using System;
-using System.Linq.Expressions;
-
 namespace Kafka.Ksql.Linq.Extensions;
 
 //public static class LinqJoinExtensions

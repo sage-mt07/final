@@ -1,9 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq.Expressions;
-using Kafka.Ksql.Linq.Query.Abstractions;
-using Kafka.Ksql.Linq.Query.Builders.Common;
 using Kafka.Ksql.Linq.Query.Builders.Functions;
+using System.Linq.Expressions;
 
 namespace Kafka.Ksql.Linq.Query.Builders;
 /// <summary>
@@ -20,7 +16,7 @@ internal class NonAggregateColumnVisitor : ExpressionVisitor
         {
             HasNonAggregateColumns = true;
         }
-        
+
         return base.VisitMember(node);
     }
 
@@ -28,15 +24,15 @@ internal class NonAggregateColumnVisitor : ExpressionVisitor
     {
         var methodName = node.Method.Name;
         var wasInsideAggregate = _insideAggregateFunction;
-        
+
         if (KsqlFunctionRegistry.IsAggregateFunction(methodName))
         {
             _insideAggregateFunction = true;
         }
-        
+
         var result = base.VisitMethodCall(node);
         _insideAggregateFunction = wasInsideAggregate;
-        
+
         return result;
     }
 }

@@ -1,7 +1,6 @@
 using Kafka.Ksql.Linq.Core.Abstractions;
 using Kafka.Ksql.Linq.StateStore.Core;
 using Kafka.Ksql.Linq.StateStore.Management;
-using Kafka.Ksql.Linq.StateStore;
 using System;
 using System.Collections.Generic;
 using System.Linq;

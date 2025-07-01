@@ -1,9 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
 using Kafka.Ksql.Linq.Query.Abstractions;
 using Kafka.Ksql.Linq.Query.Builders.Common;
+using System;
+using System.Linq.Expressions;
 
 namespace Kafka.Ksql.Linq.Query.Builders;
 
@@ -25,9 +23,9 @@ internal class GroupByClauseBuilder : BuilderBase
     {
         var visitor = new GroupByExpressionVisitor();
         visitor.Visit(expression);
-        
+
         var result = visitor.GetResult();
-        
+
         if (string.IsNullOrWhiteSpace(result))
         {
             throw new InvalidOperationException("Unable to extract GROUP BY keys from expression");
@@ -50,7 +48,7 @@ internal class GroupByClauseBuilder : BuilderBase
     {
         var visitor = new AggregateDetectionVisitor();
         visitor.Visit(expression);
-        
+
         if (visitor.HasAggregates)
         {
             throw new InvalidOperationException(
@@ -65,7 +63,7 @@ internal class GroupByClauseBuilder : BuilderBase
     {
         var visitor = new GroupByKeyCountVisitor();
         visitor.Visit(expression);
-        
+
         const int maxKeys = 10; // KSQL推奨制限
         if (visitor.KeyCount > maxKeys)
         {

@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 
 namespace Kafka.Ksql.Linq.Query.Pipeline;
 
@@ -187,8 +186,8 @@ internal record QueryStructure(
         }
 
         // CREATE TABLEはGROUP BYまたはウィンドウが推奨
-        if (QueryType == "CREATE_TABLE_AS" && 
-            !HasClause(QueryClauseType.GroupBy) && 
+        if (QueryType == "CREATE_TABLE_AS" &&
+            !HasClause(QueryClauseType.GroupBy) &&
             !HasClause(QueryClauseType.Window))
         {
             // 警告レベル（エラーではない）

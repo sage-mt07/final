@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -39,10 +38,10 @@ internal record QueryAssemblyContext(
     /// </summary>
     public QueryAssemblyContext WithExecutionMode(QueryExecutionMode mode)
     {
-        return this with 
-        { 
-            ExecutionMode = mode, 
-            IsPullQuery = mode == QueryExecutionMode.PullQuery 
+        return this with
+        {
+            ExecutionMode = mode,
+            IsPullQuery = mode == QueryExecutionMode.PullQuery
         };
     }
 
@@ -87,10 +86,10 @@ internal record QueryAssemblyContext(
     /// </summary>
     public string GetDebugInfo()
     {
-        var metadataInfo = Metadata.Count > 0 
+        var metadataInfo = Metadata.Count > 0
             ? string.Join(", ", Metadata.Select(kvp => $"{kvp.Key}={kvp.Value}"))
             : "none";
-            
+
         return $"BaseObject: {BaseObjectName}, " +
                $"Mode: {ExecutionMode}, " +
                $"IsPull: {IsPullQuery}, " +

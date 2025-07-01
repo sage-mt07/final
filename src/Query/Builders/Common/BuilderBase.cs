@@ -1,7 +1,6 @@
+using Kafka.Ksql.Linq.Query.Abstractions;
 using System;
 using System.Linq.Expressions;
-using Kafka.Ksql.Linq.Query.Abstractions;
-using Kafka.Ksql.Linq.Query.Builders.Common;
 
 namespace Kafka.Ksql.Linq.Query.Builders.Common;
 
@@ -31,10 +30,10 @@ internal abstract class BuilderBase : IKsqlBuilder
         {
             // 派生クラスの実装を呼び出し
             var result = BuildInternal(expression);
-            
+
             // 結果バリデーション
             ValidateOutput(result);
-            
+
             return result;
         }
         catch (Exception ex) when (!(ex is ArgumentException || ex is InvalidOperationException))
@@ -68,7 +67,7 @@ internal abstract class BuilderBase : IKsqlBuilder
     {
         if (expression == null)
         {
-            throw new ArgumentNullException(nameof(expression), 
+            throw new ArgumentNullException(nameof(expression),
                 $"{BuilderType} builder requires a non-null expression");
         }
 
@@ -176,7 +175,7 @@ internal abstract class BuilderBase : IKsqlBuilder
         var message = $"{BuilderType} builder failed during {operation}. " +
                      $"Expression type: {expression.GetType().Name}. " +
                      $"Expression: {expression}";
-        
+
         if (innerException != null)
         {
             message += $". Inner error: {innerException.Message}";

@@ -1,5 +1,5 @@
-using System.Collections.Generic;
 using Kafka.Ksql.Linq.StateStore;
+using System.Collections.Generic;
 
 namespace Kafka.Ksql.Linq.Configuration
 {
