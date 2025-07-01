@@ -31,7 +31,8 @@ jobs:
       run: dotnet build --configuration Release --no-restore
 
     - name: Test with coverage
-      run: dotnet test --configuration Release --no-build --collect:"XPlat Code Coverage"
+      run: |
+      	dotnet test --configuration Release --no-build --collect:"XPlat Code Coverage"  --filter "FullyQualifiedName!~physicalTests"
 
     - name: Install ReportGenerator
       run: dotnet tool install --global dotnet-reportgenerator-globaltool
