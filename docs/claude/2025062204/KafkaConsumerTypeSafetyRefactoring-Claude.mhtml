@@ -14742,7 +14742,7 @@ x-col gap-3.5 m-3.5"><div class=3D"relative"><div aria-label=3D"=E3=82=AF=
 =95=E3=81=84" class=3D"max-h-96 w-full overflow-y-auto break-words transiti=
 on-opacity duration-200 min-h-[1.5rem]"><div contenteditable=3D"true" trans=
 late=3D"no" enterkeyhint=3D"enter" tabindex=3D"0" class=3D"ProseMirror brea=
-k-words max-w-[60ch]"><p>2&gt;C:\jinto\jinto\tests\Query\Builders\BuilderUt=
+k-words max-w-[60ch]"><p>2&gt;C:\owner\owner\tests\Query\Builders\BuilderUt=
 ilTests.cs(12,20,12,44): error CS0246: =E5=9E=8B=E3=81=BE=E3=81=9F=E3=81=AF=
 =E5=90=8D=E5=89=8D=E7=A9=BA=E9=96=93=E3=81=AE=E5=90=8D=E5=89=8D 'Func&lt;,&=
 gt;' =E3=81=8C=E8=A6=8B=E3=81=A4=E3=81=8B=E3=82=8A=E3=81=BE=E3=81=9B=E3=82=
@@ -14751,13 +14751,13 @@ gt;' =E3=81=8C=E8=A6=8B=E3=81=A4=E3=81=8B=E3=82=8A=E3=81=BE=E3=81=9B=E3=82=
 =83=B3=E3=83=96=E3=83=AA=E5=8F=82=E7=85=A7=E3=81=8C=E6=8C=87=E5=AE=9A=E3=81=
 =95=E3=82=8C=E3=81=A6=E3=81=84=E3=82=8B=E3=81=93=E3=81=A8=E3=82=92=E7=A2=BA=
 =E8=AA=8D=E3=81=97=E3=81=A6=E3=81=8F=E3=81=A0=E3=81=95=E3=81=84)
-2&gt;C:\jinto\jinto\tests\Query\Builders\BuilderUtilTests.cs(12,55,12,57): =
+2&gt;C:\owner\owner\tests\Query\Builders\BuilderUtilTests.cs(12,55,12,57): =
 error CS0835: =E3=83=A9=E3=83=A0=E3=83=80=E5=BC=8F=E3=82=92=E3=80=81=E5=9E=
 =8B=E5=BC=95=E6=95=B0 'Func&lt;TestEntity, object&gt;' =E3=81=8C=E3=83=87=
 =E3=83=AA=E3=82=B2=E3=83=BC=E3=83=88=E5=9E=8B=E3=81=A7=E3=81=AF=E3=81=AA=E3=
 =81=84=E5=BC=8F=E3=83=84=E3=83=AA=E3=83=BC=E3=81=AB=E5=A4=89=E6=8F=9B=E3=81=
 =A7=E3=81=8D=E3=81=BE=E3=81=9B=E3=82=93
-2&gt;C:\jinto\jinto\tests\Query\Builders\JoinBuilderTests.cs(27,26,27,30): =
+2&gt;C:\owner\owner\tests\Query\Builders\JoinBuilderTests.cs(27,26,27,30): =
 error CS0411: =E3=83=A1=E3=82=BD=E3=83=83=E3=83=89 'Enumerable.Join&lt;TOut=
 er, TInner, TKey, TResult&gt;(IEnumerable&lt;TOuter&gt;, IEnumerable&lt;TIn=
 ner&gt;, Func&lt;TOuter, TKey&gt;, Func&lt;TInner, TKey&gt;, Func&lt;TOuter=
@@ -14939,7 +14939,7 @@ ify-between gap-2.5 overflow-hidden px-2.5 py-2 bg-bg-000 hover:border-bord=
 er-200/50 hover:shadow-always-black/10 shadow-sm shadow-always-black/5" sty=
 le=3D"width: 120px; height: 120px; min-width: 120px;"><div class=3D"relativ=
 e flex flex-col gap-1 min-h-0"><h3 class=3D"text-[12px] tracking-tighter br=
-eak-words text-text-100 line-clamp-3" style=3D"opacity: 1;">github/jinto=
+eak-words text-text-100 line-clamp-3" style=3D"opacity: 1;">github/owner=
 </h3><p class=3D"text-[10px] line-clamp-1 tracking-tighter break-words text=
 -text-500" style=3D"opacity: 1;">main</p></div><div class=3D""><div class=
 =3D"relative flex flex-row items-center gap-1 justify-between"><div class=
@@ -22877,4 +22877,5 @@ Content-Location: https://m.stripe.network/inner.html#url=https%3A%2F%2Fclaude.a
 t/html; charset=3DUTF-8"><title>StripeM-Inner</title></head><body></body></=
 html>
 ------MultipartBoundary--b8lLtjCr5UHnlpOq2yMrJtHXMqXvu5IQhAILEnBavk------
+
 

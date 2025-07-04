@@ -2687,7 +2687,7 @@ ext-left block cursor-pointer font-styrene transition-all rounded-lg border=
 dden px-2.5 py-2 bg-bg-000 shadow-sm shadow-always-black/5" style=3D"width:=
  120px; height: 120px; min-width: 120px;"><div class=3D"relative flex flex-=
 col gap-1 min-h-0"><h3 class=3D"text-[12px] tracking-tighter break-words te=
-xt-text-100 line-clamp-3" style=3D"opacity: 1;">github/jinto</h3><p clas=
+xt-text-100 line-clamp-3" style=3D"opacity: 1;">github/owner</h3><p clas=
 s=3D"text-[10px] line-clamp-1 tracking-tighter break-words text-text-500" s=
 tyle=3D"opacity: 1;">main</p></div><div class=3D""><div class=3D"relative f=
 lex flex-row items-center gap-1 justify-between"><div class=3D"flex flex-ro=
@@ -26278,4 +26278,5 @@ Content-Location: https://m.stripe.network/inner.html#url=https%3A%2F%2Fclaude.a
 t/html; charset=3DUTF-8"><title>StripeM-Inner</title></head><body></body></=
 html>
 ------MultipartBoundary--cUuM27Y396uM06Ce6sFoVXyIfi3BE4vIl8UX2uPIyr------
+
 

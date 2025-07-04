@@ -1653,7 +1653,7 @@ rder-0.5 border-border-300/25 flex flex-col justify-between gap-2.5 overflo=
 w-hidden px-2.5 py-2 bg-bg-000 shadow-sm shadow-always-black/5" style=3D"wi=
 dth: 120px; height: 120px; min-width: 120px;"><div class=3D"relative flex f=
 lex-col gap-1 min-h-0"><h3 class=3D"text-[12px] tracking-tighter break-word=
-s text-text-100 line-clamp-3" style=3D"opacity: 1;">github/jinto</h3><p =
+s text-text-100 line-clamp-3" style=3D"opacity: 1;">github/owner</h3><p =
 class=3D"text-[10px] line-clamp-1 tracking-tighter break-words text-text-50=
 0" style=3D"opacity: 1;">main</p></div><div class=3D""><div class=3D"relati=
 ve flex flex-row items-center gap-1 justify-between"><div class=3D"flex fle=
@@ -7160,7 +7160,7 @@ ing-6 tracking-tight"><p class=3D"whitespace-pre-wrap break-words">=E9=87=
 =E6=8F=9B=E3=81=8C=E5=AD=98=E5=9C=A8=E3=81=97=E3=81=BE=E3=81=99 (cast =E3=
 =81=8C=E4=B8=8D=E8=B6=B3=E3=81=97=E3=81=A6=E3=81=84=E3=81=AA=E3=81=84=E3=81=
 =8B=E3=81=A9=E3=81=86=E3=81=8B=E3=82=92=E7=A2=BA=E8=AA=8D=E3=81=97=E3=81=A6=
-=E3=81=8F=E3=81=A0=E3=81=95=E3=81=84)    KsqlDsl    C:\jinto\jinto\src\Core=
+=E3=81=8F=E3=81=A0=E3=81=95=E3=81=84)    KsqlDsl    C:\owner\owner\src\Core=
 \Modeling\EntityModelBuilder.cs    18       =20
 =E9=87=8D=E5=A4=A7=E5=BA=A6=E3=83=AC=E3=83=99=E3=83=AB    =E3=82=B3=E3=83=
 =BC=E3=83=89    =E8=AA=AC=E6=98=8E    =E3=83=97=E3=83=AD=E3=82=B8=E3=82=A7=
@@ -7174,7 +7174,7 @@ ing-6 tracking-tight"><p class=3D"whitespace-pre-wrap break-words">=E9=87=
 =E6=8F=9B=E3=81=8C=E5=AD=98=E5=9C=A8=E3=81=97=E3=81=BE=E3=81=99 (cast =E3=
 =81=8C=E4=B8=8D=E8=B6=B3=E3=81=97=E3=81=A6=E3=81=84=E3=81=AA=E3=81=84=E3=81=
 =8B=E3=81=A9=E3=81=86=E3=81=8B=E3=82=92=E7=A2=BA=E8=AA=8D=E3=81=97=E3=81=A6=
-=E3=81=8F=E3=81=A0=E3=81=95=E3=81=84)    KsqlDsl    C:\jinto\jinto\src\Core=
+=E3=81=8F=E3=81=A0=E3=81=95=E3=81=84)    KsqlDsl    C:\owner\owner\src\Core=
 \Modeling\EntityModelBuilder.cs    23       =20
 =E9=87=8D=E5=A4=A7=E5=BA=A6=E3=83=AC=E3=83=99=E3=83=AB    =E3=82=B3=E3=83=
 =BC=E3=83=89    =E8=AA=AC=E6=98=8E    =E3=83=97=E3=83=AD=E3=82=B8=E3=82=A7=
@@ -7184,7 +7184,7 @@ ing-6 tracking-tight"><p class=3D"whitespace-pre-wrap break-words">=E9=87=
     CS1503    =E5=BC=95=E6=95=B0 1: =E3=81=AF 'KsqlDsl.Core.Modeling.ModelB=
 uilder' =E3=81=8B=E3=82=89 'KsqlDsl.Core.Abstractions.IModelBuilder' =E3=81=
 =B8=E5=A4=89=E6=8F=9B=E3=81=99=E3=82=8B=E3=81=93=E3=81=A8=E3=81=AF=E3=81=A7=
-=E3=81=8D=E3=81=BE=E3=81=9B=E3=82=93    KsqlDsl    C:\jinto\jinto\src\Core\=
+=E3=81=8D=E3=81=BE=E3=81=9B=E3=82=93    KsqlDsl    C:\owner\owner\src\Core\=
 Context\KafkaContextCore.cs    88       =20
 =E9=87=8D=E5=A4=A7=E5=BA=A6=E3=83=AC=E3=83=99=E3=83=AB    =E3=82=B3=E3=83=
 =BC=E3=83=89    =E8=AA=AC=E6=98=8E    =E3=83=97=E3=83=AD=E3=82=B8=E3=82=A7=
@@ -7198,7 +7198,7 @@ Context\KafkaContextCore.cs    88       =20
 =E6=8F=9B=E3=81=8C=E5=AD=98=E5=9C=A8=E3=81=97=E3=81=BE=E3=81=99 (cast =E3=
 =81=8C=E4=B8=8D=E8=B6=B3=E3=81=97=E3=81=A6=E3=81=84=E3=81=AA=E3=81=84=E3=81=
 =8B=E3=81=A9=E3=81=86=E3=81=8B=E3=82=92=E7=A2=BA=E8=AA=8D=E3=81=97=E3=81=A6=
-=E3=81=8F=E3=81=A0=E3=81=95=E3=81=84)    KsqlDsl    C:\jinto\jinto\src\Core=
+=E3=81=8F=E3=81=A0=E3=81=95=E3=81=84)    KsqlDsl    C:\owner\owner\src\Core=
 \Modeling\ModelBuilder.cs    22       =20
 =E9=87=8D=E5=A4=A7=E5=BA=A6=E3=83=AC=E3=83=99=E3=83=AB    =E3=82=B3=E3=83=
 =BC=E3=83=89    =E8=AA=AC=E6=98=8E    =E3=83=97=E3=83=AD=E3=82=B8=E3=82=A7=
@@ -7209,7 +7209,7 @@ Context\KafkaContextCore.cs    88       =20
 ntityModel)' =E5=86=85=E3=81=AE=E3=83=91=E3=83=A9=E3=83=A1=E3=83=BC=E3=82=
 =BF=E3=83=BC 'entityModel' =E3=81=AB Null =E5=8F=82=E7=85=A7=E5=BC=95=E6=95=
 =B0=E3=81=8C=E3=81=82=E3=82=8B=E5=8F=AF=E8=83=BD=E6=80=A7=E3=81=8C=E3=81=82=
-=E3=82=8A=E3=81=BE=E3=81=99=E3=80=82    KsqlDsl    C:\jinto\jinto\src\Core\=
+=E3=82=8A=E3=81=BE=E3=81=99=E3=80=82    KsqlDsl    C:\owner\owner\src\Core\=
 Modeling\ModelBuilder.cs    22</p></div></div><div class=3D"absolute bottom=
 -0 right-2 pointer-events-none" style=3D"transform: none;"><div class=3D"ro=
 unded-lg transition min-w-max pointer-events-auto translate-y-4 bg-bg-300/9=
@@ -10069,7 +10069,7 @@ pointer font-styrene transition-all rounded-lg border-0.5 border-border-300=
 -000 shadow-sm shadow-always-black/5" style=3D"width: 100%; height: 120px; =
 min-width: 100%;"><div class=3D"relative flex flex-col gap-1 min-h-0"><h3 c=
 lass=3D"text-[12px] tracking-tighter break-words text-text-100 line-clamp-3=
-" style=3D"opacity: 1;">github/jinto</h3><p class=3D"text-[10px] line-cl=
+" style=3D"opacity: 1;">github/owner</h3><p class=3D"text-[10px] line-cl=
 amp-1 tracking-tighter break-words text-text-500" style=3D"opacity: 1;">mai=
 n</p></div><div class=3D""><div class=3D"relative flex flex-row items-cente=
 r gap-1 justify-between"><div class=3D"flex flex-row gap-1 shrink min-w-0" =
@@ -10098,7 +10098,7 @@ rder-0.5 border-border-300/25 flex flex-col justify-between gap-2.5 overflo=
 w-hidden px-2.5 py-2 bg-bg-000 shadow-sm shadow-always-black/5" style=3D"wi=
 dth: 100%; height: 120px; min-width: 100%;"><div class=3D"relative flex fle=
 x-col gap-1 min-h-0"><h3 class=3D"text-[12px] tracking-tighter break-words =
-text-text-100 line-clamp-3" style=3D"opacity: 1;">github/jinto</h3><p cl=
+text-text-100 line-clamp-3" style=3D"opacity: 1;">github/owner</h3><p cl=
 ass=3D"text-[10px] line-clamp-1 tracking-tighter break-words text-text-500"=
  style=3D"opacity: 1;">main</p></div><div class=3D""><div class=3D"relative=
  flex flex-row items-center gap-1 justify-between"><div class=3D"flex flex-=
@@ -17823,4 +17823,5 @@ Content-Location: https://m.stripe.network/inner.html#url=https%3A%2F%2Fclaude.a
 t/html; charset=3DUTF-8"><title>StripeM-Inner</title></head><body></body></=
 html>
 ------MultipartBoundary--aosT8TP6Gs5yZqU0HmTxlOwEqHyYSy3t9VIayCqoxK------
+
 

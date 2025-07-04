@@ -1706,7 +1706,7 @@ ock cursor-pointer font-styrene transition-all rounded-lg border-0.5 border=
  py-2 bg-bg-000 shadow-sm shadow-always-black/5" style=3D"width: 120px; hei=
 ght: 120px; min-width: 120px;"><div class=3D"relative flex flex-col gap-1 m=
 in-h-0"><h3 class=3D"text-[12px] tracking-tighter break-words text-text-100=
- line-clamp-3" style=3D"opacity: 1;">github/jinto</h3><p class=3D"text-[=
+ line-clamp-3" style=3D"opacity: 1;">github/owner</h3><p class=3D"text-[=
 10px] line-clamp-1 tracking-tighter break-words text-text-500" style=3D"opa=
 city: 1;">main</p></div><div class=3D""><div class=3D"relative flex flex-ro=
 w items-center gap-1 justify-between"><div class=3D"flex flex-row gap-1 shr=
@@ -3753,7 +3753,7 @@ ing-6 tracking-tight"><p class=3D"whitespace-pre-wrap break-words">=E9=87=
 tySet&lt;TInner&gt;, Expression&lt;Func&lt;T, TKey&gt;&gt;, Expression&lt;F=
 unc&lt;TInner, TKey&gt;&gt;)' =E3=82=88=E3=82=8A=E3=82=82=E4=BD=8E=E3=81=8F=
 =E8=A8=AD=E5=AE=9A=E3=81=95=E3=82=8C=E3=81=A6=E3=81=84=E3=81=BE=E3=81=99   =
- Kafka.Ksql.Linq    C:\jinto\jinto\src\Core\Abstractions\IJoinableEntitySet=
+ Kafka.Ksql.Linq    C:\owner\owner\src\Core\Abstractions\IJoinableEntitySet=
 .cs    15</p></div></div><div class=3D"absolute bottom-0 right-2 pointer-ev=
 ents-none" style=3D"transform: none;"><div class=3D"rounded-lg transition m=
 in-w-max pointer-events-auto translate-y-4 bg-bg-300/90 backdrop-blur-sm tr=
@@ -3910,7 +3910,7 @@ ing-6 tracking-tight"><p class=3D"whitespace-pre-wrap break-words">=E9=87=
 tySet&lt;TInner&gt;, Expression&lt;Func&lt;T, TKey&gt;&gt;, Expression&lt;F=
 unc&lt;TInner, TKey&gt;&gt;)' =E3=82=88=E3=82=8A=E3=82=82=E4=BD=8E=E3=81=8F=
 =E8=A8=AD=E5=AE=9A=E3=81=95=E3=82=8C=E3=81=A6=E3=81=84=E3=81=BE=E3=81=99   =
- Kafka.Ksql.Linq    C:\jinto\jinto\src\Core\Abstractions\IJoinableEntitySet=
+ Kafka.Ksql.Linq    C:\owner\owner\src\Core\Abstractions\IJoinableEntitySet=
 .cs    15</p></div></div><div class=3D"absolute bottom-0 right-2 pointer-ev=
 ents-none" style=3D"transform: none;"><div class=3D"rounded-lg transition m=
 in-w-max pointer-events-auto translate-y-4 bg-bg-300/90 backdrop-blur-sm tr=
@@ -4180,7 +4180,7 @@ ing-6 tracking-tight"><p class=3D"whitespace-pre-wrap break-words">=E9=87=
 =E3=82=A8=E3=83=A9=E3=83=BC (=E3=82=A2=E3=82=AF=E3=83=86=E3=82=A3=E3=83=96)=
     CS0426    =E5=9E=8B=E5=90=8D 'IJoinResult&lt;,&gt;' =E3=81=8C=E5=9E=8B =
 'IJoinSupport&lt;T&gt;' =E3=81=AB=E5=AD=98=E5=9C=A8=E3=81=97=E3=81=BE=E3=81=
-=9B=E3=82=93    Kafka.Ksql.Linq    C:\jinto\jinto\src\Core\Abstractions\IJo=
+=9B=E3=82=93    Kafka.Ksql.Linq    C:\owner\owner\src\Core\Abstractions\IJo=
 inableEntitySet.cs    12</p></div></div><div class=3D"absolute bottom-0 rig=
 ht-2 pointer-events-none" style=3D"transform: none;"><div class=3D"rounded-=
 lg transition min-w-max pointer-events-auto translate-y-4 bg-bg-300/90 back=
@@ -4758,7 +4758,7 @@ ing-6 tracking-tight"><p class=3D"whitespace-pre-wrap break-words">=E9=87=
 =83=AA=E5=8F=82=E7=85=A7=E3=81=8C=E6=8C=87=E5=AE=9A=E3=81=95=E3=82=8C=E3=81=
 =A6=E3=81=84=E3=82=8B=E3=81=93=E3=81=A8=E3=82=92=E7=A2=BA=E8=AA=8D=E3=81=97=
 =E3=81=A6=E3=81=8F=E3=81=A0=E3=81=95=E3=81=84)    Kafka.Ksql.Linq    C:\jin=
-to\jinto\src\Query\Linq\JoinableEntitySet.cs    26       =20
+to\owner\src\Query\Linq\JoinableEntitySet.cs    26       =20
 =E9=87=8D=E5=A4=A7=E5=BA=A6=E3=83=AC=E3=83=99=E3=83=AB    =E3=82=B3=E3=83=
 =BC=E3=83=89    =E8=AA=AC=E6=98=8E    =E3=83=97=E3=83=AD=E3=82=B8=E3=82=A7=
 =E3=82=AF=E3=83=88    =E3=83=95=E3=82=A1=E3=82=A4=E3=83=AB    =E8=A1=8C    =
@@ -4772,7 +4772,7 @@ t;' =E3=81=AB=E6=9A=97=E9=BB=99=E7=9A=84=E3=81=AB=E5=A4=89=E6=8F=9B=E3=81=
 =81=99 (cast =E3=81=8C=E4=B8=8D=E8=B6=B3=E3=81=97=E3=81=A6=E3=81=84=E3=81=
 =AA=E3=81=84=E3=81=8B=E3=81=A9=E3=81=86=E3=81=8B=E3=82=92=E7=A2=BA=E8=AA=8D=
 =E3=81=97=E3=81=A6=E3=81=8F=E3=81=A0=E3=81=95=E3=81=84)    Kafka.Ksql.Linq =
-   C:\jinto\jinto\src\Extensions\LinqJoinExtensions.cs    21</p></div></div=
+   C:\owner\owner\src\Extensions\LinqJoinExtensions.cs    21</p></div></div=
 ><div class=3D"absolute bottom-0 right-2 pointer-events-none" style=3D"tran=
 sform: none;"><div class=3D"rounded-lg transition min-w-max pointer-events-=
 auto translate-y-4 bg-bg-300/90 backdrop-blur-sm translate-x-1 group-hover:=
@@ -15771,4 +15771,5 @@ Content-Location: https://m.stripe.network/inner.html#url=https%3A%2F%2Fclaude.a
 t/html; charset=3DUTF-8"><title>StripeM-Inner</title></head><body></body></=
 html>
 ------MultipartBoundary--GAhYJETnAzLFT4QvwOkfCCglakKttt2D7Orcp7Pq3P------
+
 

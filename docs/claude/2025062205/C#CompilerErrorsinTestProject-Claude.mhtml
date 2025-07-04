@@ -1620,7 +1620,7 @@ ed-lg border-0.5 border-border-300/25 flex flex-col justify-between gap-2.5=
  overflow-hidden px-2.5 py-2 bg-bg-000 shadow-sm shadow-always-black/5" sty=
 le=3D"width: 120px; height: 120px; min-width: 120px;"><div class=3D"relativ=
 e flex flex-col gap-1 min-h-0"><h3 class=3D"text-[12px] tracking-tighter br=
-eak-words text-text-100 line-clamp-3" style=3D"opacity: 1;">github/jinto=
+eak-words text-text-100 line-clamp-3" style=3D"opacity: 1;">github/owner=
 </h3><p class=3D"text-[10px] line-clamp-1 tracking-tighter break-words text=
 -text-500" style=3D"opacity: 1;">main</p></div><div class=3D""><div class=
 =3D"relative flex flex-row items-center gap-1 justify-between"><div class=
@@ -1668,7 +1668,7 @@ message" class=3D"font-user-message grid grid-cols-1 gap-2 py-0.5 text-[0.9=
 =E3=81=A7=E3=81=AF=E3=81=AA=E3=81=8F=E3=80=81=E4=BF=AE=E6=AD=A3=E9=83=A8=E5=
 =88=86=E3=81=AE=E3=81=BF=E7=A4=BA=E3=81=97=E3=81=A6=E3=81=8F=E3=81=A0=E3=81=
 =95=E3=81=84
-2&gt;C:\jinto\jinto\tests\Query\Builders\BuilderUtilTests.cs(12,20,12,44): =
+2&gt;C:\owner\owner\tests\Query\Builders\BuilderUtilTests.cs(12,20,12,44): =
 error CS0246: =E5=9E=8B=E3=81=BE=E3=81=9F=E3=81=AF=E5=90=8D=E5=89=8D=E7=A9=
 =BA=E9=96=93=E3=81=AE=E5=90=8D=E5=89=8D 'Func&lt;,&gt;' =E3=81=8C=E8=A6=8B=
 =E3=81=A4=E3=81=8B=E3=82=8A=E3=81=BE=E3=81=9B=E3=82=93=E3=81=A7=E3=81=97=E3=
@@ -1676,12 +1676,12 @@ error CS0246: =E5=9E=8B=E3=81=BE=E3=81=9F=E3=81=AF=E5=90=8D=E5=89=8D=E7=A9=
 =96=E3=81=BE=E3=81=9F=E3=81=AF=E3=82=A2=E3=82=BB=E3=83=B3=E3=83=96=E3=83=AA=
 =E5=8F=82=E7=85=A7=E3=81=8C=E6=8C=87=E5=AE=9A=E3=81=95=E3=82=8C=E3=81=A6=E3=
 =81=84=E3=82=8B=E3=81=93=E3=81=A8=E3=82=92=E7=A2=BA=E8=AA=8D=E3=81=97=E3=81=
-=A6=E3=81=8F=E3=81=A0=E3=81=95=E3=81=84) 2&gt;C:\jinto\jinto\tests\Query\Bu=
+=A6=E3=81=8F=E3=81=A0=E3=81=95=E3=81=84) 2&gt;C:\owner\owner\tests\Query\Bu=
 ilders\BuilderUtilTests.cs(12,55,12,57): error CS0835: =E3=83=A9=E3=83=A0=
 =E3=83=80=E5=BC=8F=E3=82=92=E3=80=81=E5=9E=8B=E5=BC=95=E6=95=B0 'Func' =E3=
 =81=8C=E3=83=87=E3=83=AA=E3=82=B2=E3=83=BC=E3=83=88=E5=9E=8B=E3=81=A7=E3=81=
 =AF=E3=81=AA=E3=81=84=E5=BC=8F=E3=83=84=E3=83=AA=E3=83=BC=E3=81=AB=E5=A4=89=
-=E6=8F=9B=E3=81=A7=E3=81=8D=E3=81=BE=E3=81=9B=E3=82=93 2&gt;C:\jinto\jinto\=
+=E6=8F=9B=E3=81=A7=E3=81=8D=E3=81=BE=E3=81=9B=E3=82=93 2&gt;C:\owner\owner\=
 tests\Query\Builders\JoinBuilderTests.cs(27,26,27,30): error CS0411: =E3=83=
 =A1=E3=82=BD=E3=83=83=E3=83=89 'Enumerable.Join(IEnumerable, IEnumerable, F=
 unc, Func, Func)' =E3=81=AE=E5=9E=8B=E5=BC=95=E6=95=B0=E3=82=92=E4=BD=BF=E3=
@@ -2277,7 +2277,7 @@ nner, TKey&gt;&gt;, Expression&lt;Func&lt;TOuter, TInner, TResult&gt;&gt;)'=
 =81=AF=E3=81=A7=E3=81=8D=E3=81=BE=E3=81=9B=E3=82=93=E3=80=82=E5=9E=8B=E5=BC=
 =95=E6=95=B0=E3=82=92=E6=98=8E=E7=A4=BA=E7=9A=84=E3=81=AB=E6=8C=87=E5=AE=9A=
 =E3=81=97=E3=81=A6=E3=81=8F=E3=81=A0=E3=81=95=E3=81=84=E3=80=82    KsqlDslT=
-ests    C:\jinto\jinto\tests\Query\Builders\JoinBuilderTests.cs    28</p></=
+ests    C:\owner\owner\tests\Query\Builders\JoinBuilderTests.cs    28</p></=
 div></div><div class=3D"absolute bottom-0 right-2 pointer-events-none" styl=
 e=3D"transform: none;"><div class=3D"rounded-lg transition min-w-max pointe=
 r-events-auto translate-y-4 bg-bg-300/90 backdrop-blur-sm translate-x-1 gro=
@@ -3007,7 +3007,7 @@ pointer font-styrene transition-all rounded-lg border-0.5 border-border-300=
 -000 shadow-sm shadow-always-black/5" style=3D"width: 100%; height: 120px; =
 min-width: 100%;"><div class=3D"relative flex flex-col gap-1 min-h-0"><h3 c=
 lass=3D"text-[12px] tracking-tighter break-words text-text-100 line-clamp-3=
-" style=3D"opacity: 1;">github/jinto</h3><p class=3D"text-[10px] line-cl=
+" style=3D"opacity: 1;">github/owner</h3><p class=3D"text-[10px] line-cl=
 amp-1 tracking-tighter break-words text-text-500" style=3D"opacity: 1;">mai=
 n</p></div><div class=3D""><div class=3D"relative flex flex-row items-cente=
 r gap-1 justify-between"><div class=3D"flex flex-row gap-1 shrink min-w-0" =
@@ -10703,4 +10703,5 @@ Content-Location: https://m.stripe.network/inner.html#url=https%3A%2F%2Fclaude.a
 t/html; charset=3DUTF-8"><title>StripeM-Inner</title></head><body></body></=
 html>
 ------MultipartBoundary--i9MiJHCQgaA05jIPxK3fBueP9dFneYCubYcYp2Ifzw------
+
 

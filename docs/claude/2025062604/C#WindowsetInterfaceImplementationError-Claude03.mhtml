@@ -1687,7 +1687,7 @@ ext-left block cursor-pointer font-styrene transition-all rounded-lg border=
 dden px-2.5 py-2 bg-bg-000 shadow-sm shadow-always-black/5" style=3D"width:=
  120px; height: 120px; min-width: 120px;"><div class=3D"relative flex flex-=
 col gap-1 min-h-0"><h3 class=3D"text-[12px] tracking-tighter break-words te=
-xt-text-100 line-clamp-3" style=3D"opacity: 1;">github/jinto</h3><p clas=
+xt-text-100 line-clamp-3" style=3D"opacity: 1;">github/owner</h3><p clas=
 s=3D"text-[10px] line-clamp-1 tracking-tighter break-words text-text-500" s=
 tyle=3D"opacity: 1;">main</p></div><div class=3D""><div class=3D"relative f=
 lex flex-row items-center gap-1 justify-between"><div class=3D"flex flex-ro=
@@ -1734,57 +1734,57 @@ font-user-message grid grid-cols-1 gap-2 py-0.5 text-[0.9375rem] leading-6"=
 =82=BF=E3=83=BC=E3=83=95=E3=82=A7=E3=82=A4=E3=82=B9 =E3=83=A1=E3=83=B3=E3=
 =83=90=E3=83=BC 'IEntitySet&lt;T&gt;.AddAsync(T, CancellationToken)' =E3=82=
 =92=E5=AE=9F=E8=A3=85=E3=81=97=E3=81=BE=E3=81=9B=E3=82=93    Kafka.Ksql.Lin=
-q    C:\jinto\jinto\src\Core\Window\WindowedEntitySet.cs    14       =20
+q    C:\owner\owner\src\Core\Window\WindowedEntitySet.cs    14       =20
 =E3=82=A8=E3=83=A9=E3=83=BC (=E3=82=A2=E3=82=AF=E3=83=86=E3=82=A3=E3=83=96)=
     CS0535    'WindowedEntitySet&lt;T&gt;' =E3=81=AF=E3=82=A4=E3=83=B3=E3=
 =82=BF=E3=83=BC=E3=83=95=E3=82=A7=E3=82=A4=E3=82=B9 =E3=83=A1=E3=83=B3=E3=
 =83=90=E3=83=BC 'IEntitySet&lt;T&gt;.ToListAsync(CancellationToken)' =E3=82=
 =92=E5=AE=9F=E8=A3=85=E3=81=97=E3=81=BE=E3=81=9B=E3=82=93    Kafka.Ksql.Lin=
-q    C:\jinto\jinto\src\Core\Window\WindowedEntitySet.cs    14       =20
+q    C:\owner\owner\src\Core\Window\WindowedEntitySet.cs    14       =20
 =E3=82=A8=E3=83=A9=E3=83=BC (=E3=82=A2=E3=82=AF=E3=83=86=E3=82=A3=E3=83=96)=
     CS0535    'WindowedEntitySet&lt;T&gt;' =E3=81=AF=E3=82=A4=E3=83=B3=E3=
 =82=BF=E3=83=BC=E3=83=95=E3=82=A7=E3=82=A4=E3=82=B9 =E3=83=A1=E3=83=B3=E3=
 =83=90=E3=83=BC 'IEntitySet&lt;T&gt;.ForEachAsync(Func&lt;T, Task&gt;, Time=
 Span, CancellationToken)' =E3=82=92=E5=AE=9F=E8=A3=85=E3=81=97=E3=81=BE=E3=
-=81=9B=E3=82=93    Kafka.Ksql.Linq    C:\jinto\jinto\src\Core\Window\Window=
+=81=9B=E3=82=93    Kafka.Ksql.Linq    C:\owner\owner\src\Core\Window\Window=
 edEntitySet.cs    14       =20
 =E3=82=A8=E3=83=A9=E3=83=BC (=E3=82=A2=E3=82=AF=E3=83=86=E3=82=A3=E3=83=96)=
     CS0535    'WindowedEntitySet&lt;T&gt;' =E3=81=AF=E3=82=A4=E3=83=B3=E3=
 =82=BF=E3=83=BC=E3=83=95=E3=82=A7=E3=82=A4=E3=82=B9 =E3=83=A1=E3=83=B3=E3=
 =83=90=E3=83=BC 'IEntitySet&lt;T&gt;.GetTopicName()' =E3=82=92=E5=AE=9F=E8=
-=A3=85=E3=81=97=E3=81=BE=E3=81=9B=E3=82=93    Kafka.Ksql.Linq    C:\jinto\j=
+=A3=85=E3=81=97=E3=81=BE=E3=81=9B=E3=82=93    Kafka.Ksql.Linq    C:\owner\j=
 into\src\Core\Window\WindowedEntitySet.cs    14       =20
 =E3=82=A8=E3=83=A9=E3=83=BC (=E3=82=A2=E3=82=AF=E3=83=86=E3=82=A3=E3=83=96)=
     CS0535    'WindowedEntitySet&lt;T&gt;' =E3=81=AF=E3=82=A4=E3=83=B3=E3=
 =82=BF=E3=83=BC=E3=83=95=E3=82=A7=E3=82=A4=E3=82=B9 =E3=83=A1=E3=83=B3=E3=
 =83=90=E3=83=BC 'IEntitySet&lt;T&gt;.GetEntityModel()' =E3=82=92=E5=AE=9F=
 =E8=A3=85=E3=81=97=E3=81=BE=E3=81=9B=E3=82=93    Kafka.Ksql.Linq    C:\jint=
-o\jinto\src\Core\Window\WindowedEntitySet.cs    14       =20
+o\owner\src\Core\Window\WindowedEntitySet.cs    14       =20
 =E3=82=A8=E3=83=A9=E3=83=BC (=E3=82=A2=E3=82=AF=E3=83=86=E3=82=A3=E3=83=96)=
     CS0535    'WindowedEntitySet&lt;T&gt;' =E3=81=AF=E3=82=A4=E3=83=B3=E3=
 =82=BF=E3=83=BC=E3=83=95=E3=82=A7=E3=82=A4=E3=82=B9 =E3=83=A1=E3=83=B3=E3=
 =83=90=E3=83=BC 'IEntitySet&lt;T&gt;.GetContext()' =E3=82=92=E5=AE=9F=E8=A3=
-=85=E3=81=97=E3=81=BE=E3=81=9B=E3=82=93    Kafka.Ksql.Linq    C:\jinto\jint=
+=85=E3=81=97=E3=81=BE=E3=81=9B=E3=82=93    Kafka.Ksql.Linq    C:\owner\jint=
 o\src\Core\Window\WindowedEntitySet.cs    14       =20
 =E3=82=A8=E3=83=A9=E3=83=BC (=E3=82=A2=E3=82=AF=E3=83=86=E3=82=A3=E3=83=96)=
     CS0535    'WindowedEntitySet&lt;T&gt;' =E3=81=AF=E3=82=A4=E3=83=B3=E3=
 =82=BF=E3=83=BC=E3=83=95=E3=82=A7=E3=82=A4=E3=82=B9 =E3=83=A1=E3=83=B3=E3=
 =83=90=E3=83=BC 'IAsyncEnumerable&lt;T&gt;.GetAsyncEnumerator(CancellationT=
 oken)' =E3=82=92=E5=AE=9F=E8=A3=85=E3=81=97=E3=81=BE=E3=81=9B=E3=82=93    K=
-afka.Ksql.Linq    C:\jinto\jinto\src\Core\Window\WindowedEntitySet.cs    14=
+afka.Ksql.Linq    C:\owner\owner\src\Core\Window\WindowedEntitySet.cs    14=
        =20
 =E3=82=A8=E3=83=A9=E3=83=BC (=E3=82=A2=E3=82=AF=E3=83=86=E3=82=A3=E3=83=96)=
     CS1503    =E5=BC=95=E6=95=B0 1: =E3=81=AF 'Kafka.Ksql.Linq.Core.Abstrac=
 tions.IKafkaContext' =E3=81=8B=E3=82=89 'System.Collections.Generic.IEnumer=
 able&lt;T&gt;' =E3=81=B8=E5=A4=89=E6=8F=9B=E3=81=99=E3=82=8B=E3=81=93=E3=81=
 =A8=E3=81=AF=E3=81=A7=E3=81=8D=E3=81=BE=E3=81=9B=E3=82=93    Kafka.Ksql.Lin=
-q    C:\jinto\jinto\src\Core\Window\WindowedEntitySet.cs    24       =20
+q    C:\owner\owner\src\Core\Window\WindowedEntitySet.cs    24       =20
 =E3=82=A8=E3=83=A9=E3=83=BC (=E3=82=A2=E3=82=AF=E3=83=86=E3=82=A3=E3=83=96)=
     CS1503    =E5=BC=95=E6=95=B0 2: =E3=81=AF 'Kafka.Ksql.Linq.Core.Abstrac=
 tions.EntityModel' =E3=81=8B=E3=82=89 'Kafka.Ksql.Linq.Messaging.Contracts.=
 IErrorSink?' =E3=81=B8=E5=A4=89=E6=8F=9B=E3=81=99=E3=82=8B=E3=81=93=E3=81=
 =A8=E3=81=AF=E3=81=A7=E3=81=8D=E3=81=BE=E3=81=9B=E3=82=93    Kafka.Ksql.Lin=
-q    C:\jinto\jinto\src\Core\Window\WindowedEntitySet.cs    24       =20
+q    C:\owner\owner\src\Core\Window\WindowedEntitySet.cs    24       =20
 =E3=82=A8=E3=83=A9=E3=83=BC (=E3=82=A2=E3=82=AF=E3=83=86=E3=82=A3=E3=83=96)=
     CS0266    =E5=9E=8B 'Kafka.Ksql.Linq.Core.Window.WindowAggregatedEntity=
 Set&lt;T, TKey, TResult&gt;' =E3=82=92 'Kafka.Ksql.Linq.Core.Abstractions.I=
@@ -1794,14 +1794,14 @@ EntitySet&lt;TResult&gt;' =E3=81=AB=E6=9A=97=E9=BB=99=E7=9A=84=E3=81=AB=E5=
 =E3=81=97=E3=81=BE=E3=81=99 (cast =E3=81=8C=E4=B8=8D=E8=B6=B3=E3=81=97=E3=
 =81=A6=E3=81=84=E3=81=AA=E3=81=84=E3=81=8B=E3=81=A9=E3=81=86=E3=81=8B=E3=82=
 =92=E7=A2=BA=E8=AA=8D=E3=81=97=E3=81=A6=E3=81=8F=E3=81=A0=E3=81=95=E3=81=84=
-)    Kafka.Ksql.Linq    C:\jinto\jinto\src\Core\Window\WindowedEntitySet.cs=
+)    Kafka.Ksql.Linq    C:\owner\owner\src\Core\Window\WindowedEntitySet.cs=
     91       =20
 =E3=82=A8=E3=83=A9=E3=83=BC (=E3=82=A2=E3=82=AF=E3=83=86=E3=82=A3=E3=83=96)=
     CS0115    'WindowedEntitySet&lt;T&gt;.ExecuteQueryAsync(CancellationTok=
 en)': =E3=82=AA=E3=83=BC=E3=83=90=E3=83=BC=E3=83=A9=E3=82=A4=E3=83=89=E3=81=
 =99=E3=82=8B=E9=81=A9=E5=88=87=E3=81=AA=E3=83=A1=E3=82=BD=E3=83=83=E3=83=89=
 =E3=81=8C=E8=A6=8B=E3=81=A4=E3=81=8B=E3=82=8A=E3=81=BE=E3=81=9B=E3=82=93=E3=
-=81=A7=E3=81=97=E3=81=9F    Kafka.Ksql.Linq    C:\jinto\jinto\src\Core\Wind=
+=81=A7=E3=81=97=E3=81=9F    Kafka.Ksql.Linq    C:\owner\owner\src\Core\Wind=
 ow\WindowedEntitySet.cs    105</p></div></div><div class=3D"absolute bottom=
 -0 right-2 pointer-events-none" style=3D"transform: none;"><div class=3D"ro=
 unded-lg transition min-w-max pointer-events-auto translate-y-4 bg-bg-300/9=
@@ -3016,7 +3016,7 @@ ify-between gap-2.5 overflow-hidden px-2.5 py-2 bg-bg-000 hover:border-bord=
 er-200/50 hover:shadow-always-black/10 shadow-sm shadow-always-black/5" sty=
 le=3D"width: 120px; height: 120px; min-width: 120px;"><div class=3D"relativ=
 e flex flex-col gap-1 min-h-0"><h3 class=3D"text-[12px] tracking-tighter br=
-eak-words text-text-100 line-clamp-3" style=3D"opacity: 1;">github/jinto=
+eak-words text-text-100 line-clamp-3" style=3D"opacity: 1;">github/owner=
 </h3><p class=3D"text-[10px] line-clamp-1 tracking-tighter break-words text=
 -text-500" style=3D"opacity: 1;">main</p></div><div class=3D""><div class=
 =3D"relative flex flex-row items-center gap-1 justify-between"><div class=
@@ -11779,4 +11779,5 @@ Content-Location: https://m.stripe.network/inner.html#url=https%3A%2F%2Fclaude.a
 t/html; charset=3DUTF-8"><title>StripeM-Inner</title></head><body></body></=
 html>
 ------MultipartBoundary--I6jaYWKDTyDXUBp6PaPbtlNZP4FWD2sGSJesia8vvs------
+
 
