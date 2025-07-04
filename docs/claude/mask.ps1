@@ -2,8 +2,8 @@
 $targetPath = "C:\Users\seiji_yfc8940\final\final\docs\claude"  # ← ここを変更
 
 # 置換前と置換後の文字列
-$oldText = "ai_collaboration"
-$newText = "repository"  # 任意の置換文字列に変更可能
+$oldText = "seijim"
+$newText = "owner"  # 任意の置換文字列に変更可能
 
 # 対象ファイルの拡張子（例: txt, md, cs など）
 $extensions = @("*.md", "*.txt", "*.cs", "*.json", "*.yaml", "*.yml","*.mhtml")

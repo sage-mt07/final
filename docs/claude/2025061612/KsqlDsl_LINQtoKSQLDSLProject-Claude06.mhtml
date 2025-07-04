@@ -1664,7 +1664,7 @@ d-lg border-0.5 border-border-300/25 flex flex-col justify-between gap-2.5 =
 overflow-hidden px-2.5 py-2 bg-bg-000 shadow-sm shadow-always-black/5" styl=
 e=3D"width: 120px; height: 120px; min-width: 120px;"><div class=3D"relative=
  flex flex-col gap-1 min-h-0"><h3 class=3D"text-[12px] tracking-tighter bre=
-ak-words text-text-100 line-clamp-3" style=3D"opacity: 1;">sage-mt07/ai_col=
+ak-words text-text-100 line-clamp-3" style=3D"opacity: 1;">github/ai_col=
 laboration</h3><p class=3D"text-[10px] line-clamp-1 tracking-tighter break-=
 words text-text-500" style=3D"opacity: 1;">main</p></div><div class=3D""><d=
 iv class=3D"relative flex flex-row items-center gap-1 justify-between"><div=
@@ -14289,3 +14289,4 @@ Content-Location: https://m.stripe.network/inner.html#url=https%3A%2F%2Fclaude.a
 t/html; charset=3DUTF-8"><title>StripeM-Inner</title></head><body></body></=
 html>
 ------MultipartBoundary--TEGA5ScByguwN3moXrK8H5KMkRt5ngV8mhwB9CkvRB------
+

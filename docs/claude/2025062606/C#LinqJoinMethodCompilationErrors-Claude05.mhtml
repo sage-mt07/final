@@ -1687,7 +1687,7 @@ ext-left block cursor-pointer font-styrene transition-all rounded-lg border=
 dden px-2.5 py-2 bg-bg-000 shadow-sm shadow-always-black/5" style=3D"width:=
  120px; height: 120px; min-width: 120px;"><div class=3D"relative flex flex-=
 col gap-1 min-h-0"><h3 class=3D"text-[12px] tracking-tighter break-words te=
-xt-text-100 line-clamp-3" style=3D"opacity: 1;">sage-mt07/jinto</h3><p clas=
+xt-text-100 line-clamp-3" style=3D"opacity: 1;">github/jinto</h3><p clas=
 s=3D"text-[10px] line-clamp-1 tracking-tighter break-words text-text-500" s=
 tyle=3D"opacity: 1;">main</p></div><div class=3D""><div class=3D"relative f=
 lex flex-row items-center gap-1 justify-between"><div class=3D"flex flex-ro=
@@ -3150,7 +3150,7 @@ ded-lg border-0.5 border-border-300/25 flex flex-col justify-between gap-2.=
 5 overflow-hidden px-2.5 py-2 bg-bg-000 shadow-sm shadow-always-black/5" st=
 yle=3D"width: 120px; height: 120px; min-width: 120px;"><div class=3D"relati=
 ve flex flex-col gap-1 min-h-0"><h3 class=3D"text-[12px] tracking-tighter b=
-reak-words text-text-100 line-clamp-3" style=3D"opacity: 1;">sage-mt07/jint=
+reak-words text-text-100 line-clamp-3" style=3D"opacity: 1;">github/jint=
 o</h3><p class=3D"text-[10px] line-clamp-1 tracking-tighter break-words tex=
 t-text-500" style=3D"opacity: 1;">main</p></div><div class=3D""><div class=
 =3D"relative flex flex-row items-center gap-1 justify-between"><div class=
@@ -12928,3 +12928,4 @@ Content-Location: https://m.stripe.network/inner.html#url=https%3A%2F%2Fclaude.a
 t/html; charset=3DUTF-8"><title>StripeM-Inner</title></head><body></body></=
 html>
 ------MultipartBoundary--OWVjoC5dfPmGxm9Yk1FmlXPtTiZyzeWwtcZFsIKOZ8------
+
