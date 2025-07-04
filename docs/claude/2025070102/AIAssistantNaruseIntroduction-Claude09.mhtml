@@ -6379,7 +6379,7 @@ ing-6"><p class=3D"whitespace-pre-wrap break-words">CS0103    =E7=8F=BE=E5=
 =9C=A8=E3=81=AE=E3=82=B3=E3=83=B3=E3=83=86=E3=82=AD=E3=82=B9=E3=83=88=E3=81=
 =AB 'FormatTimeSpan' =E3=81=A8=E3=81=84=E3=81=86=E5=90=8D=E5=89=8D=E3=81=AF=
 =E5=AD=98=E5=9C=A8=E3=81=97=E3=81=BE=E3=81=9B=E3=82=93    Kafka.Ksql.Linq  =
-  C:\Users\seiji_yfc8940\final\final\src\Query\window_clause_builder_displa=
+  C:\Users\owner\final\final\src\Query\window_clause_builder_displa=
 y.cs    241</p></div></div><div class=3D"absolute bottom-0 right-2 pointer-=
 events-none" style=3D"transform: none;"><div class=3D"rounded-lg transition=
  min-w-max pointer-events-auto translate-y-4 bg-bg-300/90 backdrop-blur-sm =
@@ -6530,7 +6530,7 @@ ing-6"><p class=3D"whitespace-pre-wrap break-words">CS0103    =E7=8F=BE=E5=
 =9C=A8=E3=81=AE=E3=82=B3=E3=83=B3=E3=83=86=E3=82=AD=E3=82=B9=E3=83=88=E3=81=
 =AB 'ExtractLambdaExpression' =E3=81=A8=E3=81=84=E3=81=86=E5=90=8D=E5=89=8D=
 =E3=81=AF=E5=AD=98=E5=9C=A8=E3=81=97=E3=81=BE=E3=81=9B=E3=82=93    Kafka.Ks=
-ql.Linq    C:\Users\seiji_yfc8940\final\final\src\Query\join_clause_builder=
+ql.Linq    C:\Users\owner\final\final\src\Query\join_clause_builder=
 _display.cs    147</p></div></div><div class=3D"absolute bottom-0 right-2 p=
 ointer-events-none" style=3D"transform: none;"><div class=3D"rounded-lg tra=
 nsition min-w-max pointer-events-auto translate-y-4 bg-bg-300/90 backdrop-b=
@@ -17219,4 +17219,5 @@ Content-Location: https://m.stripe.network/inner.html#url=https%3A%2F%2Fclaude.a
 t/html; charset=3DUTF-8"><title>StripeM-Inner</title></head><body></body></=
 html>
 ------MultipartBoundary--FDrqAA3g98Zq7LKvxUVhvUmO6L7PEO81qgt4l6r6FJ------
+
 

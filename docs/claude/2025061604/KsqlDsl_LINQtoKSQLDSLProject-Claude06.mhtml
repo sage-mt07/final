@@ -1788,7 +1788,7 @@ Phase 5: =E3=83=90=E3=83=AA=E3=83=87=E3=83=BC=E3=82=B7=E3=83=A7=E3=83=B3=E3=
 =E3=80=80Phase 1=E5=AE=8C=E4=BA=86
 - Phase2=E3=80=80=E4=BB=A5=E4=B8=8B=E3=82=A8=E3=83=A9=E3=83=BC=E3=81=8C=E7=
 =99=BA=E7=94=9F=E3=81=97=E3=81=A6=E3=82=8B
-1&gt;C:\Users\seiji_yfc8940\OneDrive\=E3=83=87=E3=82=B9=E3=82=AF=E3=83=88=
+1&gt;C:\Users\owner\OneDrive\=E3=83=87=E3=82=B9=E3=82=AF=E3=83=88=
 =E3=83=83=E3=83=97\collaboration\repository\oss\src\KafkaProducerServ=
 ice.cs(19,22,19,43): error CS0104: 'ISchemaRegistryClient' =E3=81=AF=E3=80=
 =81'KsqlDsl.SchemaRegistry.ISchemaRegistryClient' =E3=81=A8 'Confluent.Sche=
@@ -1954,7 +1954,7 @@ d-break: normal; line-height: 1.5; tab-size: 2; hyphens: none; padding: 1em=
 background: transparent; color: rgb(56, 58, 66); font-family: var(--font-mo=
 no); direction: ltr; text-align: left; white-space: pre-wrap; word-spacing:=
  normal; word-break: normal; line-height: 1.5; tab-size: 2; hyphens: none;"=
-><span><span>1&gt;C:\Users\seiji_yfc8940\OneDrive\=E3=83=87=E3=82=B9=E3=82=
+><span><span>1&gt;C:\Users\owner\OneDrive\=E3=83=87=E3=82=B9=E3=82=
 =AF=E3=83=88=E3=83=83=E3=83=97\collaboration\repository\oss\src\Kafka=
 ProducerService.cs(19,22,19,43): error CS0104: 'ISchemaRegistryClient' =E3=
 =81=AF=E3=80=81'KsqlDsl.SchemaRegistry.ISchemaRegistryClient' =E3=81=A8 'Co=
@@ -19180,5 +19180,6 @@ Content-Location: https://m.stripe.network/inner.html#url=https%3A%2F%2Fclaude.a
 t/html; charset=3DUTF-8"><title>StripeM-Inner</title></head><body></body></=
 html>
 ------MultipartBoundary--L2yAs8QtaOgS0Cgh1jMCwkSuekWD8ZKic3AYenVKNy------
+
 
 
