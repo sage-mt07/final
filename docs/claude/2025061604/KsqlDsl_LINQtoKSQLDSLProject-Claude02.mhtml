@@ -1671,7 +1671,7 @@ er-300/25 flex flex-col justify-between gap-2.5 overflow-hidden px-2.5 py-2=
  bg-bg-000 shadow-sm shadow-always-black/5" style=3D"width: 120px; height: =
 120px; min-width: 120px;"><div class=3D"relative flex flex-col gap-1 min-h-=
 0"><h3 class=3D"text-[12px] tracking-tighter break-words text-text-100 line=
--clamp-3" style=3D"opacity: 1;">sage-mt07/ai_collaboration</h3><p class=3D"=
+-clamp-3" style=3D"opacity: 1;">sage-mt07/repository</h3><p class=3D"=
 text-[10px] line-clamp-1 tracking-tighter break-words text-text-500" style=
 =3D"opacity: 1;">main</p></div><div class=3D""><div class=3D"relative flex =
 flex-row items-center gap-1 justify-between"><div class=3D"flex flex-row ga=
@@ -1789,7 +1789,7 @@ Phase 5: =E3=83=90=E3=83=AA=E3=83=87=E3=83=BC=E3=82=B7=E3=83=A7=E3=83=B3=E3=
 - Phase2=E3=80=80=E4=BB=A5=E4=B8=8B=E3=82=A8=E3=83=A9=E3=83=BC=E3=81=8C=E7=
 =99=BA=E7=94=9F=E3=81=97=E3=81=A6=E3=82=8B
 1&gt;C:\Users\seiji_yfc8940\OneDrive\=E3=83=87=E3=82=B9=E3=82=AF=E3=83=88=
-=E3=83=83=E3=83=97\collaboration\ai_collaboration\oss\src\KafkaProducerServ=
+=E3=83=83=E3=83=97\collaboration\repository\oss\src\KafkaProducerServ=
 ice.cs(19,22,19,43): error CS0104: 'ISchemaRegistryClient' =E3=81=AF=E3=80=
 =81'KsqlDsl.SchemaRegistry.ISchemaRegistryClient' =E3=81=A8 'Confluent.Sche=
 maRegistry.ISchemaRegistryClient' =E9=96=93=E3=81=AE=E3=81=82=E3=81=84=E3=
@@ -1955,7 +1955,7 @@ background: transparent; color: rgb(56, 58, 66); font-family: var(--font-mo=
 no); direction: ltr; text-align: left; white-space: pre-wrap; word-spacing:=
  normal; word-break: normal; line-height: 1.5; tab-size: 2; hyphens: none;"=
 ><span><span>1&gt;C:\Users\seiji_yfc8940\OneDrive\=E3=83=87=E3=82=B9=E3=82=
-=AF=E3=83=88=E3=83=83=E3=83=97\collaboration\ai_collaboration\oss\src\Kafka=
+=AF=E3=83=88=E3=83=83=E3=83=97\collaboration\repository\oss\src\Kafka=
 ProducerService.cs(19,22,19,43): error CS0104: 'ISchemaRegistryClient' =E3=
 =81=AF=E3=80=81'KsqlDsl.SchemaRegistry.ISchemaRegistryClient' =E3=81=A8 'Co=
 nfluent.SchemaRegistry.ISchemaRegistryClient' =E9=96=93=E3=81=AE=E3=81=82=
@@ -19264,3 +19264,4 @@ Content-Location: https://m.stripe.network/inner.html#url=https%3A%2F%2Fclaude.a
 t/html; charset=3DUTF-8"><title>StripeM-Inner</title></head><body></body></=
 html>
 ------MultipartBoundary--j9bJMgommoF7mwC4rDIW07JE8ONcjjj9NzQ0d2NsMQ------
+
