@@ -121,6 +121,9 @@ public class KafkaConsumerManagerTests
         {
             await Task.Yield();
             throw new Exception("consume error");
+#pragma warning disable CS0162 // yield break is unreachable but required for async iterator
+            yield break;
+#pragma warning restore CS0162
         }
         var consumer = new StubConsumer("topic", Throwing);
         var loggerMock = new Mock<ILogger>();

@@ -53,8 +53,8 @@ public class KafkaConsumerBatchTests
     private class StubDeserializer : IDeserializer<object>
     {
         public DeserHandler Handler { get; set; } = (_, _, _) => null;
-        public object? Deserialize(ReadOnlySpan<byte> data, bool isNull, SerializationContext context)
-            => Handler(data, isNull, context);
+        public object Deserialize(ReadOnlySpan<byte> data, bool isNull, SerializationContext context)
+            => Handler(data, isNull, context)!;
     }
 
     private static EntityModel CreateModel() => new()
