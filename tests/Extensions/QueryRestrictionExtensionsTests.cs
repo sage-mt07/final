@@ -20,7 +20,8 @@ public class QueryRestrictionExtensionsTests
         protected override void OnModelCreating(IModelBuilder modelBuilder)
         {
             var set = Set<Sample>();
-            set.Where(e => e.Id > 0);
+            var grouped = set.Where(e => e.Id > 0).GroupBy(e => e.Id);
+            grouped.Select(g => new Sample { Id = g.Key });
         }
         protected override IEntitySet<T> CreateEntitySet<T>(EntityModel model)
         {
@@ -51,6 +52,22 @@ public class QueryRestrictionExtensionsTests
         var ctx = new ValidContext();
         var set = ctx.Set<Sample>();
         Assert.Throws<InvalidOperationException>(() => set.Where(s => s.Id > 0));
+    }
+
+    [Fact]
+    public void GroupBy_OutsideModelCreating_Throws()
+    {
+        var ctx = new ValidContext();
+        var set = ctx.Set<Sample>();
+        Assert.Throws<InvalidOperationException>(() => set.GroupBy(s => s.Id));
+    }
+
+    [Fact]
+    public void Select_OutsideModelCreating_Throws()
+    {
+        var ctx = new ValidContext();
+        var set = ctx.Set<Sample>();
+        Assert.Throws<InvalidOperationException>(() => set.Select(s => new Sample { Id = s.Id }));
     }
 
     [Fact]
