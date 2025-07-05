@@ -14,6 +14,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 namespace Kafka.Ksql.Linq.Tests.Infrastructure;
+#nullable enable
 
 public class KafkaAdminServiceTests
 {

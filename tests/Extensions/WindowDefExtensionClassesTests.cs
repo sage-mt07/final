@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Collections.Generic;
 using Kafka.Ksql.Linq;
 using Xunit;
+#nullable enable
 
 namespace Kafka.Ksql.Linq.Tests.Extensions;
 

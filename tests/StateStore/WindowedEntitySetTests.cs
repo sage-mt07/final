@@ -10,6 +10,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 
+#nullable enable
+
 namespace Kafka.Ksql.Linq.Tests.StateStore;
 
 public class WindowedEntitySetTests

@@ -14,6 +14,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Xunit;
+#nullable enable
 
 namespace Kafka.Ksql.Linq.Tests.Infrastructure.Consumer;
 
@@ -67,6 +68,7 @@ public class KafkaConsumerManagerTests
     {
         async IAsyncEnumerable<KafkaMessage<SampleEntity, object>> OneMessage([EnumeratorCancellation] CancellationToken token)
         {
+            await Task.Yield();
             yield return new KafkaMessage<SampleEntity, object> { Value = new SampleEntity { Id = 1 } };
         }
         var consumer = new StubConsumer("topic", OneMessage);
@@ -84,6 +86,7 @@ public class KafkaConsumerManagerTests
     {
         async IAsyncEnumerable<KafkaMessage<SampleEntity, object>> TwoMessages([EnumeratorCancellation] CancellationToken token)
         {
+            await Task.Yield();
             yield return new KafkaMessage<SampleEntity, object> { Value = new SampleEntity { Id = 1 } };
             yield return new KafkaMessage<SampleEntity, object> { Value = new SampleEntity { Id = 2 } };
         }
@@ -118,7 +121,6 @@ public class KafkaConsumerManagerTests
         {
             await Task.Yield();
             throw new Exception("consume error");
-            yield break;
         }
         var consumer = new StubConsumer("topic", Throwing);
         var loggerMock = new Mock<ILogger>();

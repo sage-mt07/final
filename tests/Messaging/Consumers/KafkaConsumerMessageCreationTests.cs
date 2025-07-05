@@ -12,6 +12,7 @@ using Kafka.Ksql.Linq.Messaging.Producers.Core;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Xunit;
+#nullable enable
 
 namespace Kafka.Ksql.Linq.Tests.Messaging.Consumers;
 
