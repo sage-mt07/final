@@ -116,14 +116,6 @@ ksqldbサーバの本質的なストリーム/テーブル定義には作用し�
 
 本当に効かせたいフィルタや集約は、必ずOnModelCreating等のDSLで事前登録してください。
 
-複数ウィンドウの集約・推奨パターン
-Window(x)拡張メソッドを用いてウィンドウ粒度ごとにデータを扱うことができます。
-```
-// ✅ Window(x)パターン（唯一の正解・推奨パターン）
-await context.Set<OrderCandle>()
-    .Window(5)
-    .ForEachAsync(...);
-```
 
 
 ## Quick Start
