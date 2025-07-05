@@ -19,11 +19,21 @@ public class Sale
     public decimal Amount { get; set; }
 }
 
+public class SaleWindowTotal
+{
+    public decimal Total { get; set; }
+}
+
 public class SalesContext : KsqlContext
 {
     protected override void OnModelCreating(IModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Sale>();
+        modelBuilder.Entity<SaleWindowTotal>()
+            .HasQuery(q => q.Window(TumblingWindow.OfMinutes(1).EmitFinal())
+                             .UseFinalized()
+                             .GroupBy(_ => 1)
+                             .Select(g => new SaleWindowTotal { Total = g.Sum(s => s.Amount) }));
     }
 }
 
@@ -52,11 +62,7 @@ class Program
         // wait briefly for message to be published
         await Task.Delay(500);
 
-        await context.Set<Sale>()
-            .Window(TumblingWindow.OfMinutes(1).EmitFinal())
-            .UseFinalized()
-            .GroupBy(_ => 1)
-            .Select(g => new { Total = g.Sum(s => s.Amount) })
+        await context.Set<SaleWindowTotal>()
             .ForEachAsync(r =>
             {
                 Console.WriteLine($"Window total: {r.Total}");

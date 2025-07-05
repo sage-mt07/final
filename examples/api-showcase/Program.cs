@@ -18,11 +18,21 @@ public class ApiMessage
     public string Category { get; set; } = string.Empty;
 }
 
+public class CategoryCount
+{
+    public string Key { get; set; } = string.Empty;
+    public long Count { get; set; }
+}
+
 public class ApiContext : KsqlContext
 {
     protected override void OnModelCreating(IModelBuilder modelBuilder)
     {
         modelBuilder.Entity<ApiMessage>();
+        modelBuilder.Entity<CategoryCount>()
+            .HasQuery(q => q.Where(m => m.Category == "A")
+                             .GroupBy(m => m.Category)
+                             .Select(g => new CategoryCount { Key = g.Key, Count = g.Count() }));
     }
 }
 
@@ -51,10 +61,7 @@ class Program
         // wait briefly for message to be published
         await Task.Delay(500);
 
-        await context.Set<ApiMessage>()
-            .Where(m => m.Category == "A")
-            .GroupBy(m => m.Category)
-            .Select(g => new { g.Key, Count = g.Count() })
+        await context.Set<CategoryCount>()
             .OnError(ErrorAction.Skip)
             .WithRetry(2)
             .ForEachAsync(r =>
