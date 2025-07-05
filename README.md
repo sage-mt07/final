@@ -86,6 +86,21 @@ class Program
 ### 4. サンプルコード
 
 
+## 📂 Examples
+
+実行可能なサンプルは `examples/` フォルダーにまとまっています。Producer と Consumer をペアで収録しており、各READMEに手順を記載しています。
+
+- [hello-world](./examples/hello-world/) - 最小構成のメッセージ送受信
+- [basic-produce-consume](./examples/basic-produce-consume/) - getting-started の基本操作
+- [window-finalization](./examples/window-finalization/) - タンブリングウィンドウ集計の確定処理
+- [error-handling](./examples/error-handling/) - リトライとエラーハンドリングの基礎
+- [error-handling-dlq](./examples/error-handling-dlq/) - DLQ運用を含むエラー処理
+- [configuration](./examples/configuration/) - 環境別のログ設定例
+- [configuration-mapping](./examples/configuration-mapping/) - appsettings と DSL 設定のマッピング
+- [manual-commit](./examples/manual-commit/) - 手動コミットの利用例
+- [sqlserver-vs-kafka](./examples/sqlserver-vs-kafka/) - SQL Server 操作との対比
+- [api-showcase](./examples/api-showcase/) - 代表的な DSL API の利用例
+
 ## 📚 ドキュメント構成ガイド
 
 このOSSでは、利用者のレベルや目的に応じて複数のドキュメントを用意しています。
