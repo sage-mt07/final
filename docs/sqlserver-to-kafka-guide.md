@@ -319,17 +319,44 @@ SQL: SELECT customer, COUNT(*) FROM orders WHERE ... GROUP BY customer, DATEPART
 - 重要：遅延イベントの扱い
     Kafkaでは遅れて届いたデータを受け取った場合、ウィンドウが再計算されるかは「グレース期間」に依存する。
 
-### 💡 DSLライブラリでの表現（簡易例）
+### 💡 DSLライブラリでの表現
+5分ごとにOrderを集計する例
+
 ```csharp
-var orders = context.Set<Order>();
-
-var windowed = orders.Window(TimeSpan.FromMinutes(5));
-
-var result = windowed.Aggregate(g => new OrderCount
+public class Order
 {
-    CustomerId = g.Key,
-    Count = g.Count()
-});
+    public int OrderId { get; set; }
+    public decimal Amount { get; set; }
+}
+
+public class OrderWindowTotal
+{
+    public DateTime WindowStart { get; set; }
+    public DateTime WindowEnd { get; set; }
+    public string GroupKey { get; set; } = "Total"; // ここで「全体集約」であることを明示
+    public decimal Total { get; set; }
+}
+
+
+protected override void OnModelCreating(IModelBuilder modelBuilder)
+{
+    // 個々の注文データ
+    modelBuilder.Entity<Order>();
+
+    modelBuilder.Entity<OrderWindowTotal>()
+        .HasQueryFrom<Order>(q =>
+            q.Window(TumblingWindow.OfMinutes(5).EmitFinal())
+            .UseFinalized()
+            .GroupBy(_ => "Total") // わかりやすいキー名で全件まとめ
+            .Select(g => new OrderWindowTotal
+            {
+                WindowStart = g.Window.Start,
+                WindowEnd = g.Window.End,
+                GroupKey = g.Key,
+                Total = g.Sum(o => o.Amount)
+            }));
+
+}
 ```
 ※内部的には orders_window_5min のようなトピックに自動的に出力されます。
 

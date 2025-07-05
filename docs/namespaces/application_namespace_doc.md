@@ -1,348 +1,160 @@
-# Application 詳細設計
+# Kafka.Ksql.Linq.Application namespace 責務一覧
 
-## 🎯 責務・設計方針
+## 📋 概要
+**KSQLコンテキストの構築・設定・初期化を担う上位層namespace**
 
-### 主要責務
-- **開発者向けAPI提供**：EF風の直感的なKafkaContext APIとFluent Builder設計
-- **設定管理・バリデーション**：Schema Registry接続、ログ設定、初期化オプションの統合管理
-- **スキーマ自動登録**：起動時のAvroスキーマ一括登録とFail-Fast設計
-- **Producer/Consumer統合**：Pool削除による直接管理とシンプル化設計
-
-### 設計原則・制約
-- **EF風API**: DbContextライクな開発体験、親しみやすいインターフェース
-- **Fail-Fast**: 初期化時エラーは即座に終了、実行時は適切な例外処理
-- **自動化優先**: OnModelCreating → スキーマ登録 → 接続確認の自動フロー
-- **Pool削除方針**: 複雑性削減のため、直接Manager使用でシンプル化
-
-### 他namespaceとの境界
-- **Core**: EntityModelとKafkaContextCoreを活用、型安全性を確保
-- **Messaging**: ProducerManager/ConsumerManagerの直接管理
-- **Serialization**: スキーマ登録サービスとの連携、Avro操作委譲
-- **Query**: （直接連携なし、Core経由でEntitySet提供）
+Core層の抽象化（`KafkaContextCore`）を継承し、Schema Registry連携・Producer/Consumer管理・StateStore統合など本格的なKafka機能を提供する実装層です。
 
 ---
 
-## 🏗️ 主要クラス構成
+## 🏗️ 主要クラス群
 
-### 📁 Extensions/ - 拡張メソッド（🟢低変更頻度）
-| ファイル | クラス | 責務 | 変更頻度 |
-|---------|--------|------|----------|
-| `AvroSchemaInfoExtensions.cs` | AvroSchemaInfoExtensions | スキーマSubject名生成、型推論ヘルパー | 🟢 |
+### **KsqlContextBuilder**
+**責務**: KSQLコンテキストの段階的構築（Builderパターン）
 
-### 📁 Context/ - コンテキスト実装（🔴高変更頻度）
-| ファイル | クラス | 責務 | 変更頻度 |
-|---------|--------|------|----------|
-| `KsqlContext.cs` | KafkaContext | 簡素化統合KafkaContext、Pool削除版 | 🔴 |
-| `KsqlContext.cs` | EventSetWithServices<T> | 簡素化Manager統合EventSet | 🔴 |
-
-### 📁 Builder/ - Fluent API（🟡中変更頻度）
-| ファイル | クラス | 責務 | 変更頻度 |
-|---------|--------|------|----------|
-| `KsqlContextBuilder.cs` | KsqlContextBuilder | Fluent API設定、コンテキスト構築 | 🟡 |
-
-### 📁 Options/ - 設定管理（🟡中変更頻度）
-| ファイル | クラス | 責務 | 変更頻度 |
-|---------|--------|------|----------|
-| `KsqlContextOptions.cs` | KsqlContextOptions | 設定値管理、バリデーション | 🟡 |
-| `KsqlContextOptionsExtensions.cs` | KsqlContextOptionsExtensions | 設定拡張メソッド | 🟡 |
-
----
-
-## 🔄 データフロー・依存関係
-
-### Context初期化フロー
-```
-KsqlContextBuilder.Create()
-   ↓
-UseSchemaRegistry() → KsqlContextOptions設定
-   ↓
-BuildContext<T>() → KafkaContext実装クラス生成
-   ↓
-OnModelCreating() → Core.ModelBuilder実行
-   ↓
-ConvertToAvroConfigurations() → AvroEntityConfiguration変換
-   ↓
-AvroSchemaRegistrationService → スキーマ一括登録（Fail-Fast）
-```
-
-### EntitySet操作フロー
-```
-context.Orders.AddAsync()
-   ↓
-EventSetWithServices<T>.AddAsync()
-   ↓
-KafkaProducerManager.SendAsync() → Messaging層委譲
-   ↓
-ProducerManager → SerializationManager → Kafka送信
-```
-
-### 設定適用フロー
-```
-KsqlContextOptions
-   ↓
-SchemaRegistryClient → ISchemaRegistryClient設定
-LoggerFactory → ILoggerFactory設定
-Validation設定 → AutoRegister/FailOnErrors等
-   ↓
-BuildContext時に各Manager初期化で使用
-```
-
----
-
-## 🚀 変更頻度・作業パターン
-
-### 🔴 高頻度変更パターン
-**1. Context機能拡張**
-- `KafkaContext`: 新しいEntitySet操作、Manager統合方式変更
- - `EventSetWithServices`: Producer/Consumer操作の拡張
-- Core層との連携パターン改善
-
-**2. 初期化・設定機能強化**
-- OnModelCreating時の自動スキーマ登録ロジック改善
-- ConvertToAvroConfigurations変換ロジック拡張
-- Fail-Fast例外処理の精密化
-
-**3. Pool削除対応の継続改善**
-- Manager直接使用パターンの最適化
-- リソース管理方式の改善
-- エラーハンドリング強化
-
-### 🟡 中頻度変更パターン
-**1. Builder API拡張**
-- `KsqlContextBuilder`: 新しい設定オプション対応
-- Fluent API種別の追加
-- 設定バリデーション強化
-
-**2. Options機能拡張**
-- `KsqlContextOptions`: 新しい設定項目追加
-- Schema Registry以外の外部サービス設定
-- 環境別設定プロファイル
-
-**3. 設定拡張メソッド**
-- `KsqlContextOptionsExtensions`: 便利メソッド追加
-- 設定パターンの標準化
-
-### 🟢 低頻度変更パターン
-**1. Extensions拡張**
-- `AvroSchemaInfoExtensions`: 新しいスキーマ操作
-- Subject命名規則変更（慎重に実施）
-
-**2. アーキテクチャ変更**
-- Pool戦略の見直し（現在は直接管理）
-- Context初期化フローの根本的変更
-
----
-
-## 📝 設計制約・注意事項
-
-### アーキテクチャ制約
-- **Pool削除方針**: ProducerPool/ConsumerPoolは使用しない、Manager直接管理
-- **Fail-Fast原則**: スキーマ登録失敗時は即座にアプリケーション終了
-- **EF風API維持**: DbContextライクなインターフェース設計の堅持
-- **自動化優先**: OnModelCreating完了後の自動スキーマ登録強制
-
-### パフォーマンス考慮事項
-- **初期化時間**: スキーマ一括登録によるスタートアップ時間への影響
-- **Manager直接管理**: Pool削除によるシンプル化とリソース効率化
-- **設定バリデーション**: 起動時の設定検証コスト
-- **リソースリーク防止**: IDisposableの適切な実装
-
-### セキュリティ・品質制約
-- **Schema Registry認証**: SSL/SASL設定の適切な管理
-- **設定検証**: 不正設定の早期検出
-- **例外透過性**: Core/Infrastructure例外の適切な伝播
-- **ログ出力**: 初期化・設定関連の詳細ログ
-
----
-
-## 🔗 他Namespaceとの連携
-
-### Core依存関係
 ```csharp
-// EntityModel: POCO→Avro設定変換
-protected IReadOnlyDictionary<Type, AvroEntityConfiguration> ConvertToAvroConfigurations(
-    Dictionary<Type, EntityModel> entityModels)
+// 使用例
+var context = KsqlContextBuilder.Create()
+    .UseSchemaRegistry("http://localhost:8081")
+    .EnableLogging(loggerFactory)
+    .ConfigureValidation(autoRegister: true, failOnErrors: true)
+    .BuildContext<MyKsqlContext>();
+```
+
+- **設計意図**: Fluent APIによる型安全な設定構築
+- **主要機能**:
+  - Schema Registry設定（URL/Config/Client指定）
+  - ロギング設定
+  - 検証設定（自動登録、エラー処理、プリウォーミング）
+  - タイムアウト設定
+  - ジェネリック型でのコンテキスト生成
+
+### **KsqlContextOptions + Extensions**
+**責務**: コンテキスト設定値の集約管理と検証
+
+- **核心機能**:
+  - Schema Registry Client必須チェック
+  - タイムアウト値検証
+  - 自動スキーマ登録制御
+  - キャッシュプリウォーミング制御
+  - エラーハンドリング制御
+
+- **拡張メソッド群**:
+  - `UseSchemaRegistry()` - URL/Config指定でのクライアント生成
+  - `EnableLogging()` - LoggerFactory設定
+  - `ConfigureValidation()` - 検証オプション一括設定
+  - `WithTimeouts()` - タイムアウト設定
+
+### **AvroSchemaInfoExtensions**
+**責務**: Avroスキーマ情報の操作・変換ユーティリティ
+
+```csharp
+// Subject名生成
+var keySubject = schemaInfo.GetKeySubject();     // "{TopicName}-key"
+var valueSubject = schemaInfo.GetValueSubject(); // "{TopicName}-value"
+
+// Stream/Table判定
+var type = schemaInfo.GetStreamTableType();      // "Table" or "Stream"
+
+// キー型判定  
+var keyType = schemaInfo.GetKeyTypeName();       // "string", プロパティ型名, or "CompositeKey"
+```
+
+- **設計意図**: スキーマ関連処理の共通化、命名規則の統一
+- **判定ロジック**: `HasCustomKey`プロパティベースでのStream/Table自動判別
+
+---
+
+## 🔗 継承・依存関係
+
+### **継承構造**
+```
+KafkaContextCore (Core層)
+    ↓ 継承
+KsqlContext (Application層)
+    ↓ 廃止予定
+KafkaContext (互換性シム)
+```
+
+### **設定オプションの使い分け**
+- **`KsqlContextOptions`** (Application層): Schema Registry、ログ、検証など上位機能の設定
+- **`KafkaContextOptions`** (Core層): 検証モードなど基本設定のみ
+
+### **外部依存関係**
+- **Schema Registry**: `Confluent.SchemaRegistry.*`
+- **設定管理**: `Microsoft.Extensions.Configuration`
+- **ログ出力**: `Microsoft.Extensions.Logging`
+- **Core抽象化**: `Kafka.Ksql.Linq.Core.*`
+
+---
+
+## ⚡ 実装の特徴
+
+### **スキーマ自動登録フロー**
+1. `OnModelCreating()` でモデル構築
+2. `EntityModel` → `AvroEntityConfiguration` 変換
+3. Schema Registry への同期登録実行
+4. Kafka接続確認・DLQトピック生成
+
+### **初期化戦略**
+- **通常モード**: スキーマ登録 + Kafka接続確認を実行
+- **テストモード**: `SkipSchemaRegistration = true` でスキーマ処理をスキップ
+- **失敗時**: FATAL例外で即座にアプリケーション停止
+
+### **StateStore統合**
+- RocksDB設定時の自動バインディング作成
+- エンティティ単位でのストア管理
+- レディネス状態の監視・通知
+
+---
+
+## 🎯 責務境界
+
+### **このnamespaceが担う責務**
+- ✅ KSQLコンテキストの構築・設定管理
+- ✅ Schema Registry連携の初期化
+- ✅ 上位層サービス（Producer/Consumer/StateStore）の統合
+- ✅ Avroスキーマ情報の操作ユーティリティ
+
+### **このnamespaceが担わない責務**  
+- ❌ 実際のKafkaメッセージング処理（`Messaging`層）
+- ❌ スキーマ登録の実装詳細（`Serialization`層）
+- ❌ エンティティセットの具体的実装（ルート層 `EventSet<T>`）
+- ❌ 低レベルKafka操作（`Infrastructure`層）
+
+---
+
+## 💡 利用パターン
+
+### **基本的な初期化パターン**
+```csharp
+public class MyKsqlContext : KsqlContext  
 {
-    foreach (var kvp in entityModels)
+    protected override void OnModelCreating(IModelBuilder modelBuilder)
     {
-        var entityModel = kvp.Value;
-        var avroConfig = new AvroEntityConfiguration(entityModel.EntityType)
-        {
-            TopicName = entityModel.TopicAttribute?.TopicName,
-            KeyProperties = entityModel.KeyProperties
-        };
-        avroConfigs[kvp.Key] = avroConfig;
+        modelBuilder.Entity<OrderEvent>()
+            .ToTopic("orders")
+            .HasKey(o => o.OrderId);
     }
 }
+
+// 使用
+var context = KsqlContextBuilder.Create()
+    .UseSchemaRegistry("http://localhost:8081")
+    .EnableLogging(loggerFactory)
+    .BuildContext<MyKsqlContext>();
 ```
 
-### Messaging連携
+### **設定重点パターン**  
 ```csharp
-// 簡素化Manager（Pool削除版）
-public KafkaContext()
-{
-    _producerManager = new KafkaProducerManager(
-        Microsoft.Extensions.Options.Options.Create(new KsqlDslOptions()),
-        null   // LoggerFactory
-    );
-
-    _consumerManager = new KafkaConsumerManager(
-        Microsoft.Extensions.Options.Options.Create(new KsqlDslOptions()),
-        null   // LoggerFactory
-    );
-}
-
-// EventSet送信処理
-protected override async Task SendEntityAsync(T entity, CancellationToken cancellationToken)
-{
-    var producerManager = _kafkaContext.GetProducerManager();
-    await producerManager.SendAsync(entity, cancellationToken);
-}
+var options = KsqlContextBuilder.Create()
+    .UseConfiguration(configuration)
+    .ConfigureValidation(
+        autoRegister: true,
+        failOnErrors: false,      // 本番では緩い設定
+        enablePreWarming: true)
+    .WithTimeouts(TimeSpan.FromMinutes(2))
+    .Build();
 ```
 
-### Serialization連携
-```csharp
-// Schema Registry設定
-public KsqlContextBuilder UseSchemaRegistry(string url)
-{
-    _options.UseSchemaRegistry(url);
-    return this;
-}
-
-public KsqlContextOptions UseSchemaRegistry(this KsqlContextOptions options, string url)
-{
-    var config = new SchemaRegistryConfig { Url = url };
-    options.SchemaRegistryClient = new CachedSchemaRegistryClient(config);
-    return options;
-}
-```
-
-### インターフェース定義
-```csharp
-// Builder API
-KsqlContextBuilder UseSchemaRegistry(string url);
-KsqlContextBuilder EnableLogging(ILoggerFactory loggerFactory);
-KsqlContextBuilder ConfigureValidation(bool autoRegister, bool failOnErrors, bool enablePreWarming);
-T BuildContext<T>() where T : KafkaContext;
-
-// Options API
-void Validate();
-ISchemaRegistryClient SchemaRegistryClient { get; set; }
-bool AutoRegisterSchemas { get; set; }
-bool FailOnInitializationErrors { get; set; }
-```
-
-### 協調動作パターン
-1. **Builder→Options**: Fluent APIでの設定値設定
-2. **Options→Context**: 初期化時の設定適用
-3. **Context→Core**: OnModelCreating、EntitySet管理
-4. **Context→Messaging**: Manager直接使用、Pool回避
-5. **Context→Serialization**: スキーマ登録サービス連携
-
----
-
-## 💡 実装上の重要なポイント
-
-### Pool削除による直接Manager使用
-```csharp
-// ✅ 新設計: 直接Manager使用
-internal KafkaProducerManager GetProducerManager() => _producerManager;
-internal KafkaConsumerManager GetConsumerManager() => _consumerManager;
-
-// ❌ 旧設計: Pool使用（削除済み）
-// private readonly ProducerPool _producerPool;
-// private readonly ConsumerPool _consumerPool;
-```
-
-### Fail-Fast設計の実装
-```csharp
-public void Validate()
-{
-    if (SchemaRegistryClient == null)
-        throw new InvalidOperationException("SchemaRegistryClient is required");
-
-    if (SchemaRegistrationTimeout <= TimeSpan.Zero)
-        throw new InvalidOperationException("SchemaRegistrationTimeout must be positive");
-}
-```
-
-### EF風API設計
-```csharp
-// DbContextライクなAPI
-protected override IEntitySet<T> CreateEntitySet<T>(EntityModel entityModel)
-{
-    return new EventSetWithServices<T>(this, entityModel);
-}
-
-// DbSet<T>相当のEntitySet<T>
-public IEntitySet<Order> Orders => Set<Order>();
-```
-
-### ConvertToAvroConfigurations実装
-```csharp
-protected IReadOnlyDictionary<Type, AvroEntityConfiguration> ConvertToAvroConfigurations(
-    Dictionary<Type, EntityModel> entityModels)
-{
-    var avroConfigs = new Dictionary<Type, AvroEntityConfiguration>();
-
-    foreach (var kvp in entityModels)
-    {
-        var entityModel = kvp.Value;
-        var avroConfig = new AvroEntityConfiguration(entityModel.EntityType)
-        {
-            TopicName = entityModel.TopicAttribute?.TopicName,
-            KeyProperties = entityModel.KeyProperties
-        };
-
-        avroConfigs[kvp.Key] = avroConfig;
-    }
-
-    return avroConfigs;
-}
-```
-
-### Builder実装パターン
-```csharp
-public T BuildContext<T>() where T : KafkaContext
-{
-    var options = Build(); // 設定検証実行
-
-    // KsqlContextOptions引数のコンストラクタ優先
-    var ctor = typeof(T).GetConstructor(new[] { typeof(KsqlContextOptions) });
-    if (ctor != null)
-    {
-        return (T)ctor.Invoke(new object[] { options });
-    }
-
-    // パラメータレスコンストラクタにフォールバック
-    ctor = typeof(T).GetConstructor(Type.EmptyTypes);
-    if (ctor != null)
-    {
-        return (T)ctor.Invoke(null);
-    }
-
-    // 最後の手段: Activator使用
-    return (T)Activator.CreateInstance(typeof(T), options)!;
-}
-```
-
----
-
-## 🎯 Application層の設計哲学
-
-### 開発体験重視
-- **親しみやすさ**: EF CoreのDbContextに似た API設計
-- **自動化**: 面倒な初期化処理の自動化
-- **Fail-Fast**: 設定ミスの早期発見
-
-### シンプル化原則
-- **Pool削除**: 複雑性排除、直接Manager使用
-- **設定統合**: 散在していた設定の一元管理
-- **Builder統合**: 設定とContext生成の統合API
-
-### 堅牢性確保
-- **設定バリデーション**: 実行前の設定チェック
-- **例外伝播**: 下位層例外の適切な伝播
-- **リソース管理**: 適切なDispose実装
-
-Application層は開発者が最初に触れる部分として、使いやすさと堅牢性を両立した設計となっています。
+**このドキュメントにより、Application namespaceの責務と使用方法が明確になり、大規模ソース参照時の迷いを解消できます。**
