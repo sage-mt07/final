@@ -4,12 +4,20 @@ using System.Linq;
 using System.Linq.Expressions;
 using Kafka.Ksql.Linq.Core.Abstractions;
 using Kafka.Ksql.Linq.Query.Pipeline;
+using Kafka.Ksql.Linq.Core.Modeling;
 using Xunit;
 
 namespace Kafka.Ksql.Linq.Tests.Query.Pipeline;
 
 public class DDLQueryGeneratorTests
 {
+    private static T ExecuteInScope<T>(Func<T> func)
+    {
+        using (ModelCreatingScope.Enter())
+        {
+            return func();
+        }
+    }
     private static EntityModel CreateEntityModel()
     {
         return new EntityModel
@@ -25,7 +33,7 @@ public class DDLQueryGeneratorTests
     {
         var model = CreateEntityModel();
         var generator = new DDLQueryGenerator();
-        var query = generator.GenerateCreateStream("s1", "topic", model);
+        var query = ExecuteInScope(() => generator.GenerateCreateStream("s1", "topic", model));
         Assert.Contains("CREATE STREAM s1", query);
         Assert.Contains("KAFKA_TOPIC='topic'", query);
     }
@@ -38,7 +46,7 @@ public class DDLQueryGeneratorTests
                          .GroupBy(e => e.Type)
                          .Select(g => new { g.Key, Count = g.Count() });
         var generator = new DDLQueryGenerator();
-        var query = generator.GenerateCreateTableAs("t1", "Base", expr.Expression);
+        var query = ExecuteInScope(() => generator.GenerateCreateTableAs("t1", "Base", expr.Expression));
         Assert.Contains("CREATE TABLE t1 AS SELECT", query);
         Assert.Contains("FROM Base", query);
         Assert.Contains("WHERE (IsActive = true)", query);
