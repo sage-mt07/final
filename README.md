@@ -1,6 +1,8 @@
 # Kafka.Ksql.Linq
 
- Kafka／ksqlDB向けEntity Framework風DSLライブラリ
+本OSSはC# Entity Framework/DbContextに着想を得た直感的なLINQスタイルDSLを提供します。
+
+
 
 ## 特徴
 Kafka.Ksql.Linqは、Kafka／ksqlDB向けのクエリを  
@@ -10,6 +12,10 @@ C#のLINQスタイルで簡潔かつ直感的に記述できる、Entity Framewo
 既存のRDB開発経験者でも、Kafkaストリーム処理やKSQL文の記述・運用を  
 
 .NETの慣れ親しんだ形で実現できることを目指しています。
+
+ ⚠️ **注意：本OSSは見た目はEF/LINQ風ですが、実装の本質は「Kafka/KSQL専用DSL」です。  
+ そのため、通常のEF/LINQのようなWhere/GroupBy等のチェーン式は「アプリ本体で書いてもKSQLに反映されません」。  
+ 正しい粒度や集約単位の指定は「Window(x)」拡張メソッドを唯一の正解として採用しています。**
 
 ## サンプルコード
 
@@ -21,10 +27,8 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
 
-[Topic("manual-commit-orders")]
 public class ManualCommitOrder
 {
-    [Key]
     public int OrderId { get; set; }
     public decimal Amount { get; set; }
 }
@@ -79,6 +83,7 @@ class Program
 ```
 
 ❌ 誤用例（NG）
+⚠️ 注意：本OSSは見た目はEF/LINQ風ですが、「Where/GroupBy」等のLINQチェーンは「アプリ本体」側ではKSQLに一切反映されません。
 
 ```
 // これはksqldbのストリーム定義には作用しません
@@ -110,6 +115,16 @@ await context.Set<ApiMessageFiltered>()
 ksqldbサーバの本質的なストリーム/テーブル定義には作用しません。
 
 本当に効かせたいフィルタや集約は、必ずOnModelCreating等のDSLで事前登録してください。
+
+複数ウィンドウの集約・推奨パターン
+Window(x)拡張メソッドを用いてウィンドウ粒度ごとにデータを扱うことができます。
+```
+// ✅ Window(x)パターン（唯一の正解・推奨パターン）
+await context.Set<OrderCandle>()
+    .Window(5)
+    .ForEachAsync(...);
+```
+
 
 ## Quick Start
 ### 1. インストール
