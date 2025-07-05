@@ -697,4 +697,15 @@ public class DMLQueryGeneratorTests
 
         Assert.Contains("Nested aggregate functions are not supported", ex.Message);
     }
+
+    [Fact]
+    public void GenerateSelectAll_OutsideScope_Throws()
+    {
+        var generator = new DMLQueryGenerator();
+
+        var ex = Assert.Throws<InvalidOperationException>(() =>
+            generator.GenerateSelectAll("s1"));
+
+        Assert.Contains("Where/GroupBy/Select", ex.Message);
+    }
 }

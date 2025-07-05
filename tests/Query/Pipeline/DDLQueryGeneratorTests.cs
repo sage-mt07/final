@@ -52,4 +52,16 @@ public class DDLQueryGeneratorTests
         Assert.Contains("WHERE (IsActive = true)", query);
         Assert.Contains("GROUP BY Type", query);
     }
+
+    [Fact]
+    public void GenerateCreateStream_OutsideScope_Throws()
+    {
+        var model = CreateEntityModel();
+        var generator = new DDLQueryGenerator();
+
+        var ex = Assert.Throws<InvalidOperationException>(() =>
+            generator.GenerateCreateStream("s1", "topic", model));
+
+        Assert.Contains("Where/GroupBy/Select", ex.Message);
+    }
 }
