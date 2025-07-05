@@ -1530,7 +1530,7 @@ text-300">S</div></div><div class=3D"opacity-0 -translate-x-0.5 transition-=
 all duration-200 flex w-full text-sm justify-between items-center font-medi=
 um min-w-0"><div class=3D"flex flex-col items-start w-full max-w-full overf=
 low-hidden pr-4"><span class=3D"w-full max-w-full overflow-hidden text-star=
-t block truncate">Seiji</span><span class=3D"w-full truncate text-xs text-t=
+t block truncate">owner</span><span class=3D"w-full truncate text-xs text-t=
 ext-300 font-normal text-start">=E3=83=97=E3=83=AD=E3=83=97=E3=83=A9=E3=83=
 =B3</span></div><svg xmlns=3D"http://www.w3.org/2000/svg" width=3D"14" heig=
 ht=3D"14" fill=3D"currentColor" viewBox=3D"0 0 256 256" class=3D"flex-shrin=
@@ -13602,5 +13602,6 @@ Content-Location: https://m.stripe.network/inner.html#url=https%3A%2F%2Fclaude.a
 t/html; charset=3DUTF-8"><title>StripeM-Inner</title></head><body></body></=
 html>
 ------MultipartBoundary--EoRDoxc6TarukOwLwcLIuEG4X0RPzxEkbs7G9a4wST------
+
 
 
