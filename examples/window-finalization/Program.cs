@@ -12,6 +12,9 @@ public class Sale
     [Key]
     public int Id { get; set; }
 
+    // 商品ID。サンプルではこのプロパティでウィンドウ集計を行う
+    public int ProductId { get; set; }
+
     [AvroTimestamp]
     public DateTime OccurredAt { get; set; }
 
@@ -21,6 +24,7 @@ public class Sale
 
 public class SaleWindowTotal
 {
+    public int ProductId { get; set; }
     public decimal Total { get; set; }
 }
 
@@ -30,10 +34,16 @@ public class SalesContext : KsqlContext
     {
         modelBuilder.Entity<Sale>();
         modelBuilder.Entity<SaleWindowTotal>()
-            .HasQuery(q => q.Window(TumblingWindow.OfMinutes(1).EmitFinal())
-                             .UseFinalized()
-                             .GroupBy(_ => 1)
-                             .Select(g => new SaleWindowTotal { Total = g.Sum(s => s.Amount) }));
+            // 集約元エンティティを明示する
+            .HasQuery<Sale>(q => q.Window(TumblingWindow.OfMinutes(1).EmitFinal())
+                                 .UseFinalized()
+                                 // 意味のあるキーでグループ化
+                                 .GroupBy(s => s.ProductId)
+                                 .Select(g => new SaleWindowTotal
+                                 {
+                                     ProductId = g.Key,
+                                     Total = g.Sum(s => s.Amount)
+                                 }));
     }
 }
 
