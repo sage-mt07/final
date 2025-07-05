@@ -93,21 +93,21 @@ class Program
 ### 🧑‍🏫 初級〜中級者向け（Kafkaに不慣れな方）
 | ドキュメント | 内容概要 |
 |--|--|
-| `docs/sqlserver-to-kafka-guide.md` | SQL Server経験者向け：Kafkaベースの開発導入ガイド |
-| `docs/getting-started.md` | はじめての方向け：基本構成と動作確認手順（※作成中） |
+| `docs/sqlserver-to-kafka-guide.md` | [SQL Server経験者向け：Kafkaベースの開発導入ガイド](./docs/sqlserver-to-kafka-guide.md) |
+| `docs/getting-started.md` | [はじめての方向け：基本構成と動作確認手順](./docs/getting-started.md) |
 
 ### 🛠️ 上級開発者向け（DSL実装や拡張が目的の方）
 | ドキュメント | 内容概要 |
 |--|--|
-| `docs/dev_guide.md` | OSSへの機能追加・実装フローと開発ルール |
+| `docs/dev_guide.md` | [OSSへの機能追加・実装フローと開発ルール](./docs/dev_guide.md) |
 | `docs/namespaces/*.md` | 各Namespace（Core / Messaging 等）の役割と構造 |
 
 ### 🏗️ アーキテクト・運用担当者向け（構造や制約を把握したい方）
 | ドキュメント | 内容概要 |
 |--|--|
-| `docs/docs_advanced_rules.md` | 運用設計上の制約、設計判断の背景と意図 |
-| `docs/docs_configuration_reference.md` | appsettings.json などの構成ファイルとマッピング解説 |
-| `docs/architecture_overview.md` | 全体アーキテクチャ構造と各層の責務定義 |
+| `docs/docs_advanced_rules.md` | [運用設計上の制約、設計判断の背景と意図](./docs/docs_advanced_rules.md) |
+| `docs/docs_configuration_reference.md` | [appsettings.json などの構成ファイルとマッピング解説](.docs/docs_configuration_reference.md) |
+| `docs/architecture_overview.md` | [全体アーキテクチャ構造と各層の責務定義] (./docs/architecture_overview.md)|
 
 ---
 > 本プロジェクトの開発思想・AI協働方法論は[Amagi Protocol統合ドキュメント](./docs/amagiprotocol/amagi_protocol_full.md)、
