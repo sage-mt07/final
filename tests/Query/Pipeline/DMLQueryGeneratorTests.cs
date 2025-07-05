@@ -4,17 +4,25 @@ using System.Linq;
 using System.Linq.Expressions;
 using Kafka.Ksql.Linq;
 using Kafka.Ksql.Linq.Query.Pipeline;
+using Kafka.Ksql.Linq.Core.Modeling;
 using Xunit;
 
 namespace Kafka.Ksql.Linq.Tests.Query.Pipeline;
 
 public class DMLQueryGeneratorTests
 {
+    private static T ExecuteInScope<T>(Func<T> func)
+    {
+        using (ModelCreatingScope.Enter())
+        {
+            return func();
+        }
+    }
     [Fact]
     public void GenerateSelectAll_WithPushQuery_AppendsEmitChanges()
     {
         var generator = new DMLQueryGenerator();
-        var query = generator.GenerateSelectAll("s1", isPullQuery: false);
+        var query = ExecuteInScope(() => generator.GenerateSelectAll("s1", isPullQuery: false));
         Assert.Equal("SELECT * FROM s1 EMIT CHANGES", query);
     }
 
@@ -23,7 +31,7 @@ public class DMLQueryGeneratorTests
     {
         Expression<Func<TestEntity, bool>> expr = e => e.Id == 1;
         var generator = new DMLQueryGenerator();
-        var query = generator.GenerateSelectWithCondition("s1", expr.Body, false);
+        var query = ExecuteInScope(() => generator.GenerateSelectWithCondition("s1", expr.Body, false));
         Assert.Equal("SELECT * FROM s1 WHERE (Id = 1) EMIT CHANGES", query);
     }
 
@@ -31,7 +39,7 @@ public class DMLQueryGeneratorTests
     public void GenerateCountQuery_ReturnsExpected()
     {
         var generator = new DMLQueryGenerator();
-        var query = generator.GenerateCountQuery("t1");
+        var query = ExecuteInScope(() => generator.GenerateCountQuery("t1"));
         Assert.Equal("SELECT COUNT(*) FROM t1", query);
     }
 
@@ -40,7 +48,7 @@ public class DMLQueryGeneratorTests
     {
         Expression<Func<TestEntity, object>> expr = e => new { Sum = e.Id };
         var generator = new DMLQueryGenerator();
-        var query = generator.GenerateAggregateQuery("t1", expr.Body);
+        var query = ExecuteInScope(() => generator.GenerateAggregateQuery("t1", expr.Body));
         Assert.Contains("FROM t1", query);
         Assert.StartsWith("SELECT", query);
     }
@@ -50,7 +58,7 @@ public class DMLQueryGeneratorTests
     {
         Expression<Func<IGrouping<int, TestEntity>, object>> expr = g => new { Last = g.LatestByOffset(x => x.Id) };
         var generator = new DMLQueryGenerator();
-        var query = generator.GenerateAggregateQuery("t1", expr.Body);
+        var query = ExecuteInScope(() => generator.GenerateAggregateQuery("t1", expr.Body));
         Assert.Equal("SELECT LATEST_BY_OFFSET(Id) AS Last FROM t1", query);
     }
 
@@ -59,7 +67,7 @@ public class DMLQueryGeneratorTests
     {
         Expression<Func<IGrouping<int, TestEntity>, object>> expr = g => new { First = g.EarliestByOffset(x => x.Id) };
         var generator = new DMLQueryGenerator();
-        var query = generator.GenerateAggregateQuery("t1", expr.Body);
+        var query = ExecuteInScope(() => generator.GenerateAggregateQuery("t1", expr.Body));
         Assert.Equal("SELECT EARLIEST_BY_OFFSET(Id) AS First FROM t1", query);
     }
 
@@ -76,7 +84,7 @@ public class DMLQueryGeneratorTests
             .OrderBy(x => x.Key);
 
         var generator = new DMLQueryGenerator();
-        var query = generator.GenerateLinqQuery("s1", expr.Expression, false);
+        var query = ExecuteInScope(() => generator.GenerateLinqQuery("s1", expr.Expression, false));
 
         Assert.True(
             query.Contains("SELECT g.Key") || query.Contains("SELECT Key"));
@@ -122,7 +130,7 @@ public class DMLQueryGeneratorTests
             .Select(g => new { g.Key, OrderCount = g.Count(), TotalAmount = g.Sum(x => x.Amount) });
 
         var generator = new DMLQueryGenerator();
-        var query = generator.GenerateLinqQuery("Orders", expr.Expression, false);
+        var query = ExecuteInScope(() => generator.GenerateLinqQuery("Orders", expr.Expression, false));
 
         Assert.True(query.Contains("SELECT g.Key") || query.Contains("SELECT Key"));
         Assert.Contains("COUNT(*) AS OrderCount", query);
@@ -151,7 +159,7 @@ public class DMLQueryGeneratorTests
             });
 
         var generator = new DMLQueryGenerator();
-        var query = generator.GenerateLinqQuery("Orders", expr.Expression, false);
+        var query = ExecuteInScope(() => generator.GenerateLinqQuery("Orders", expr.Expression, false));
 
         Assert.Contains("JOIN", query);
         Assert.Contains("GROUP BY CustomerId", query);
@@ -181,7 +189,7 @@ public class DMLQueryGeneratorTests
             });
 
         var generator = new DMLQueryGenerator();
-        var result = generator.GenerateLinqQuery("joined", query.Expression, false);
+        var result = ExecuteInScope(() => generator.GenerateLinqQuery("joined", query.Expression, false));
 
         Assert.Contains("JOIN", result);
         Assert.Contains("GROUP BY", result);
@@ -210,7 +218,7 @@ public class DMLQueryGeneratorTests
             });
 
         var generator = new DMLQueryGenerator();
-        var result = generator.GenerateLinqQuery("multiagg", query.Expression, false);
+        var result = ExecuteInScope(() => generator.GenerateLinqQuery("multiagg", query.Expression, false));
 
         Assert.Contains("GROUP BY", result);
         Assert.Contains("HAVING", result);
@@ -246,7 +254,7 @@ public class DMLQueryGeneratorTests
             });
 
         var generator = new DMLQueryGenerator();
-        var result = generator.GenerateLinqQuery("joined", query.Expression, false);
+        var result = ExecuteInScope(() => generator.GenerateLinqQuery("joined", query.Expression, false));
 
         Assert.Contains("JOIN", result);
         Assert.Contains("WINDOW TUMBLING", result);
@@ -273,7 +281,7 @@ public class DMLQueryGeneratorTests
             });
 
         var generator = new DMLQueryGenerator();
-        var result = generator.GenerateLinqQuery("orders", query.Expression, false);
+        var result = ExecuteInScope(() => generator.GenerateLinqQuery("orders", query.Expression, false));
 
         Assert.Contains("GROUP BY", result);
         Assert.Contains("HAVING", result);
@@ -298,7 +306,7 @@ public class DMLQueryGeneratorTests
             });
 
         var generator = new DMLQueryGenerator();
-        var result = generator.GenerateLinqQuery("orders", query.Expression, false);
+        var result = ExecuteInScope(() => generator.GenerateLinqQuery("orders", query.Expression, false));
 
         Assert.Contains("GROUP BY", result);
         Assert.Contains("CASE WHEN", result);
@@ -323,7 +331,7 @@ public class DMLQueryGeneratorTests
             });
 
         var generator = new DMLQueryGenerator();
-        var result = generator.GenerateLinqQuery("orders", query.Expression, false);
+        var result = ExecuteInScope(() => generator.GenerateLinqQuery("orders", query.Expression, false));
 
         Assert.Contains("GROUP BY", result);
         Assert.Contains("AVG", result);
@@ -346,7 +354,7 @@ public class DMLQueryGeneratorTests
             });
 
         var generator = new DMLQueryGenerator();
-        var result = generator.GenerateLinqQuery("orders", query.Expression, false);
+        var result = ExecuteInScope(() => generator.GenerateLinqQuery("orders", query.Expression, false));
 
         Assert.Contains("GROUP BY", result);
         Assert.Contains("CustomerId", result);
@@ -370,7 +378,7 @@ public class DMLQueryGeneratorTests
             .OrderBy(x => x.Total);
 
         var generator = new DMLQueryGenerator();
-        var result = generator.GenerateLinqQuery("orders", query.Expression, false);
+        var result = ExecuteInScope(() => generator.GenerateLinqQuery("orders", query.Expression, false));
 
         Assert.Contains("GROUP BY", result);
         Assert.Contains("SUM", result);
@@ -393,7 +401,7 @@ public class DMLQueryGeneratorTests
             .OrderByDescending(x => x.Total); // descending sort
 
         var generator = new DMLQueryGenerator();
-        var result = generator.GenerateLinqQuery("orders", query.Expression, false);
+        var result = ExecuteInScope(() => generator.GenerateLinqQuery("orders", query.Expression, false));
 
         Assert.Contains("GROUP BY", result);
         Assert.Contains("SUM", result);
@@ -419,7 +427,7 @@ public class DMLQueryGeneratorTests
             .ThenByDescending(x => x.Total);       // descending
 
         var generator = new DMLQueryGenerator();
-        var result = generator.GenerateLinqQuery("orders", query.Expression, false);
+        var result = ExecuteInScope(() => generator.GenerateLinqQuery("orders", query.Expression, false));
 
         Assert.Contains("GROUP BY", result);
         Assert.Contains("ORDER BY", result);
@@ -447,7 +455,7 @@ public class DMLQueryGeneratorTests
             });
 
         var generator = new DMLQueryGenerator();
-        var result = generator.GenerateLinqQuery("orders", query.Expression, false);
+        var result = ExecuteInScope(() => generator.GenerateLinqQuery("orders", query.Expression, false));
 
         Assert.Contains("GROUP BY", result);
         Assert.Contains("HAVING", result);
@@ -474,7 +482,7 @@ public class DMLQueryGeneratorTests
             });
 
         var generator = new DMLQueryGenerator();
-        var result = generator.GenerateLinqQuery("orders", query.Expression, false);
+        var result = ExecuteInScope(() => generator.GenerateLinqQuery("orders", query.Expression, false));
 
         Assert.Contains("GROUP BY", result);
         Assert.Contains("SUM", result);
@@ -504,7 +512,7 @@ public class DMLQueryGeneratorTests
             });
 
         var generator = new DMLQueryGenerator();
-        var result = generator.GenerateLinqQuery("orders", query.Expression, false);
+        var result = ExecuteInScope(() => generator.GenerateLinqQuery("orders", query.Expression, false));
 
         Assert.Contains("GROUP BY", result);
         Assert.Contains("HAVING", result);
@@ -531,7 +539,7 @@ public class DMLQueryGeneratorTests
             });
 
         var generator = new DMLQueryGenerator();
-        var result = generator.GenerateLinqQuery("orders", query.Expression, false);
+        var result = ExecuteInScope(() => generator.GenerateLinqQuery("orders", query.Expression, false));
 
         Assert.Contains("GROUP BY CustomerId", result);
         Assert.Contains("HAVING", result);
@@ -556,7 +564,7 @@ public class DMLQueryGeneratorTests
             });
 
         var generator = new DMLQueryGenerator();
-        var result = generator.GenerateLinqQuery("orders", query.Expression, false);
+        var result = ExecuteInScope(() => generator.GenerateLinqQuery("orders", query.Expression, false));
 
         Assert.Contains("WHERE", result);
         Assert.Contains("NOT IN", result);
@@ -592,7 +600,7 @@ public class DMLQueryGeneratorTests
             });
 
         var generator = new DMLQueryGenerator();
-        var result = generator.GenerateLinqQuery("orders", query.Expression, false);
+        var result = ExecuteInScope(() => generator.GenerateLinqQuery("orders", query.Expression, false));
 
         Assert.Contains("WHERE", result);
         Assert.Contains("IS NULL", result);
@@ -614,7 +622,7 @@ public class DMLQueryGeneratorTests
             });
 
         var generator = new DMLQueryGenerator();
-        var result = generator.GenerateLinqQuery("orders", query.Expression, false);
+        var result = ExecuteInScope(() => generator.GenerateLinqQuery("orders", query.Expression, false));
 
         Assert.Contains("WHERE", result);
         Assert.Contains("IS NOT NULL", result);
@@ -637,7 +645,7 @@ public class DMLQueryGeneratorTests
             });
 
         var generator = new DMLQueryGenerator();
-        var result = generator.GenerateLinqQuery("orders", query.Expression, false);
+        var result = ExecuteInScope(() => generator.GenerateLinqQuery("orders", query.Expression, false));
 
         Assert.Contains("WHERE CustomerId IS NOT NULL", result);
         Assert.Contains("GROUP BY CustomerId", result);
@@ -660,7 +668,7 @@ public class DMLQueryGeneratorTests
             });
 
         var generator = new DMLQueryGenerator();
-        var result = generator.GenerateLinqQuery("orders", query.Expression, false);
+        var result = ExecuteInScope(() => generator.GenerateLinqQuery("orders", query.Expression, false));
 
         Assert.Contains("GROUP BY", result);
         Assert.Contains("UPPER", result);
@@ -685,8 +693,19 @@ public class DMLQueryGeneratorTests
         var generator = new DMLQueryGenerator();
 
         var ex = Assert.Throws<InvalidOperationException>(() =>
-            generator.GenerateLinqQuery("orders", query.Expression, false));
+            ExecuteInScope(() => generator.GenerateLinqQuery("orders", query.Expression, false)));
 
         Assert.Contains("Nested aggregate functions are not supported", ex.Message);
+    }
+
+    [Fact]
+    public void GenerateSelectAll_OutsideScope_Throws()
+    {
+        var generator = new DMLQueryGenerator();
+
+        var ex = Assert.Throws<InvalidOperationException>(() =>
+            generator.GenerateSelectAll("s1"));
+
+        Assert.Contains("Where/GroupBy/Select", ex.Message);
     }
 }

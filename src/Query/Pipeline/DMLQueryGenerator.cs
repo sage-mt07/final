@@ -1,6 +1,7 @@
 using Kafka.Ksql.Linq.Query.Abstractions;
 using Kafka.Ksql.Linq.Query.Builders;
 using Kafka.Ksql.Linq.Query.Builders.Common;
+using Kafka.Ksql.Linq.Core.Modeling;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -43,6 +44,7 @@ internal class DMLQueryGenerator : GeneratorBase, IDMLQueryGenerator
     /// </summary>
     public string GenerateSelectAll(string objectName, bool isPullQuery = true)
     {
+        ModelCreatingScope.EnsureInScope();
         try
         {
             var context = new QueryAssemblyContext(objectName, isPullQuery);
@@ -62,6 +64,7 @@ internal class DMLQueryGenerator : GeneratorBase, IDMLQueryGenerator
     /// </summary>
     public string GenerateSelectWithCondition(string objectName, Expression whereExpression, bool isPullQuery = true)
     {
+        ModelCreatingScope.EnsureInScope();
         try
         {
             var context = new QueryAssemblyContext(objectName, isPullQuery);
@@ -86,6 +89,7 @@ internal class DMLQueryGenerator : GeneratorBase, IDMLQueryGenerator
     /// </summary>
     public string GenerateCountQuery(string objectName)
     {
+        ModelCreatingScope.EnsureInScope();
         try
         {
             var context = new QueryAssemblyContext(objectName, true); // Pull Query
@@ -105,6 +109,7 @@ internal class DMLQueryGenerator : GeneratorBase, IDMLQueryGenerator
     /// </summary>
     public string GenerateAggregateQuery(string objectName, Expression aggregateExpression)
     {
+        ModelCreatingScope.EnsureInScope();
         try
         {
             var context = new QueryAssemblyContext(objectName, true); // Aggregates default to pull query
@@ -132,6 +137,7 @@ internal class DMLQueryGenerator : GeneratorBase, IDMLQueryGenerator
     /// </summary>
     public string GenerateLinqQuery(string objectName, Expression linqExpression, bool isPullQuery = false)
     {
+        ModelCreatingScope.EnsureInScope();
         try
         {
             var context = new QueryAssemblyContext(objectName, isPullQuery);

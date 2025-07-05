@@ -17,6 +17,7 @@ using Kafka.Ksql.Linq.Tests.Serialization;
 using Xunit;
 
 namespace Kafka.Ksql.Linq.Tests.Messaging;
+#nullable enable
 
 public class KafkaProducerManagerDisposeTests
 {

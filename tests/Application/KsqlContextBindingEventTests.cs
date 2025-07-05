@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using Xunit;
+#nullable enable
 
 namespace Kafka.Ksql.Linq.Tests.Application;
 

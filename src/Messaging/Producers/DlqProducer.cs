@@ -147,7 +147,7 @@ internal class DlqProducer : IErrorSink, IDisposable
         var headers = new Dictionary<string, string>();
         foreach (var kvp in messageContext.Headers)
         {
-            headers[kvp.Key] = kvp.Value.ToString();
+            headers[kvp.Key] = kvp.Value?.ToString() ?? string.Empty;
         }
 
         return new DlqEnvelope

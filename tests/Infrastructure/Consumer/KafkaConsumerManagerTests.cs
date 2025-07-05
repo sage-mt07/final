@@ -14,6 +14,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Xunit;
+#nullable enable
 
 namespace Kafka.Ksql.Linq.Tests.Infrastructure.Consumer;
 
@@ -67,6 +68,7 @@ public class KafkaConsumerManagerTests
     {
         async IAsyncEnumerable<KafkaMessage<SampleEntity, object>> OneMessage([EnumeratorCancellation] CancellationToken token)
         {
+            await Task.Yield();
             yield return new KafkaMessage<SampleEntity, object> { Value = new SampleEntity { Id = 1 } };
         }
         var consumer = new StubConsumer("topic", OneMessage);
@@ -84,6 +86,7 @@ public class KafkaConsumerManagerTests
     {
         async IAsyncEnumerable<KafkaMessage<SampleEntity, object>> TwoMessages([EnumeratorCancellation] CancellationToken token)
         {
+            await Task.Yield();
             yield return new KafkaMessage<SampleEntity, object> { Value = new SampleEntity { Id = 1 } };
             yield return new KafkaMessage<SampleEntity, object> { Value = new SampleEntity { Id = 2 } };
         }
@@ -93,11 +96,12 @@ public class KafkaConsumerManagerTests
         var tcs = new TaskCompletionSource<bool>();
         int count = 0;
 
-        await manager.SubscribeAsync<SampleEntity>(async (e, ctx) =>
+        await manager.SubscribeAsync<SampleEntity>((e, ctx) =>
         {
             count++;
             if (count == 1) throw new InvalidOperationException("fail");
             tcs.SetResult(true);
+            return Task.CompletedTask;
         }, cancellationToken: CancellationToken.None);
 
         await Task.WhenAny(tcs.Task, Task.Delay(1000));
@@ -118,7 +122,9 @@ public class KafkaConsumerManagerTests
         {
             await Task.Yield();
             throw new Exception("consume error");
+#pragma warning disable CS0162 // yield break is unreachable but required for async iterator
             yield break;
+#pragma warning restore CS0162
         }
         var consumer = new StubConsumer("topic", Throwing);
         var loggerMock = new Mock<ILogger>();

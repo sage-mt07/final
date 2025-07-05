@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
+#nullable enable
 
 namespace Kafka.Ksql.Linq.Tests;
 
@@ -29,6 +30,7 @@ public class EventSetCreateMessageContextTests
 
         public override async IAsyncEnumerator<TestEntity> GetAsyncEnumerator(CancellationToken cancellationToken = default)
         {
+            await Task.Yield();
             yield break;
         }
     }

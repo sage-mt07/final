@@ -13,6 +13,7 @@ using Kafka.Ksql.Linq.Messaging.Producers.Core;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Xunit;
+#nullable enable
 
 namespace Kafka.Ksql.Linq.Tests.Messaging.Consumers;
 
@@ -52,8 +53,8 @@ public class KafkaConsumerBatchTests
     private class StubDeserializer : IDeserializer<object>
     {
         public DeserHandler Handler { get; set; } = (_, _, _) => null;
-        public object? Deserialize(ReadOnlySpan<byte> data, bool isNull, SerializationContext context)
-            => Handler(data, isNull, context);
+        public object Deserialize(ReadOnlySpan<byte> data, bool isNull, SerializationContext context)
+            => Handler(data, isNull, context)!;
     }
 
     private static EntityModel CreateModel() => new()
