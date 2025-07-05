@@ -2,6 +2,7 @@ using Kafka.Ksql.Linq.Core.Abstractions;
 using Kafka.Ksql.Linq.Query.Abstractions;
 using Kafka.Ksql.Linq.Query.Builders;
 using Kafka.Ksql.Linq.Query.Builders.Common;
+using Kafka.Ksql.Linq.Core.Context;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -92,6 +93,7 @@ internal class DDLQueryGenerator : GeneratorBase, IDDLQueryGenerator
     /// </summary>
     public string GenerateCreateStreamAs(string streamName, string baseObject, Expression linqExpression)
     {
+        ModelCreationScope.EnsureActive("Where/GroupBy/Select");
         try
         {
             var context = new QueryAssemblyContext(baseObject, false); // Push Query
@@ -114,6 +116,7 @@ internal class DDLQueryGenerator : GeneratorBase, IDDLQueryGenerator
     /// </summary>
     public string GenerateCreateTableAs(string tableName, string baseObject, Expression linqExpression)
     {
+        ModelCreationScope.EnsureActive("Where/GroupBy/Select");
         try
         {
             var context = new QueryAssemblyContext(baseObject, false); // Push Query

@@ -1,6 +1,7 @@
 using Kafka.Ksql.Linq.Query.Abstractions;
 using Kafka.Ksql.Linq.Query.Builders;
 using Kafka.Ksql.Linq.Query.Builders.Common;
+using Kafka.Ksql.Linq.Core.Context;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -105,6 +106,7 @@ internal class DMLQueryGenerator : GeneratorBase, IDMLQueryGenerator
     /// </summary>
     public string GenerateAggregateQuery(string objectName, Expression aggregateExpression)
     {
+        ModelCreationScope.EnsureActive("Where/GroupBy/Select");
         try
         {
             var context = new QueryAssemblyContext(objectName, true); // Aggregates default to pull query
@@ -132,6 +134,7 @@ internal class DMLQueryGenerator : GeneratorBase, IDMLQueryGenerator
     /// </summary>
     public string GenerateLinqQuery(string objectName, Expression linqExpression, bool isPullQuery = false)
     {
+        ModelCreationScope.EnsureActive("Where/GroupBy/Select");
         try
         {
             var context = new QueryAssemblyContext(objectName, isPullQuery);
