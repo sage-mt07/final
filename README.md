@@ -78,6 +78,38 @@ class Program
 
 ```
 
+❌ 誤用例（NG）
+
+```
+// これはksqldbのストリーム定義には作用しません
+await context.Set<ApiMessage>()
+    .Where(m => m.Category == "A")    // ← 実際にはフィルタされない
+    .GroupBy(m => m.Category)         // ← 集約もksqldb側には伝わらない
+    .ForEachAsync(...);
+```
+
+✅ 正しいパターン（推奨）
+
+```
+// OnModelCreatingなどで、あらかじめストリーム/テーブル＋条件を宣言する
+modelBuilder.Entity<ApiMessage>()
+    .HasQuery(q => q.Where(m => m.Category == "A").GroupBy(m => m.Category));
+
+// その上で、アプリ側は
+await context.Set<ApiMessageFiltered>()
+    .ForEachAsync(...);  // ← 事前登録済みストリーム/テーブルにアクセス
+```
+
+
+⚠️ 注意：KSQLのクエリ定義とLINQ式について
+
+このOSSではC#のDSL（POCO＋属性＋OnModelCreating）でストリーム/テーブルの定義やフィルタ・集約が可能ですが、
+その内容は裏側でKSQL（CREATE STREAM/TABLE ...）として自動登録されています。
+
+アプリ側で .ForEachAsync() や .ToListAsync() の前に Where/GroupBy など LINQ式を書いても、
+ksqldbサーバの本質的なストリーム/テーブル定義には作用しません。
+
+本当に効かせたいフィルタや集約は、必ずOnModelCreating等のDSLで事前登録してください。
 
 ## Quick Start
 ### 1. インストール
