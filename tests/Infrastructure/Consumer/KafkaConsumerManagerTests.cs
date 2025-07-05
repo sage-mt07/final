@@ -96,11 +96,12 @@ public class KafkaConsumerManagerTests
         var tcs = new TaskCompletionSource<bool>();
         int count = 0;
 
-        await manager.SubscribeAsync<SampleEntity>(async (e, ctx) =>
+        await manager.SubscribeAsync<SampleEntity>((e, ctx) =>
         {
             count++;
             if (count == 1) throw new InvalidOperationException("fail");
             tcs.SetResult(true);
+            return Task.CompletedTask;
         }, cancellationToken: CancellationToken.None);
 
         await Task.WhenAny(tcs.Task, Task.Delay(1000));
