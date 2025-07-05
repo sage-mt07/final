@@ -83,7 +83,10 @@ public abstract class KafkaContextCore : IKsqlContext
     protected void ConfigureModel()
     {
         var modelBuilder = new ModelBuilder(Options.ValidationMode);
-        OnModelCreating(modelBuilder);
+        using (ModelCreationScope.Enter())
+        {
+            OnModelCreating(modelBuilder);
+        }
         ApplyModelBuilderSettings(modelBuilder);
     }
 
