@@ -111,6 +111,8 @@ ksqldbサーバの本質的なストリーム/テーブル定義には作用し�
 
 本当に効かせたいフィルタや集約は、必ずOnModelCreating等のDSLで事前登録してください。
 
+Where/GroupBy/Select を含むクエリチェーンは **OnModelCreating専用** です。アプリコードから呼び出すと `InvalidOperationException` がスローされます。
+
 ## Quick Start
 ### 1. インストール
 ### 2. 設定

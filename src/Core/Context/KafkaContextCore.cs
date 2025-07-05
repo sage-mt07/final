@@ -19,6 +19,7 @@ public abstract class KafkaContextCore : IKsqlContext
     private readonly Dictionary<Type, object> _entitySets = new();
     protected readonly KafkaContextOptions Options;
     private bool _disposed = false;
+    internal bool IsInModelCreating { get; private set; }
 
     protected KafkaContextCore()
     {
@@ -83,7 +84,15 @@ public abstract class KafkaContextCore : IKsqlContext
     protected void ConfigureModel()
     {
         var modelBuilder = new ModelBuilder(Options.ValidationMode);
-        OnModelCreating(modelBuilder);
+        IsInModelCreating = true;
+        try
+        {
+            OnModelCreating(modelBuilder);
+        }
+        finally
+        {
+            IsInModelCreating = false;
+        }
         ApplyModelBuilderSettings(modelBuilder);
     }
 
